@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+:root {
+  font-size: 2vmin;
+  color: rgba(0, 0, 0, 0.65);
+  line-height: 1.15;
+}
