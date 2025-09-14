@@ -118,10 +118,4 @@
 .ui-icon:hover .ui-icon-tooltip {
     opacity: 0.8;
 }
-
-.ui-icon-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-gap: 1em;
-}
 </style>

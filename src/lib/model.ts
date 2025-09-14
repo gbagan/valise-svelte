@@ -14,6 +14,7 @@ export interface Model<Pos> {
   mode: Mode;
   help: boolean;
   showWin: boolean;
+  dialog: "rules" | null;
 }
 
 export function initModel<Pos>(position: Pos): Model<Pos> {
@@ -28,6 +29,7 @@ export function initModel<Pos>(position: Pos): Model<Pos> {
     mode: "solo",
     help: false,
     showWin: false,
+    dialog: "rules",
   }
 }
 
@@ -37,6 +39,8 @@ export interface Dict<Pos, Move> {
   initialPosition: () => Pos,
   onNewGame?: () => void,
   updateScore?: () => { isNewRecord: boolean, showWin: boolean };
+  possibleMoves?: () => Move[];
+  isLosingPosition?: () => boolean;
 }
 
 function playHelper<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>, move: Move): boolean {
@@ -56,7 +60,7 @@ export async function playA<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>,
     return
   }
 
-  const {isNewRecord, showWin} = dict.updateScore ? dict.updateScore() : defaultUpdateScore(model, dict);
+  const {isNewRecord, showWin} = dict.updateScore ? dict.updateScore() : defaultUpdateScore(dict);
   if (isNewRecord) {
     // save to storage
   }
@@ -65,13 +69,18 @@ export async function playA<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>,
     await delay(1000);
     model.showWin = false;
   } else if (model.mode === "expert" || model.mode === "random") {
-    // delay (Milliseconds 1000.0)
-    // computerPlay
+    await delay(1000);
+    const move = computerMove(model, dict)!;
+    playHelper(model, dict, move);
+    if (dict.isLevelFinished()) {
+      model.showWin = true;
+      await delay(1000);
+      model.showWin = false;
+    }
   }
 }
 
-export function defaultUpdateScore<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>):
-    { isNewRecord: boolean, showWin: boolean } {
+export function defaultUpdateScore<Pos, Move>(dict: Dict<Pos, Move>): { isNewRecord: boolean, showWin: boolean } {
   return {
     isNewRecord: false,
     showWin: dict.isLevelFinished()
@@ -105,7 +114,7 @@ export function undo<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>) {
     return;
   }
   const position = model.history.pop()!;
-  model.redoHistory.push(position);
+  model.redoHistory.push(model.position);
   model.position = position;
   changeTurn(model);
   
@@ -117,9 +126,33 @@ export function redo<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>) {
     return;
   }
   const position = model.redoHistory.pop()!;
-  model.history.push(position);
+  model.history.push(model.position);
   model.position = position;
   changeTurn(model);
   
   // onPositionChange
+}
+
+function computerMove<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>): Move | null {
+  if (dict.isLevelFinished()) {
+    return null;
+  }
+  const moves = dict.possibleMoves!();
+  let bestMove = null;
+  if (model.mode === "expert") {
+    for (const move of moves) {
+      let found = false;
+      playHelper(model, dict, move);
+      if (dict.isLosingPosition!()) {
+        found = true;
+      }
+      model.position = model.history.pop()!;
+      model.turn = model.turn == 1 ? 2 : 1;
+      if (found) {
+        bestMove = move;
+        break;
+      }
+    }
+  }
+  return bestMove;
 }

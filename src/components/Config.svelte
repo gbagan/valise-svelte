@@ -10,7 +10,7 @@
 
 <div class="p-0 ui-card bg-white">
   <div class="flex items-center justify-center ui-card-head">
-    <div class="ui-card-title">{title}</div>
+      <div class="ui-card-title">{title}</div>
   </div>
   <div class="ui-card-body">{@render children()}</div>
 </div>

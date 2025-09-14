@@ -1,7 +1,7 @@
 <script lang="ts">
   interface Props {
-    title: string;
-    children: any;
+      title: string;
+      children: any;
   }
   
   const {title, children}: Props = $props();
@@ -9,15 +9,7 @@
 
 <div>
   <div class="text-2xl font-bold mt-4 mb-4">{title}</div>
-  <div class="ui-icon-grid">
+  <div class="grid grid-cols-5 gap-4">
     {@render children()}
   </div>
 </div>
-
-<style>
-.ui-icon-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-gap: 1em;
-}
-</style>

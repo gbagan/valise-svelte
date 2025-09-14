@@ -1,15 +1,16 @@
 <script lang="ts" generics="Pos">
   import { type Model } from '../lib/model';
+    import Dialog from './Dialog.svelte';
 
   interface Props {
     model: Model<Pos>;
     board: any;
     config: any;
+    rules: any;
     winTitle?: string;
   }
   
-
-  let { board, config, winTitle, model }: Props = $props();
+  const { board, config, rules, winTitle, model=$bindable() }: Props = $props();
 </script>
 
 {#snippet winPanel(title: string, visible: boolean)}
@@ -24,6 +25,13 @@
   {@render board()}
   {@render config()}
   {@render winPanel(winTitle || "GAGNÉ", model.showWin)}
+  {#if model.dialog === "rules"}
+    <Dialog title="Règles du jeu" onOk={() => model.dialog = null}>
+      <div class="ui-rules">
+        {@render rules()}
+      </div>
+    </Dialog>
+  {/if}
 </div>
 
 <style>
@@ -66,4 +74,10 @@
         transition: none;
     }
 }
+
+.ui-rules {
+    width: 46rem;
+    font-size: 1.1rem;
+}
+
 </style>

@@ -1,21 +1,24 @@
 <script lang="ts">
-  import Baseball from './game/Baseball.svelte'
+  import Baseball from './game/Baseball.svelte';
+  import Nim from './game/Nim.svelte';
 
-  let location = $state("baseball");
+  let location = $state("nim");
 </script>
 
-  <div class="main-main-container game">
-    {#if location !== ""}
-      <a class="main-minivalise-link" href="#main" aria-label="valise">
-        <svg style="width: 100%; height: 100%">
-          <use href="#valise"/>
-        </svg>
-      </a>
-    {/if}
-    {#if location === "baseball"}
-      <Baseball />
-    {/if}
-  </div>
+<div class="main-main-container game">
+  {#if location !== ""}
+    <a class="main-minivalise-link" href="#main" aria-label="valise">
+      <svg style="width: 100%; height: 100%">
+        <use href="#valise"/>
+      </svg>
+    </a>
+  {/if}
+  {#if location === "baseball"}
+    <Baseball />
+  {:else if location === "nim"}
+    <Nim />
+  {/if}
+</div>
 
 <style>
   .main-main-container {

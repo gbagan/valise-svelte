@@ -1,8 +1,6 @@
 <script lang="ts">
-  import { take } from '../lib/util';
+  import { range, shuffle, take } from '../lib/util';
   import {type Model, type Dict, initModel, playA, newGame } from '../lib/model';
-  import shuffle from 'lodash.shuffle';
-  import range from 'lodash.range';
   import Template from '../components/Template.svelte';
   import UndoIcon from '../components/UndoIcon.svelte';
   import RedoIcon from '../components/RedoIcon.svelte';
@@ -116,19 +114,19 @@
   </Config>
 {/snippet}
 
-<Template {model} {board} {config} />
+{#snippet rules()}
+  Le but du jeu est d'amener chaque jeton dans sa base (celle qui a la même couleur que le jeton).<br/>
+  Pour cela, tu peux déplacer un jeton vers une base adjacente si celle-ci possède un emplacement libre.<br/>
+  Pour déplacer un jeton, il te suffit de cliquer dessus.
+{/snippet}
+
+
+<Template bind:model={model} {board} {config} {rules} />
 
 <style>
-.ui-board {
-    overflow: hidden;
-    box-shadow: 0px 0px 5px 5px #bdc3c7;
-    position: relative;
-}
-
 .baseball-board {
     height: 80vmin;
     width: 80vmin;
-    position: relative;
     background-color: lightgreen;
 }
 
