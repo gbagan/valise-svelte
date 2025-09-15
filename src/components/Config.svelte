@@ -4,12 +4,11 @@
     children: any,
   }
   
-
   let { title, children }: Props = $props();
 </script>
 
-<div class="p-0 ui-card bg-white">
-  <div class="flex items-center justify-center ui-card-head">
+<div class="ui-card">
+  <div class="ui-card-head">
       <div class="ui-card-title">{title}</div>
   </div>
   <div class="ui-card-body">{@render children()}</div>
@@ -17,13 +16,18 @@
 
 <style>
 .ui-card {
+    padding: 0;
     list-style: none;
     transition: all .3s;
     border-radius: 2px;
     border: 1px solid #e8e8e8;
+    background-color: white;
 }
 
 .ui-card-head{
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border-bottom: 1px solid #e8e8e8;
     padding: 0.5rem;
 }

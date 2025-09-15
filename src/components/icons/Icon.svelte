@@ -15,30 +15,30 @@
 </script>
 
 <button
-  class={["ui-icon", {selected, round, large, hidden}]}
+  class={["icon", {selected, round, large, hidden}]}
   disabled={disabled}
   onclick={onclick}
   oncontextmenu={ev => ev.preventDefault()} 
 >
   {#if text && text.startsWith("#")}
     <svg style:width="100%" style:height="100%" style={style}>
-      <use href={text} class="ui-icon-symbol" />
+      <use href={text} class="icon-symbol" />
     </svg>
   {:else if text}
-    <span class="ui-icon-text">{text}</span>
+    <span class="icon-text">{text}</span>
   {/if}
 
   {#if tooltip !== undefined}
-    <span class="ui-icon-tooltip">{tooltip}</span>
+    <span class="tooltip">{tooltip}</span>
   {/if}
 </button>
 
 <style>
-.ui-icon-symbol {
+.icon-symbol {
     opacity: 0.8;
 }
 
-.ui-icon {
+.icon {
     line-height: 1.15;
     color: rgba(0, 0, 0, 0.65);
 
@@ -68,7 +68,7 @@
 
     &:disabled {
         cursor: not-allowed;
-        .ui-icon-text,.ui-icon-symbol {
+        .icon-text,.icon-symbol {
             opacity: 0.5;
         }
     }
@@ -79,13 +79,13 @@
     }
 }
 
-.ui-icon-text {
+.icon-text {
     text-align: center;
     font-size: 1.5rem;
     font-weight: bold;
 }
 
-.ui-icon-tooltip {
+.tooltip {
     font-weight: normal;
     font-size: 0.9rem;
     background-color: #0000BF;
@@ -115,7 +115,7 @@
     }
 }
 
-.ui-icon:hover .ui-icon-tooltip {
+.icon:hover .tooltip {
     opacity: 0.8;
 }
 </style>

@@ -15,6 +15,8 @@ export interface Model<Pos> {
   help: boolean;
   showWin: boolean;
   dialog: "rules" | null;
+  newGameAction: (() => void) | null
+  locked: boolean;
 }
 
 export function initModel<Pos>(position: Pos): Model<Pos> {
@@ -30,7 +32,16 @@ export function initModel<Pos>(position: Pos): Model<Pos> {
     help: false,
     showWin: false,
     dialog: "rules",
+    newGameAction: null,
+    locked: false,
   }
+}
+
+export interface SizeLimit {
+  minRows: number;
+  maxRows: number;
+  minCols: number;
+  maxCols: number;
 }
 
 export interface Dict<Pos, Move> {
@@ -55,10 +66,10 @@ function playHelper<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>, move: M
 }
 
 export async function playA<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>, move: Move) {
-  //playA move = lockAction $ do
   if (!playHelper(model, dict, move)) {
     return
   }
+
 
   const {isNewRecord, showWin} = dict.updateScore ? dict.updateScore() : defaultUpdateScore(dict);
   if (isNewRecord) {
@@ -69,6 +80,7 @@ export async function playA<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>,
     await delay(1000);
     model.showWin = false;
   } else if (model.mode === "expert" || model.mode === "random") {
+    model.locked = true;
     await delay(1000);
     const move = computerMove(model, dict)!;
     playHelper(model, dict, move);
@@ -77,6 +89,7 @@ export async function playA<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>,
       await delay(1000);
       model.showWin = false;
     }
+    model.locked = false;
   }
 }
 
@@ -88,7 +101,14 @@ export function defaultUpdateScore<Pos, Move>(dict: Dict<Pos, Move>): { isNewRec
 }
 
 
-export function newGame<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>) {
+export function newGame<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>, action?: () => void) {
+  if (!model.newGameAction && action && model.history.length > 0 && !dict.isLevelFinished()) {
+    model.newGameAction = action || (() => {})
+    return;
+  }
+
+  (action || model.newGameAction || (() => {}))();
+
   if (dict.onNewGame) {
     dict.onNewGame();
   }
@@ -99,6 +119,7 @@ export function newGame<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>) {
   model.redoHistory = [];
   model.help = false;
   model.turn = 1;
+  model.newGameAction = null;
   //  # set (_scores ∘ at "custom") Nothing
 }
 
@@ -133,6 +154,19 @@ export function redo<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>) {
   // onPositionChange
 }
 
+export function reset<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>) {
+  if (model.history.length === 0) {
+    return;
+  }
+  const position = model.history[0];
+  model.history = [];
+  model.redoHistory = [];
+  model.turn === 1;
+  model.position = position;
+  
+  // onPositionChange
+}
+
 function computerMove<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>): Move | null {
   if (dict.isLevelFinished()) {
     return null;
@@ -155,4 +189,36 @@ function computerMove<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>): Move
     }
   }
   return bestMove;
+}
+
+
+export function setGridSize<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>, nbRows: number,
+                                      nbColumns: number, sizeLimit?: SizeLimit) {
+  if (!sizeLimit) {
+    return
+  }
+  const {minRows, maxRows, minCols, maxCols} = sizeLimit;
+  
+  if (nbRows < minRows || nbRows > maxRows || nbColumns < minCols || nbColumns > maxCols) {
+    return;
+  }
+  
+  newGame(model, dict, () => {
+    model.nbRows = nbRows;
+    model.nbColumns = nbColumns;
+  });
+}
+
+
+// un message qui indique à qui est le tour ou si la partie est finie
+export function turnMessage<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>) {
+  if (dict.isLevelFinished()) {
+    return "Partie finie"
+  } else if (model.turn === 1) {
+    return "Tour du premier joueur"
+  } else if (model.mode === "duel") {
+    return "Tour du second joueur"
+  } else {
+    return "Tour de l'IA"
+  }
 }

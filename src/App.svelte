@@ -1,13 +1,21 @@
 <script lang="ts">
   import Baseball from './game/Baseball.svelte';
   import Nim from './game/Nim.svelte';
+  import Frog from './game/Frog.svelte';
+  import { onMount } from 'svelte';
 
-  let location = $state("nim");
+  let location = $state(window.location.hash.slice(1) || "main");
+
+  onMount(() =>
+    addEventListener("hashchange", () => { 
+      location = window.location.hash.slice(1) || "main";
+    })
+  )
 </script>
 
-<div class="main-main-container game">
-  {#if location !== ""}
-    <a class="main-minivalise-link" href="#main" aria-label="valise">
+<div class="container game">
+  {#if location !== "main"}
+    <a class="valise-link" href="#main" aria-label="valise">
       <svg style="width: 100%; height: 100%">
         <use href="#valise"/>
       </svg>
@@ -17,20 +25,24 @@
     <Baseball />
   {:else if location === "nim"}
     <Nim />
+  {:else if location === "frog"}
+    <Frog />
   {/if}
 </div>
 
 <style>
-  .main-main-container {
+  .container {
     min-height: 100%;
     width: 100%;
     position: fixed;
     transform: scale(1);
+    top: 0;
+    left: 0;
     &.game {
-        animation: linear 1s gameenter;
+      animation: linear 1s gameenter;
     }
     &.valise {
-        animation: linear 1s valiseenter;
+      animation: linear 1s valiseenter;
     }
 }
 
@@ -53,7 +65,7 @@
 }
 
 
-.main-minivalise-link {
+.valise-link {
     position: absolute;
     left: 0;
     width: calc(192vmin / 25);

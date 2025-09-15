@@ -9,15 +9,15 @@
   let { title, onOk, onCancel, children }: Props = $props();
 </script>
 
-<div class="absolute left-0 top-0 w-full h-full items-center flex justify-center ui-dialog-container">
-  <div class="ui-dialog">
-    <div class="ui-dialog-head">
-      <div class="ui-dialog-title">{title}</div>
+<div class="container">
+  <div class="dialog">
+    <div class="head">
+      <div class="title">{title}</div>
     </div>
-    <div class="ui-dialog-body">
+    <div class="body">
       {@render children()}
     </div>
-    <div class="ui-dialog-buttons">
+    <div class="buttons">
       {#if onCancel}
         <button class="ui-button ui-button-primary" onclick={onCancel}>Annuler</button>
       {/if}
@@ -29,12 +29,20 @@
 </div>
 
 <style>
-.ui-dialog-container {
+.container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background-color: rgba(127, 140, 141, 0.7);
     z-index: 1000;
 }    
 
-.ui-dialog {
+.dialog {
     padding: 0;
     background: white;
     border-radius: 2px;
@@ -42,7 +50,7 @@
     display: block;
 }
 
-.ui-dialog-head {
+.head {
     border-bottom: 1px solid #e8e8e8;
     padding: 1rem;
     border-radius: 2px 2px 0 0;
@@ -50,7 +58,7 @@
     min-height: 2rem;
 }
 
-.ui-dialog-title {
+.title {
     font-size: 2rem;
     color: rgba(0, 0, 0, 0.85);
     font-weight: 500;
@@ -58,13 +66,13 @@
     flex: 1;
 }
 
-.ui-dialog-body {
+.body {
     padding: 1.5em;
     margin-bottom: -1px;
     border-bottom: 1px solid #e8e8e8;
 }
 
-.ui-dialog-buttons {
+.buttons {
     padding: 1em;
     text-align: right;
 

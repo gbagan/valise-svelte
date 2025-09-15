@@ -2,10 +2,7 @@
   import { range, shuffle, take } from '../lib/util';
   import {type Model, type Dict, initModel, playA, newGame } from '../lib/model';
   import Template from '../components/Template.svelte';
-  import UndoIcon from '../components/UndoIcon.svelte';
-  import RedoIcon from '../components/RedoIcon.svelte';
-  import IconGroup from '../components/IconGroup.svelte';
-  import IconSelectGroup from '../components/IconSelectGroup.svelte';
+  import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
 
   type Pos = number[];
@@ -57,16 +54,17 @@
 
   const levelFinished = $derived(isLevelFinished());
 
+  // svelte-ignore state_referenced_locally
   newGame(model, dict);
 
 </script>
 
 {#snippet board()}
-  <div class="ui-board baseball-board">
+  <div class="ui-board board">
     <svg viewBox="0 0 100 100">
       {#each take(colors, nbBases) as color, i}
         <rect
-          class="baseball-base"
+          class="base"
           stroke={color}
           style:transform={transformBase(i, nbBases)}          
         />
@@ -75,9 +73,11 @@
       {#each model.position as pos, peg}
         {#if peg !== missingPeg}
           <g
-            class="baseball-player"
+            class="player"
             style:transform={transformPeg(pos, nbBases)}
           >
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
             <use
               href="#meeple"
               width="7"
@@ -100,17 +100,19 @@
 
 {#snippet config()}
   <Config title="Baseball multicolore">
-    <IconSelectGroup
+    <I.SelectGroup
       title="Nombre de bases"
       values={[4, 5, 6, 7, 8]}
       selected={nbBases}
-      setter={() => {}}
+      setter={i => newGame(model, dict, () => nbBases = i)}
     />
 
-    <IconGroup title="Options">
-      <UndoIcon {model} {dict}/>
-      <RedoIcon {model} {dict}/>
-    </IconGroup>
+    <I.Group title="Options">
+      <I.Undo {model} {dict} />
+      <I.Redo {model} {dict} />
+      <I.Reset {model} {dict} />
+      <I.Rules {model} />
+    </I.Group>
   </Config>
 {/snippet}
 
@@ -121,16 +123,16 @@
 {/snippet}
 
 
-<Template bind:model={model} {board} {config} {rules} />
+<Template bind:model={model} {dict} {board} {config} {rules} />
 
 <style>
-.baseball-board {
+.board {
     height: 80vmin;
     width: 80vmin;
     background-color: lightgreen;
 }
 
-.baseball-base {
+.base {
     stroke-width: 1.2;
     fill: white;
     x: -10px;
@@ -139,7 +141,7 @@
     height: 20px;
 }
 
-.baseball-player {
+.player {
     transition: transform 0.5s linear;
 }
 

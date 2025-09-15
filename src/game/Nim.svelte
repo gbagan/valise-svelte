@@ -2,14 +2,9 @@
   import { range } from '../lib/util';
   import {type Model, type Dict, initModel, playA, newGame } from '../lib/model';
   import Template from '../components/Template.svelte';
-  import UndoIcon from '../components/UndoIcon.svelte';
-  import RedoIcon from '../components/RedoIcon.svelte';
-  import IconGroup from '../components/IconGroup.svelte';
-  import IconSelectGroup from '../components/IconSelectGroup.svelte';
+  import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
 
-  // model = genModel [] _ { mode = ExpertMode } (Ext { length: 10, nbPiles: 4 })
-  
   type Pos = [number, number][];
   type Move = {pile: number, pos: number};
 
@@ -39,7 +34,7 @@
 
   const isLevelFinished = () => 
     model.position.every(([p1, p2]) =>
-      p2 - p1 == 1 && p1 == (model.turn === 2 ? length - 2 : 0)
+      p2 - p1 === 1 && p1 == (model.turn === 2 ? length - 2 : 0)
     );
 
   function possibleMoves(): Move[] {
@@ -65,18 +60,31 @@
 
   const dict: Dict<Pos, Move> = { play, isLevelFinished, initialPosition, possibleMoves, isLosingPosition };
 
-  newGame(model, dict);
+  let turnMessage = $derived(
+    isLevelFinished() 
+    ? "Partie finie" 
+    : model.turn === 1
+    ? "Tour du joueur bleu"
+    : "Tour du joueur rouge"
+  );
+
+
+  // svelte-ignore state_referenced_locally
+    newGame(model, dict);
 </script>
 
 {#snippet row(i: number)}
-  <rect class="nim-row nim-row-10" y={10+19*i}/>
+  <rect class="row row-10" y={10+19*i}/>
 {/snippet}
 
 {#snippet square(i: number, j: number)}
+  <!-- svelte-ignore a11y_click_events_have_key_events -->
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
   <rect
-    class="nim-square"
+    class="square"
     style:transform="translate({5 + 10 * j}px, {15 + 19 * i}px) rotate(45deg)"
     style:cursor={canPlay({pile:i, pos: j}) ? "pointer" : "not-allowed"}
+    onclick={() => playA(model, dict, {pile: i, pos: j})}
   />
 {/snippet}
 
@@ -85,29 +93,39 @@
     href="#meeple"
     width="8"
     height="8"
-    class="nim-player"
+    class="player"
     fill={player === 0 ? "blue" : "red"}
-    style:transform="translate({5 + 10 * j}px, {11 + 19 * i}px)"
+    style:transform="translate({1 + 10 * j}px, {11 + 19 * i}px)"
   />
 {/snippet}
 
 {#snippet board()}
-  <div class="ui-board nim-board">
+  <div class="ui-board board">
     <svg viewBox="0 0 100 100">
+      {#each range(0, nbPiles) as i}
+        {@render row(i)}
+        {#each range(0, length) as j}
+          {@render square(i, j)}
+        {/each}
+      {/each}
+      
       {#each model.position as [p1, p2], i}
         {@render peg(i, 0, p1)}
         {@render peg(i, 1, p2)}
       {/each}
     </svg>
+    <span class="turn-message">{turnMessage}</span>
   </div>
 {/snippet}
 
 {#snippet config()}
   <Config title="Bloque moi si tu peux">
-    <IconGroup title="Options">
-      <UndoIcon {model} {dict}/>
-      <RedoIcon {model} {dict}/>
-    </IconGroup>
+    <I.Group title="Options">
+      <I.Undo {model} {dict} />
+      <I.Redo {model} {dict} />
+      <I.Reset {model} {dict} />
+      <I.Rules {model} />
+    </I.Group>
   </Config>
 {/snippet}
 
@@ -120,17 +138,17 @@
   Tu gagnes la partie si ton adversaire n'a aucun mouvement possible.
 {/snippet}
 
-<Template bind:model={model} {board} {config} {rules} />
+<Template bind:model={model} {dict} {board} {config} {rules} />
 
 <style>
-.nim-board {
+.board {
     height: 80vmin;
     width: 80vmin;
     position: relative;
     background-color: lightblue;
 }
 
-.nim-square {
+.square {
     x: -2.5px;
     y: -2.5px;
     width: 5px;
@@ -138,30 +156,32 @@
     fill: grey;
 }
 
-.nim-row {
+.row {
     height: 10px;
     fill: snow;
 }
 
-.nim-row-5 {
+.row-5 {
     x: 25px;
     width: 50px;
 }
 
-.nim-row-10 {
+.row-10 {
     width: 100px;
 }
 
-.nim-player {
+.player {
     cursor: not-allowed;
     transition: all 0.5s linear;
 }
 
-.nim-turn-message {
+.turn-message {
     position: absolute;
     left: 0;
+    top: 0;
     color: blue;
     font-size: 1.5em;
+    font-weight: bold;
 }
 </style>
 
