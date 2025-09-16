@@ -3,6 +3,7 @@
   import Baseball from './game/Baseball.svelte';
   import Nim from './game/Nim.svelte';
   import Frog from './game/Frog.svelte';
+  import Jetons from './game/Jetons.svelte';
   import { onMount } from 'svelte';
 
   let location = $state(window.location.hash.slice(1) || "main");
@@ -32,6 +33,8 @@ $inspect(location);
     <Nim />
   {:else if location === "frog"}
     <Frog />
+  {:else if location === "jetons"}
+    <Jetons />
   {/if}
 </div>
 

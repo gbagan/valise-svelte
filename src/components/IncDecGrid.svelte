@@ -9,7 +9,7 @@
     nbRows: number;
     nbColumns: number;
     resize: (row: number, col: number) => void;
-    children: any;
+    children: () => any;
   }
 
   const {locked, nbRows, nbColumns, showRowButtons, showColButtons, customSize, resize, children }: Props = $props();
@@ -65,6 +65,7 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    gap: 1rem;
 }
 
 .container {

@@ -6,9 +6,9 @@
   interface Props {
     model: Model<Pos>;
     dict: Dict<Pos, Move>;
-    board: any;
-    config: any;
-    rules: any;
+    board: () => any;
+    config: () => any;
+    rules: () => any;
     winTitle?: string;
     sizeLimit?: SizeLimit;
   }

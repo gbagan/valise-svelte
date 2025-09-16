@@ -50,3 +50,11 @@ export function randomPick<A>(arr: A[]): A | null {
     return arr[Math.random() * arr.length | 0];
   }
 }
+
+export function dCoords(cols: number, x: number, y: number): [number, number] {
+  const row1 = x / cols | 0;
+  const col1 = x % cols;
+  const row2 = y / cols | 0;
+  const col2 = y % cols;
+  return [row1 - row2, col1 - col2];
+}
