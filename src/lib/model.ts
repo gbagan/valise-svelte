@@ -1,4 +1,4 @@
-import {delay} from "./util";
+import {delay, randomPick} from "./util";
 
 type Turn = 1 | 2;
 type Mode = "solo" | "random" | "expert" | "duel"
@@ -100,7 +100,6 @@ export function defaultUpdateScore<Pos, Move>(dict: Dict<Pos, Move>): { isNewRec
   }
 }
 
-
 export function newGame<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>, action?: () => void) {
   if (!model.newGameAction && action && model.history.length > 0 && !dict.isLevelFinished()) {
     model.newGameAction = action || (() => {})
@@ -131,14 +130,24 @@ function changeTurn<Pos>(model: Model<Pos>) {
 }
 
 export function undo<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>) {
-  if (model.history.length === 0) {
-    return;
+  if (model.mode === "duel" || model.mode === "solo") {
+    if (model.history.length === 0) {
+      return;
+    }
+    const position = model.history.pop()!;
+    model.redoHistory.push(model.position);
+    model.position = position;
+    model.turn = model.turn === 1 ? 2 : 1;
+  } else {
+    if (model.history.length <= 1) {
+      return;
+    }
+    model.history.pop();
+    const position = model.history.pop()!;
+    model.redoHistory.push(model.position);
+    model.position = position;
   }
-  const position = model.history.pop()!;
-  model.redoHistory.push(model.position);
-  model.position = position;
-  changeTurn(model);
-  
+
   // onPositionChange
 }
 
@@ -188,9 +197,12 @@ function computerMove<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>): Move
       }
     }
   }
-  return bestMove;
+  if (bestMove !== null) {
+    return bestMove;
+  } else {
+    return randomPick(moves)
+  }
 }
-
 
 export function setGridSize<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>, nbRows: number,
                                       nbColumns: number, sizeLimit?: SizeLimit) {
@@ -208,7 +220,6 @@ export function setGridSize<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>,
     model.nbColumns = nbColumns;
   });
 }
-
 
 // un message qui indique à qui est le tour ou si la partie est finie
 export function turnMessage<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>) {

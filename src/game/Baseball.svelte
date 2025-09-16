@@ -108,10 +108,10 @@
     />
 
     <I.Group title="Options">
-      <I.Undo {model} {dict} />
-      <I.Redo {model} {dict} />
-      <I.Reset {model} {dict} />
-      <I.Rules {model} />
+      <I.Undo bind:model={model} {dict} />
+      <I.Redo bind:model={model} {dict} />
+      <I.Reset bind:model={model} {dict} />
+      <I.Rules bind:model={model} />
     </I.Group>
   </Config>
 {/snippet}

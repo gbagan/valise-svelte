@@ -1,3 +1,18 @@
+export function repeat<A>(n: number, val: A): A[] {
+  const res = new Array(n);
+  res.fill(val);
+  return res;
+}
+
+export function generate<A>(n: number, f: (i: number) => A): A[] {
+  const res = new Array(n);
+  for (let i = 0; i < n; i++) {
+    res[i] = f(i);
+  }
+  return res;
+}
+
+
 export function range(start: number, end: number): number[] {
   if (end <= start) {
       return [];
@@ -26,4 +41,12 @@ export function take<A>(arr: A[], n: number): A[] {
 
 export function delay(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export function randomPick<A>(arr: A[]): A | null {
+  if (arr.length === 0) {
+    return null;
+  } else {
+    return arr[Math.random() * arr.length | 0];
+  }
 }

@@ -1,5 +1,5 @@
-<script lang="ts" generics="Pos,Move">
-  import { type Model, type Dict } from '../../lib/model';
+<script lang="ts" generics="Pos">
+  import { type Model } from '../../lib/model';
   import Icon from "./Icon.svelte";
 
   interface Props {

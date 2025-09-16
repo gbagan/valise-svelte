@@ -1,0 +1,1 @@
+- désactiver SelectGroup et MultiSelectGroup quand locked=true

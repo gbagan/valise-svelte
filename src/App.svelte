@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Valise from './game/Valise.svelte';
   import Baseball from './game/Baseball.svelte';
   import Nim from './game/Nim.svelte';
   import Frog from './game/Frog.svelte';
@@ -11,9 +12,11 @@
       location = window.location.hash.slice(1) || "main";
     })
   )
+
+$inspect(location);
 </script>
 
-<div class="container game">
+<div class="container {location === "main" ? "valise" : "game"}">
   {#if location !== "main"}
     <a class="valise-link" href="#main" aria-label="valise">
       <svg style="width: 100%; height: 100%">
@@ -21,7 +24,9 @@
       </svg>
     </a>
   {/if}
-  {#if location === "baseball"}
+  {#if location === "main"}
+    <Valise />
+  {:else if location === "baseball"}
     <Baseball />
   {:else if location === "nim"}
     <Nim />

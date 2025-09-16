@@ -69,8 +69,7 @@
 
 .container {
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: stretch;
     gap: 1rem;
 }
 

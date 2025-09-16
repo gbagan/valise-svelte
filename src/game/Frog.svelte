@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { range } from '../lib/util';
-  import {type Model, type Dict, initModel, playA, turnMessage, type SizeLimit } from '../lib/model';
+  import { generate, range, repeat } from '../lib/util';
+  import {type Model, type Dict, initModel, playA, turnMessage, type SizeLimit, newGame } from '../lib/model';
   import Template from '../components/Template.svelte';
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
@@ -34,20 +34,16 @@
     return losing;
   });
 
-
   const play = (v: number) => canPlay(v) ? v : null;
   const initialPosition = () => model.nbRows;
   const isLevelFinished = () => model.position === 0;
   const possibleMoves = () => range(0, model.nbRows+1).filter(canPlay);
   const isLosingPosition = () => losingPositions[model.position];
-  const onNewGame = () => {
-    marked = new Array(model.nbRows);
-    marked.fill(false);
-  }
+  const onNewGame = () => marked = repeat(model.nbRows, false);
 
   const dict: Dict<Pos, Move> = { play, isLevelFinished, initialPosition, onNewGame, possibleMoves, isLosingPosition };   
 
-  let reachable = $derived(range(0, model.nbRows+1).map(canPlay));
+  let reachable = $derived(generate(model.nbRows+1, canPlay));
 
   const sizeLimit: SizeLimit = {
     minRows: 5,
@@ -56,6 +52,12 @@
     maxCols: 0,
   }
 
+  function movesSetter(move: number) {
+    const next = [1, 2, 3, 4, 5].filter(m => (m === move) != moves.includes(m));
+    if (next.length > 0) {
+      newGame(model, dict, () => moves = next);
+    }
+  }
 
   type Cartesian = { x: number, y: number };
   type Polar = { radius: number, theta: number };
@@ -114,8 +116,9 @@
     if (e.button === 2 || e.shiftKey) {
       marked[i] = !marked[i];
     } else {
-      playA(model, dict, i)}
+      playA(model, dict, i)
     }
+  }
 </script>
 
 
@@ -176,7 +179,7 @@
         {#if model.help}
           <text x={p.x} y={p.y} class="index">{model.nbRows - i}</text>
         {/if}
-        {#if marked[i] && i != model.position}
+        {#if marked[i] && i !== model.position}
           <use href="#frog2" x={p.x-20} y={p.y-20} width="20" height="20" class="frog marked" />
         {/if}
       {/each}
@@ -188,12 +191,18 @@
 
 {#snippet config()}
   <Config title="La grenouille">
+    <I.MultiSelectGroup
+      title="Déplacements autorisés"
+      values={[1, 2, 3, 4, 5]}
+      selected={moves}
+      setter={movesSetter}
+    />
     <I.Group title="Options">
-      <I.Help {model} />
-      <I.Undo {model} {dict} />
-      <I.Redo {model} {dict} />
-      <I.Reset {model} {dict} />
-      <I.Rules {model} />
+      <I.Help bind:model={model} />
+      <I.Undo bind:model={model} {dict} />
+      <I.Redo bind:model={model} {dict} />
+      <I.Reset bind:model={model} {dict} />
+      <I.Rules bind:model={model} />
     </I.Group>
   </Config>
 {/snippet}

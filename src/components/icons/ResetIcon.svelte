@@ -7,7 +7,7 @@
     dict: Dict<Pos, Move>;
   }
 
-  const {model, dict}: Props = $props();
+  const {model=$bindable(), dict}: Props = $props();
 </script>
 
 <Icon

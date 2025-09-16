@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { range } from '../lib/util';
+  import { generate, range } from '../lib/util';
   import {type Model, type Dict, initModel, playA, newGame } from '../lib/model';
   import Template from '../components/Template.svelte';
   import * as I from '../components/Icons';
@@ -27,7 +27,7 @@
   }
 
   function initialPosition(): Pos {
-    return range(0, nbPiles).map(() =>
+    return generate(nbPiles, () =>
       [Math.random() * 5 | 0, 5 + Math.random() * 5 | 0]
     )
   }
@@ -62,7 +62,7 @@
 
   let turnMessage = $derived(
     isLevelFinished() 
-    ? "Partie finie" 
+    ? "Partie finie"
     : model.turn === 1
     ? "Tour du joueur bleu"
     : "Tour du joueur rouge"
@@ -121,10 +121,10 @@
 {#snippet config()}
   <Config title="Bloque moi si tu peux">
     <I.Group title="Options">
-      <I.Undo {model} {dict} />
-      <I.Redo {model} {dict} />
-      <I.Reset {model} {dict} />
-      <I.Rules {model} />
+      <I.Undo bind:model={model} {dict} />
+      <I.Redo bind:model={model} {dict} />
+      <I.Reset bind:model={model} {dict} />
+      <I.Rules bind:model={model} />
     </I.Group>
   </Config>
 {/snippet}
