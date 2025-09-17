@@ -25,25 +25,25 @@
   }
 
   let losingPositions: boolean[] = $derived.by(() => {
-    const nbRows = model.nbRows;
-    const losing = new Array(nbRows+1);
+    const rows = model.rows;
+    const losing = new Array(rows+1);
     losing[0] = true;
-    for (let i = 1; i <= nbRows; i++) {
+    for (let i = 1; i <= rows; i++) {
       losing[i] = moves.every(m => i - m >= 0 && !losing[i-m]);
     }
     return losing;
   });
 
   const play = (v: number) => canPlay(v) ? v : null;
-  const initialPosition = () => model.nbRows;
+  const initialPosition = () => model.rows;
   const isLevelFinished = () => model.position === 0;
-  const possibleMoves = () => range(0, model.nbRows+1).filter(canPlay);
+  const possibleMoves = () => range(0, model.rows+1).filter(canPlay);
   const isLosingPosition = () => losingPositions[model.position];
-  const onNewGame = () => marked = repeat(model.nbRows, false);
+  const onNewGame = () => marked = repeat(model.rows, false);
 
   const dict: Dict<Pos, Move> = { play, isLevelFinished, initialPosition, onNewGame, possibleMoves, isLosingPosition };   
 
-  let reachable = $derived(generate(model.nbRows+1, canPlay));
+  let reachable = $derived(generate(model.rows+1, canPlay));
 
   const sizeLimit: SizeLimit = {
     minRows: 5,
@@ -98,7 +98,7 @@
   const spiralDescription = spiral({ x: 0, y: 0 }, 0, 61, 0, 37 / 6 * Math.PI, Math.PI / 6.0);
 
   let polarPoints = $derived.by(() => {
-    const n = model.nbRows;
+    const n = model.rows;
     return range(0, n+1).map(i => {
       const theta = Math.sqrt(i == n ? 21 : i * 20 / n) * 1.36 * Math.PI;
       const radius = 61 * theta / (2 * Math.PI);
@@ -180,7 +180,7 @@
         {@render lily(i, p.x, p.y, false, false)}
         {@render lily(i, p.x, p.y, true, !reachable[i] || model.locked)}
         {#if model.help}
-          <text x={p.x} y={p.y} class="index">{model.nbRows - i}</text>
+          <text x={p.x} y={p.y} class="index">{model.rows - i}</text>
         {/if}
         {#if marked[i] && i !== model.position}
           <use href="#frog2" x={p.x-20} y={p.y-20} width="20" height="20" class="frog marked" />

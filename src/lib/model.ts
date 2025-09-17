@@ -8,8 +8,8 @@ export interface Model<Pos> {
   history: Pos[];
   redoHistory: Pos[];
   turn: Turn;
-  nbRows: number;
-  nbColumns: number;
+  rows: number;
+  columns: number;
   customSize: boolean;
   mode: Mode;
   help: boolean;
@@ -25,8 +25,8 @@ export function initModel<Pos>(position: Pos): Model<Pos> {
     history: [],
     redoHistory: [],
     turn: 1,
-    nbRows: 0,
-    nbColumns: 0,
+    rows: 0,
+    columns: 0,
     customSize: false,
     mode: "solo",
     help: false,
@@ -215,8 +215,8 @@ export function setGridSize<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>,
   }
   
   newGame(model, dict, () => {
-    model.nbRows = nbRows;
-    model.nbColumns = nbColumns;
+    model.rows = nbRows;
+    model.columns = nbColumns;
   });
 }
 
@@ -239,7 +239,7 @@ export function isScoreDict<Pos, Move>(dict: Dict<Pos, Move>): dict is Dict<Pos,
 }
 
 
-type ShowWinPolicy = "onNewRecord" | "always";
+type ShowWinPolicy = "onNewRecord" | "always" | "never";
 
 export function updateScore<Pos, Move>(
   model: Model<Pos> & ScoreModel<Pos>,

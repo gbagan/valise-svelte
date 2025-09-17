@@ -22,7 +22,7 @@
 
   function play({ from, to }: Move) {
     const position = model.position;
-    const [row, col] = dCoords(model.nbColumns, from, to);
+    const [row, col] = dCoords(model.columns, from, to);
     const pfrom = position[from];
     const pto = position[to];
     if (pfrom > 0 && pfrom <= pto && row * row + col * col === 1) {
@@ -32,11 +32,11 @@
     }
   }
 
-  const initialPosition = () => repeat(model.nbRows * model.nbColumns, 1);
+  const initialPosition = () => repeat(model.rows * model.columns, 1);
 
   const isLevelFinished = () => {
     const position = model.position;
-    const columns = model.nbColumns;
+    const columns = model.columns;
     return position.every((x, i) => {
       let y = (i + 1) % columns == 0 ? 0 : position[i + 1];
       let z = position[i + columns] ?? 0;
@@ -45,7 +45,7 @@
   }
 
   const score = () => model.position.filter(v => v > 0).length;
-  const scoreHash = () => `${model.nbRows},${model.nbColumns}`;
+  const scoreHash = () => `${model.rows},${model.columns}`;
   const objective = "minimize";
 
   const dict: Dict<Pos, Move> & ScoreDict = {
@@ -69,12 +69,12 @@
 {#snippet peg(i: number, val: number, dragged: boolean, droppable: boolean,
   onpointerdown?: (e: PointerEvent) => void, onpointerup?: (e: PointerEvent) => void)
 }
-  {@const row = i / model.nbColumns | 0}
-  {@const col = i % model.nbColumns}
+  {@const row = i / model.columns | 0}
+  {@const col = i % model.columns}
   <g style:transform="translate({25+50*col}px,{25+50*row}px)">
     <rect
       class={["peg", {dragged, droppable}]}
-      fill="rgb(255 {255 * (1 - Math.sqrt(val / (model.nbRows * model.nbColumns)))} 0)"
+      fill="rgb(255 {255 * (1 - Math.sqrt(val / (model.rows * model.columns)))} 0)"
       filter="drop-shadow({val/2}px {val/2}px 0.5px #656565)"
       {onpointerdown} {onpointerup}
     />
@@ -88,9 +88,9 @@
 
 {#snippet board()}
   <div class="board-container">
-    <div class="ui-board" style={gridStyle(model.nbRows, model.nbColumns, 3)}>
+    <div class="ui-board" style={gridStyle(model.rows, model.columns, 3)}>
       <DndBoard
-        viewBox="0 0 {50 * model.nbColumns} {50 * model.nbRows}"
+        viewBox="0 0 {50 * model.columns} {50 * model.rows}"
         bind:dragged={dragged}
         {draggedElement}
       >
@@ -125,8 +125,8 @@
 
 {#snippet bestScore(position: Pos)}
   <div class="bestscore-container">
-    <div class="ui-board" style={gridStyle(model.nbRows, model.nbColumns, 3)}>
-      <svg viewBox="0 0 {50 * model.nbColumns} {50 * model.nbRows}">
+    <div class="ui-board" style={gridStyle(model.rows, model.columns, 3)}>
+      <svg viewBox="0 0 {50 * model.columns} {50 * model.rows}">
         {#each position as val, i}
           {#if val !== 0}
             {@render peg(i, val, false, false)}

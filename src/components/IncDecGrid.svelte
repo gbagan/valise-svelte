@@ -6,13 +6,13 @@
     showRowButtons: boolean;
     showColButtons: boolean;
     customSize: boolean;
-    nbRows: number;
-    nbColumns: number;
+    rows: number;
+    columns: number;
     resize: (row: number, col: number) => void;
     children: () => any;
   }
 
-  const {locked, nbRows, nbColumns, showRowButtons, showColButtons, customSize, resize, children }: Props = $props();
+  const {locked, rows, columns, showRowButtons, showColButtons, customSize, resize, children }: Props = $props();
 </script>
 
 <div class="grid">
@@ -25,15 +25,15 @@
           text="#plus"
           disabled={locked}
           hidden={!customSize}
-          onclick={() => resize(nbRows+1, nbColumns)}
+          onclick={() => resize(rows+1, columns)}
         />
-        <div class="text">{nbRows}</div>
+        <div class="text">{rows}</div>
         <Icon 
           round={true}
           text="#minus"
           disabled={locked}
           hidden={!customSize}
-          onclick={() => resize(nbRows-1, nbColumns)}
+          onclick={() => resize(rows-1, columns)}
         />
       </div>
     {/if}
@@ -45,18 +45,17 @@
         text="#minus"
         disabled={locked}
         hidden={!customSize}
-        onclick={() => resize(nbRows, nbColumns-1)}
+        onclick={() => resize(rows, columns-1)}
       />
-      <div class="text">{nbColumns}</div>
+      <div class="text">{columns}</div>
       <Icon
         round={true}
         text="#plus"
         disabled={locked}
         hidden={!customSize}
-        onclick={() => resize(nbRows, nbColumns+1)}
+        onclick={() => resize(rows, columns+1)}
       />
     </div>
-    
   {/if}
 </div>
 

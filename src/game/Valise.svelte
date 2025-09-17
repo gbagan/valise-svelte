@@ -117,15 +117,6 @@
     opacity: 0;
 }
 
-.object {
-    pointer-events: inherit;
-}
-
-.object-link {
-    cursor: pointer;
-    fill: transparent;
-}
-
 .main-container {
     display: flex;
     align-items: center;

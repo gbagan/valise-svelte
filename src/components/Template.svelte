@@ -29,8 +29,8 @@
 <div class="main-container">
   {#if sizeLimit}
     <IncDecGrid
-      nbRows={model.nbRows}
-      nbColumns={model.nbColumns}
+      rows={model.rows}
+      columns={model.columns}
       showRowButtons={sizeLimit.maxRows > 0}
       showColButtons={sizeLimit.maxCols > 0}
       locked={model.locked}

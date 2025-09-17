@@ -1,25 +1,27 @@
 <script lang="ts">
-  import { initModel, newGame, type Dict, type Model } from "../lib/model";
-  import { dCoords, generate, range, repeat } from "../lib/util";
+  import { initModel, newGame, playA, updateScore, type Dict, type Model, type ScoreDict, type ScoreModel } from "../lib/model";
+  import { dCoords, generate, gridStyle, range, repeat } from "../lib/util";
   import Template from '../components/Template.svelte';
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
+    import Icon from "../components/icons/Icon.svelte";
 
-  type Piece = "R" | "B" | "K" | "N" | "Q" | "custom" | "";
+  type Piece = "R" | "B" | "K" | "N" | "Q" | "custom" | null;
   type Pos = Piece[];
   type Move = number;
 
   const piecesList: Piece[] = ["R", "B", "K", "N", "Q"];
   
-  let model: Model<Pos> = $state({
+  let model: Model<Pos> & ScoreModel<Pos> = $state({
     ...initModel([]),
     nbRows: 8,
     nbColumns: 8,
+    scores: {}
   });
 
   let selectedPiece: Piece = $state("Q");
   let selectedSquare: number | null = $state(null);
-  let allowedPieces: Piece[] = ["R"];
+  let allowedPieces: Piece[] = $state(["R"]);
   let multiPieces = $state(false);
 
   function legalMoves(piece: Piece, x: number, y: number) {
@@ -28,7 +30,7 @@
       case "K": return x * x + y * y <= 2;
       case "R": return x * y == 0;
       case "B": return x * x - y * y == 0;
-      case "K": return x * x + y * y == 5;
+      case "N": return x * x + y * y == 5;
       default: return false;
     }
   }
@@ -36,7 +38,7 @@
    // teste si la pièce de type "piece" à la position index1 peut attaquer la pièce à la position index2
    // suppose que la pièce est différent de Empty
   function canCapture(piece: Piece, index1: number, index2: number): boolean {
-    const [row, col] = dCoords(model.nbColumns, index1, index2);
+    const [row, col] = dCoords(model.columns, index1, index2);
     if (piece !== "custom") {
       return index1 !== index2 && legalMoves(piece, row, col);
     } else {
@@ -47,14 +49,14 @@
   // renvoie l'ensemble des positions pouvant être attaquées par une pièce
   // à la position index sous forme de tableau de booléens
   const attackedBy = (piece: Piece, index: number) =>
-    generate(model.nbRows * model.nbColumns, i => canCapture(piece, index, i));
+    generate(model.rows * model.columns, i => canCapture(piece, index, i));
 
   // ensemble des cases pouvant être attaquées par une pièce sur le plateau
   let capturable = $derived.by(() => {
-    const n = model.nbRows * model.nbColumns;
+    const n = model.rows * model.columns;
     const res = repeat(n, false);
     model.position.forEach((piece, i) => {
-      if (piece !== "") {
+      if (piece !== null) {
         const attacked = attackedBy(piece, i);
         for (let i = 0; i < n; i++) {
           res[i] ||= attacked[i];
@@ -65,96 +67,214 @@
     return res;
   });
 
+  let isValidPosition = $derived(model.position.every((piece, i) =>
+    piece === null || !capturable[i]
+  ));
+
   // ensemble des cases attaquées par l'endroit du pointeur de la souris
   let attackedBySelected = $derived(
     selectedSquare === null
-    ? repeat(model.nbRows * model.nbColumns, false)
+    ? repeat(model.rows * model.columns, false)
     : attackedBy(selectedPiece, selectedSquare)
   );
 
   function play(i: Move): Pos | null {
-    const p = model.position[i] === "" ? selectedPiece : "";
+    const p = model.position[i] === null ? selectedPiece : null;
     return model.position.with(i, p);
   }
 
-  const initialPosition = () => repeat(model.nbRows * model.nbColumns, "" as Piece);
+  const initialPosition = () => repeat(model.rows * model.columns, null);
   const isLevelFinished = () => false;
   const onNewGame = () => selectedPiece = allowedPieces[0];
 
-  const dict: Dict<Pos, Move> = { play, isLevelFinished, initialPosition, onNewGame };
+  const objective = "maximize";
+  const score = () => isValidPosition ? model.position.filter(p => p !== null).length : 0;
+  const scoreHash = () => `${model.rows},${model.columns},${allowedPieces[0]}`;
+
+  const dict: Dict<Pos, Move> & ScoreDict = {
+    play, isLevelFinished, initialPosition, onNewGame,
+    objective, score, scoreHash
+  };
+  dict.updateScore = () => updateScore(model, dict, false, "never")
+
+  function tooltip(piece: Piece): string {
+    switch (piece) {
+      case "Q": return "Reine";
+      case "K": return "Roi";
+      case "R": return "Tour";
+      case "B": return "Fou";
+      case "N": return "Cavalier";
+      default: return "Pièce personnalisée";
+    }
+  }
+
+  function changeAllowedPieces(piece: Piece) {
+    newGame(model, dict, () => {
+      if (multiPieces) {
+        const pieces = piecesList.filter(p2 => (p2 === piece) !== allowedPieces.includes(p2));
+        if (pieces.length > 0) {
+          allowedPieces = pieces;
+        }
+      } else {
+        allowedPieces = [piece];
+      }
+    })
+  }
 
   // svelte-ignore state_referenced_locally
   newGame(model, dict);
-  model.position[11] = "K";
-  model.position[41] = "Q";
-  model.position[15] = "R";
-  model.position[21] = "B";
-  model.position[61] = "N";
 </script>
 
+{#snippet pieceSelector()}
+  <div class="gutter2 pieceselector">
+    {#each allowedPieces as piece}
+      <Icon
+        text="#piece-{piece}"
+        selected={piece === selectedPiece}
+        onclick={() => selectedPiece = piece}
+      />
+    {/each}
+  </div>
+{/snippet}
 
+{#snippet lines(rows: number, columns: number)}
+  {#each range(1, columns) as i}
+    <line y1="0" y2={50*rows} x1={i*50} x2={i*50} class="line" />
+  {/each}
+  {#each range(1, rows) as i}
+    <line x1="0" x2={50*columns} y1={i*50} y2={i*50} class="line" />
+  {/each}
+{/snippet}
+
+{#snippet board2()}
+  <div class="board">
+    <div class="ui-board board" style={gridStyle(model.rows, model.columns, 5)}>
+      <svg viewBox="0 0 {50*model.columns} {50*model.rows}">
+        {#each model.position as piece, i}
+          {@const x = 50 * (i % model.columns)}  
+          {@const y = 50 * (i / model.columns | 0)}  
+          <!-- svelte-ignore a11y_click_events_have_key_events -->
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
+          <rect {x} {y}
+            class={["square", {
+              attacked: i === selectedSquare || attackedBySelected[i],
+              capturable: model.help && (piece !== null || capturable[i])
+            }]}
+            onclick={() => playA(model, dict, i)}
+            onpointerenter={() => selectedSquare = i}
+            onpointerleave={() => selectedSquare = null}
+          />
+          {#if piece !== null}
+            <use
+              class={["piece", {capturable: capturable[i]}]}
+              href="#piece-{piece}"
+              x={x + 5}
+              y={y + 5}
+              width="40"
+              height="40"
+            />
+          {/if}
+        {/each}
+        {@render lines(model.rows, model.columns)}
+      </svg>
+    </div>
+  </div>
+{/snippet}
 
 {#snippet board()}
-  <div class="ui-board board">
-    <svg viewBox="0 0 {50*model.nbColumns} {50*model.nbRows}">
-      {#each range(1, model.nbColumns) as i}
-        <line
-          y1="0"
-          y2={50*model.nbRows}
-          x1={i*50}
-          x2={i*50}
-          stroke="#bdc3c7"
-        />
-      {/each}
-      {#each range(1, model.nbRows) as i}
-        <line
-          x1="0"
-          x2={50*model.nbColumns}
-          y1={i*50}
-          y2={i*50}
-          stroke="#bdc3c7"
-        />
-      {/each}
-      {#each model.position as piece, i}
-        {#if piece !== ""}
-          {@const x = 50 * (i % model.nbColumns) + 5}  
-          {@const y = 50 * (i / model.nbColumns | 0) + 5}
-          
-          <use
-            class={["piece", {capturable: capturable[i]}]}
-            href="#piece-{piece}"
-            style:transform="translate({x}px,{y}px)"
-            width="40"
-            height="40"
-          />
-        {/if}
-      {/each}
-
-    </svg>
-  </div>  
+  <div class="board-container">
+    {@render pieceSelector()}
+    {@render board2()}
+  </div>
 {/snippet}
 
 {#snippet config()}
-  <div>
-
-  </div>  
+  <Config title="Les reines">
+    <I.SizesGroup bind:model={model} {dict}
+      values={[[4, 4], [5, 5], [7, 7], [8, 8]]}
+      customSize={true}
+    />
+    <I.Group title="Pièces disponibles">
+      {#each piecesList as piece}
+        <Icon
+          text="#piece-{piece}"
+          selected={allowedPieces.includes(piece)}
+          tooltip={tooltip(piece)}
+          onclick={() => changeAllowedPieces(piece)}
+        />
+    {/each}
+    </I.Group>
+    <I.Group title="Options">
+      <Icon
+        text="#customize"
+        tooltip="Mode mixte"
+        selected={multiPieces}
+        onclick={() => multiPieces = !multiPieces}
+      />
+      <I.Help bind:model={model} />
+      <I.Reset bind:model={model} {dict} />
+      <I.Rules bind:model={model} />
+    </I.Group>
+    <I.BestScore bind:model={model} {dict} />
+  </Config>
 {/snippet}
 
 {#snippet rules()}
-  Place le plus de pièces possible sur ta grille sans qu\'aucune ne soit menacée par une autre pièce.<br/>
-  Tu peux choisir de jouer avec différentes pièces comme celles du jeu d\'échecs.<br/>
+  Place le plus de pièces possible sur ta grille sans qu'aucune ne soit menacée par une autre pièce.<br/>
+  Tu peux choisir de jouer avec différentes pièces comme celles du jeu d'échecs.<br/>
   Le mode mixte permet de jouer avec plusieurs pièces différentes.<br/>
   Tu peux jouer avec une pièce personnalisée si tu le souhaites.
 {/snippet}
 
-<Template bind:model={model} {dict} {board} {config} {rules} />
+{#snippet bestScore(pos: Pos)}
+  <div class="bestscore-container">
+    <div class="ui-board" style={gridStyle(model.rows, model.columns, 5)}>
+      <svg viewBox="0 0 {50*model.columns} {50*model.rows}">
+        {#each model.position as piece, i}
+          {@const x = 50 * (i % model.columns)}  
+          {@const y = 50 * (i / model.columns | 0)}
+          <rect {x} {y} class="square" />
+          {#if piece !== null}
+            <use
+              class={["piece", {capturable: capturable[i]}]}
+              href="#piece-{piece}"
+              x={x + 5}
+              y={y + 5}
+              width="40"
+              height="40"
+            />
+          {/if}
+        {/each}
+        {@render lines(model.rows, model.columns)}
+      </svg>
+    </div>
+  </div>
+{/snippet}
+
+<Template bind:model={model} {dict} {board} {config} {rules} {bestScore} />
 
 <style>
+  .board-container {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
   .board {
     width: 75vmin;
     height: 75vmin;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
  
+  .line {
+    stroke: #bdc3c7;
+    stroke-width: 0.5;
+    pointer-events: none;
+  }
 
   .piece {
     pointer-events: none;
@@ -165,29 +285,26 @@
   }
 
   .square {
-    float: left;
-    background: white;
-    box-shadow: 0px 0px 0px 1px #bdc3c7;
+    fill: white;
+    width: 50px;
+    height: 50px;
+    &.attacked {
+      filter: brightness(0.9);
+    }
+    &.capturable {
+      fill: rgb(224, 123, 162);
+    }
   }
 
-  .square-selected {
-    filter: brightness(0.8);
+  .pieceselector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+    gap: 1rem;
   }
 
-  .square-nonavailable {
-    background: rgb(224, 123, 162);
-  }
-
-  .queens-square-capturable .piece {
-    fill: red;
-    color: red;
-  }   
-
-  .queens-pieceselector {
-    margin-bottom: 0.5em;
-  }
-
-  .queens-bestscore-container {
+  .bestscore-container {
     width: 60vmin;
     height: 60vmin;
   }

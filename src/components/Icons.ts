@@ -7,3 +7,4 @@ export { default as Rules } from './icons/RulesIcon.svelte';
 export { default as Group } from './icons/IconGroup.svelte';
 export { default as SelectGroup } from './icons/IconSelectGroup.svelte';
 export { default as MultiSelectGroup } from './icons/IconMultiSelectGroup.svelte';
+export { default as SizesGroup } from './icons/SizesGroup.svelte';
