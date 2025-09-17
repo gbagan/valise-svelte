@@ -12,11 +12,13 @@
     rectY?: string;
     rectWidth?: string;
     rectHeight?: string;
-    fill?: string;
+    style?: string;
     svg: SVGElement;
+    setHelp: (s: string | null) => void;
   }
 
-  const {symbol, link, drag, x, y, width, height, rectX, rectY, rectWidth, rectHeight, fill, svg}: Props = $props();
+  const {symbol, link, drag, help, x, y, width, height,
+        rectX, rectY, rectWidth, rectHeight, style, svg, setHelp}: Props = $props();
 
   let x2: number | null = $state(null);
   let y2: number | null = $state(null);
@@ -49,21 +51,28 @@
 
 </script>
 
-<g style:transform="translate({x2 ?? x / 8.5}%, {y2 ?? y / 6.9}%)" fill={fill}>
-  <svg class={["object", {draggable: drag}]} {width} {height} {onpointerdown}>
-  <use href="#{symbol}" class="symbol" />
-    {#if link}
-      <a href="#{link}" aria-label={link}>
-        <rect
-          x={rectX ?? "0"}
-          y={rectY ?? "0"}
-          width={rectWidth ?? "100%"}
-          height={rectHeight ?? "100%"}
-          class="link"
-        />
-      </a>
-    {/if}
-  </svg>
+<g style:transform="translate({x2 ?? x / 8.5}%, {y2 ?? y / 6.9}%)">
+  <g {style}>
+    <svg
+      class={["object", {draggable: drag}]}
+      onpointerenter={() => setHelp(help)}
+      onpointerleave={() => setHelp(null)}
+      {width} {height} {onpointerdown}
+    >
+      <use href="#{symbol}" class="symbol" />
+      {#if link}
+        <a href="#{link}" aria-label={link}>
+          <rect
+            x={rectX ?? "0"}
+            y={rectY ?? "0"}
+            width={rectWidth ?? "100%"}
+            height={rectHeight ?? "100%"}
+            class="link"
+          />
+        </a>
+      {/if}
+    </svg>
+  </g>
 </g>
 
 <style>

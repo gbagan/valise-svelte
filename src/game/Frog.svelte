@@ -1,6 +1,6 @@
 <script lang="ts">
   import { generate, range, repeat } from '../lib/util';
-  import {type Model, type Dict, initModel, playA, turnMessage, type SizeLimit, newGame } from '../lib/model';
+  import {type Model, type Dict, initModel, playA, turnMessage, type SizeLimit, newGame, winTitleFor2Player } from '../lib/model';
   import Template from '../components/Template.svelte';
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
@@ -110,6 +110,7 @@
   let frogPoint = $derived(polarPoints[model.position]);
 
   let message = $derived(turnMessage(model, dict));
+  let winTitle = $derived(winTitleFor2Player(model));
 
   const onLilyClick = (e: MouseEvent, i: number) => {
     if (e.shiftKey) {
@@ -219,7 +220,7 @@
   Tu peux placer des indices sur les nénuphars avec un clic droit ou shift + clic gauche.
 {/snippet}
 
-<Template bind:model={model} {dict} {board} {config} {rules} {sizeLimit} />
+<Template bind:model={model} {dict} {board} {config} {rules} {winTitle} {sizeLimit} />
 
 <style>
 .board {

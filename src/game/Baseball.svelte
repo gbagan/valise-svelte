@@ -13,14 +13,12 @@
   let missingPeg = $state(1);
 
   function play(i: number): Pos | null {
-    const position = [...model.position];
+    const position = model.position;
     const j = missingPeg;
-    const x = model.position[i];
-    const y = model.position[j];
+    const x = position[i];
+    const y = position[j];
     if ([1, nbBases-1, -1, -nbBases+1].includes((x >> 1) - (y >> 1))) {
-       position[i] = y;
-       position[j] = x;
-       return position;
+      return position.with(i, y).with(j, x);
     } else {
       return null;
     }

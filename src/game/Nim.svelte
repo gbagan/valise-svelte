@@ -1,6 +1,6 @@
 <script lang="ts">
   import { generate, range } from '../lib/util';
-  import {type Model, type Dict, initModel, playA, newGame } from '../lib/model';
+  import {type Model, type Dict, initModel, playA, newGame, winTitleFor2Player } from '../lib/model';
   import Template from '../components/Template.svelte';
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
@@ -68,6 +68,7 @@
     : "Tour du joueur rouge"
   );
 
+   let winTitle = $derived(winTitleFor2Player(model));
 
   // svelte-ignore state_referenced_locally
     newGame(model, dict);
@@ -138,7 +139,7 @@
   Tu gagnes la partie si ton adversaire n'a aucun mouvement possible.
 {/snippet}
 
-<Template bind:model={model} {dict} {board} {config} {rules} />
+<Template bind:model={model} {dict} {board} {config} {rules} {winTitle} />
 
 <style>
 .board {

@@ -1,22 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-    import ValiseObject from '../components/ValiseObject.svelte';
-
-  interface ObjectParams {
-    symbol: string;
-    drag?: boolean;
-    link?: string;
-    help: string;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    rectX?: string;
-    rectY?: string;
-    rectWidth?: string;
-    rectHeight?: string;
-    fill?: string;
-  }
+  import ValiseObject from '../components/ValiseObject.svelte';
 
   let isOpen = $state(false);
   let help: string | null = $state(null);
@@ -24,79 +8,68 @@
   //let drag: {name: string, x: number, y: number} | null = $state(null);
   // let positions: Record<string, {x: number, y: number}> = $state({});
 
+  function setHelp(s: string | null) {
+    if (s === null) {
+      helpVisible = false;
+    } else {
+      help = s;
+      helpVisible = true;
+    }
+  }
+
   let svg: SVGElement = $state()!;
 
   onMount(() => setTimeout(() => isOpen = true, 1500));
-
 </script>
-
-{#snippet object(p: ObjectParams)}
-  <g style:transform="translate({p.x / 8.5}%, {p.y / 6.9}%)" fill={p.fill}>
-    <svg
-      class="object"
-      width={p.width}
-      height={p.height}
-      onpointerenter={p.link ? (() => {helpVisible = true; help = p.help}) : undefined}
-      onpointerleave={p.link ? (() => helpVisible = false) : undefined}
-    >
-      <use href="#{p.symbol}" class="symbol" />
-      {#if p.link}
-        <a href="#{p.link}" aria-label={p.link}>
-          <rect
-            x={p.rectX ?? "0"}
-            y={p.rectY ?? "0"}
-            width={p.rectWidth ?? "100%"}
-            height={p.rectHeight ?? "100%"}
-            class="object-link"
-          />
-        </a>
-      {/if}
-    </svg>
-  </g>
-{/snippet}
 
 {#snippet valise()}
   <svg bind:this={svg} viewBox="0 0 825 690">
     <use href="#valise" class="valise-close" /> 
     <g class="valise-open">
       <use href="#openvalise"/>
-      {@render object({
-        symbol: "frog2",
-        link: "frog",
-        help: "Jeu: la grenouille",
-        x: 549,
-        y: 320,
-        width: 40,
-        height: 40,
-        fill: "#bcd35f"
-      })}
-      {@render object({
-        symbol: "block2",
-        link: "nim",
-        help: "Jeu: bloque moi si tu peux",
-        x: 380,
-        y: 120,
-        width: 40,
-        height: 40
-      })}
-      {@render object({
-        symbol: "tricolor2",
-        link: "baseball",
-        help: "Jeu: baseball multicolore",
-        x: 350,
-        y: 330,
-        width: 90,
-        height: 60
-      })}
+        <ValiseObject
+          symbol="knight"
+          link="queens"
+          help="Jeu: les 8 reines"
+          x={461} y={380} width={24} height={48}
+          style="transform:rotate(40deg);"
+          {svg} {setHelp}
+        />
+      <ValiseObject
+        symbol="stack"
+        link="jetons"
+        help="Jeu: acquisition"
+        x={350} y={500} width={50} height={50}
+        {svg} {setHelp}
+      />
+      <ValiseObject
+        symbol="block2"
+        link="nim"
+        help="Jeu: bloque moi si tu peux"
+        x={380} y={120} width={40} height={40}
+        {svg} {setHelp}
+      />
+      <ValiseObject
+        symbol="tricolor2"
+        link="baseball"
+        help="Jeu: baseball multicolore"
+        x={350} y={330} width={90} height={60}
+        {svg} {setHelp}
+      />
+      <ValiseObject
+        symbol="frog2"
+        link="frog"
+        help="Jeu: la grenouille"
+        x={549} y={320} width={40} height={40}
+        style="fill:#bcd35f;"
+        {svg} {setHelp}
+      />
       <ValiseObject
         symbol="flowerpot"
         help="Quelque chose se cache derrière ce pot"
         drag={true}
-        x={533}
-        y={300}
-        width={64}
-        height={64}
-        {svg}
+        x={533} y={300} width={64} height={64}
+        {svg} {setHelp}
       />
     </g>
   </svg>

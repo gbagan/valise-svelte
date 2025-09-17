@@ -277,3 +277,10 @@ export function turnMessage<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>)
     return "Tour de l'IA"
   }
 }
+
+export const winTitleFor2Player = <Pos>(model: Model<Pos>) =>
+  model.mode === "duel"
+  ? `Le ${model.turn === 2 ? "premier" : "second"} joueur gagne`
+  : model.turn === 2
+  ? "Tu as gagné"
+  : "L'IA gagne";

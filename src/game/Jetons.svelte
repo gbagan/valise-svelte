@@ -52,7 +52,7 @@
     play, isLevelFinished, initialPosition,
     score, scoreHash, objective
   };
-  dict.updateScore = () => updateScore(model, dict, true, "onNewRecord");
+  dict.updateScore = () => updateScore(model, dict, true, "always");
 
   const sizeLimit = {minRows: 2, minCols: 2, maxCols: 6, maxRows: 6};
 
