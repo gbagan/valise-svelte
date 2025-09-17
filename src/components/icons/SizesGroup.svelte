@@ -1,10 +1,10 @@
 <script lang="ts" generics="Pos,Move">
-  import { type Model, type Methods, newGame } from '../../lib/model';
+  import { type Model, type SizeModel, type Methods, newGame } from '../../lib/model';
   import Icon from "./Icon.svelte";
   import IconGroup from "./IconGroup.svelte";
 
   interface Props {
-    model: Model<Pos>;
+    model: Model<Pos> & SizeModel;
     methods: Methods<Pos, Move>;
     values: [number, number][];
     customSize?: boolean;

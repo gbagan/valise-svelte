@@ -1,6 +1,7 @@
 <script lang="ts">
   import { dCoords, gridStyle, repeat } from '../lib/util';
-  import {type Model, type ScoreModel, type Methods, type ScoreMethods, initModel, newGame, updateScore } from '../lib/model';
+  import {type Model, type ScoreModel, type Methods, type ScoreMethods, type SizeModel,
+    initModel, newGame, updateScore } from '../lib/model';
   import Template from '../components/Template.svelte';
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
@@ -10,7 +11,7 @@
   type Pos = number[];
   type Move = {from: number, to: number};
 
-  let model: Model<Pos> & ScoreModel<Pos> = $state({
+  let model: Model<Pos> & SizeModel & ScoreModel<Pos> = $state({
     ...initModel([]),
     rows: 4,
     columns: 4,

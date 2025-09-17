@@ -13,7 +13,6 @@
   let bestScore: [number, Pos] | undefined = $derived(model.scores[methods.scoreHash()]);
 
   let title = $derived(`Meilleur score (${bestScore ? "" + bestScore[0] : "∅"})`);
-
 </script>
 
 <IconGroup title={title}>

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { generate, range, repeat } from '../lib/util';
-  import {type Model, type Methods, initModel, playA, turnMessage, type SizeLimit, newGame, winTitleFor2Player } from '../lib/model';
+  import {type Model, type Methods, type SizeLimit, type SizeModel,
+          initModel, playA, turnMessage, newGame, winTitleFor2Player } from '../lib/model';
   import Template from '../components/Template.svelte';
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
@@ -8,10 +9,11 @@
   type Pos = number;
   type Move = number;
   
-  let model: Model<Pos> = $state({
+  let model: Model<Pos> & SizeModel = $state({
     ...initModel(20),
     mode: 'expert',
     rows: 20,
+    columns: 0,
     customSize: true,
   });
 

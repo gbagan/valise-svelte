@@ -8,9 +8,6 @@ export interface Model<Pos> {
   history: Pos[];
   redoHistory: Pos[];
   turn: Turn;
-  rows: number;
-  columns: number;
-  customSize: boolean;
   mode: Mode;
   help: boolean;
   showWin: boolean;
@@ -25,9 +22,6 @@ export function initModel<Pos>(position: Pos): Model<Pos> {
     history: [],
     redoHistory: [],
     turn: 1,
-    rows: 0,
-    columns: 0,
-    customSize: false,
     mode: "solo",
     help: false,
     showWin: false,
@@ -203,8 +197,23 @@ function computerMove<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>)
   }
 }
 
-export function setGridSize<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>, rows: number,
-                                      columns: number, sizeLimit?: SizeLimit) {
+export interface SizeModel {
+  rows: number;
+  columns: number;
+  customSize: boolean;
+}
+
+export function isSizeModel<Pos>(model: Model<Pos>): model is Model<Pos> & SizeModel {
+  return !!(model as any).rows && !!(model as any).columns && !!(model as any).customSize
+}
+
+export function setGridSize<Pos, Move>(
+  model: Model<Pos>&SizeModel,
+  methods: Methods<Pos, Move>,
+  rows: number,
+  columns: number,
+  sizeLimit?: SizeLimit)
+{
   if (!sizeLimit) {
     return
   }

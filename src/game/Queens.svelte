@@ -1,5 +1,7 @@
 <script lang="ts">
-  import { initModel, newGame, playA, updateScore, type Methods, type Model, type ScoreMethods, type ScoreModel } from "../lib/model";
+  import { initModel, newGame, playA, updateScore,
+        type Methods, type Model, type ScoreMethods, type ScoreModel, type SizeModel
+      } from "../lib/model";
   import { dCoords, generate, gridStyle, range, repeat } from "../lib/util";
   import Template from '../components/Template.svelte';
   import * as I from '../components/Icons';
@@ -12,10 +14,11 @@
 
   const piecesList: Piece[] = ["R", "B", "K", "N", "Q"];
   
-  let model: Model<Pos> & ScoreModel<Pos> = $state({
+  let model: Model<Pos> & ScoreModel<Pos> & SizeModel = $state({
     ...initModel([]),
     rows: 8,
     columns: 8,
+    customSize: false,
     scores: {}
   });
 

@@ -1,5 +1,5 @@
 <script lang="ts" generics="Pos, Move">
-  import { setGridSize, type Model, type Methods, type SizeLimit, newGame, isScoreModel, isScoreMethods } from '../lib/model';
+  import { setGridSize, type Model, type Methods, type SizeLimit, newGame, isScoreModel, isScoreMethods, isSizeModel } from '../lib/model';
   import Dialog from './Dialog.svelte';
   import IncDecGrid from './IncDecGrid.svelte';
 
@@ -27,7 +27,7 @@
 {/snippet}
 
 <div class="main-container">
-  {#if sizeLimit}
+  {#if sizeLimit && isSizeModel(model)}
     <IncDecGrid
       rows={model.rows}
       columns={model.columns}
