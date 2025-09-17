@@ -1,9 +1,9 @@
 <script lang="ts" generics="Pos, D, P">
-  import { type Model, type Dict, playA } from '../lib/model';
+  import { type Model, type Methods, playA } from '../lib/model';
   interface Props {
     model: Model<Pos>;
     dragged: D | null;
-    dict: Dict<Pos, {from: D, to: D }>;
+    methods: Methods<Pos, {from: D, to: D }>;
     id: D;
     draggable?: boolean;
     droppable?: boolean;
@@ -18,11 +18,11 @@
     ) => any;
   }
 
-  let { model=$bindable(), dragged=$bindable(), draggable, droppable, dict, id, params, render }: Props = $props();
+  let { model=$bindable(), dragged=$bindable(), draggable, droppable, methods, id, params, render }: Props = $props();
   
   let candrop = $derived(
     !!droppable && dragged !== null
-    && dict.play({from: dragged, to: id}) !== null
+    && methods.play({from: dragged, to: id}) !== null
   );
 
   function onpointerdown(e: PointerEvent) {
@@ -32,7 +32,7 @@
   function onpointerup(e: PointerEvent) {
     e.stopPropagation();
     if (dragged !== null) {
-      playA(model, dict, {from: dragged, to: id});
+      playA(model, methods, {from: dragged, to: id});
     }
     dragged = null;
   }

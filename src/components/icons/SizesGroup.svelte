@@ -1,19 +1,19 @@
 <script lang="ts" generics="Pos,Move">
-  import { type Model, type Dict, newGame } from '../../lib/model';
+  import { type Model, type Methods, newGame } from '../../lib/model';
   import Icon from "./Icon.svelte";
   import IconGroup from "./IconGroup.svelte";
 
   interface Props {
     model: Model<Pos>;
-    dict: Dict<Pos, Move>;
+    methods: Methods<Pos, Move>;
     values: [number, number][];
     customSize?: boolean;
   }
   
-  const {model=$bindable(), dict, values, customSize }: Props = $props();
+  const {model=$bindable(), methods, values, customSize }: Props = $props();
 
   const setSize = (rows: number, columns: number) =>
-    newGame(model, dict, () => {
+    newGame(model, methods, () => {
       model.rows = rows;
       model.columns = columns;
       model.customSize = false;
@@ -34,7 +34,7 @@
       text="NxM"
       tooltip="Taille personalisée"
       selected={model.customSize}
-      onclick={() => newGame(model, dict, () => model.customSize = true)}
+      onclick={() => newGame(model, methods, () => model.customSize = true)}
     />
   {/if}
 </IconGroup>

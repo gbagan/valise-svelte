@@ -1,11 +1,11 @@
 <script lang="ts" generics="Pos, Move">
-  import { setGridSize, type Model, type Dict, type SizeLimit, newGame, isScoreModel, isScoreDict } from '../lib/model';
+  import { setGridSize, type Model, type Methods, type SizeLimit, newGame, isScoreModel, isScoreMethods } from '../lib/model';
   import Dialog from './Dialog.svelte';
   import IncDecGrid from './IncDecGrid.svelte';
 
   interface Props {
     model: Model<Pos>;
-    dict: Dict<Pos, Move>;
+    methods: Methods<Pos, Move>;
     board: () => any;
     config: () => any;
     rules: () => any;
@@ -15,7 +15,7 @@
   }
   
 
-  const { board, config, rules, bestScore, winTitle, sizeLimit, model=$bindable(), dict}: Props = $props();
+  const { board, config, rules, bestScore, winTitle, sizeLimit, model=$bindable(), methods}: Props = $props();
 </script>
 
 {#snippet winPanel(title: string, visible: boolean)}
@@ -35,7 +35,7 @@
       showColButtons={sizeLimit.maxCols > 0}
       locked={model.locked}
       customSize={model.customSize}
-      resize={(row, col) => setGridSize(model, dict, row, col, sizeLimit)}
+      resize={(row, col) => setGridSize(model, methods, row, col, sizeLimit)}
     >
       {@render board()}
     </IncDecGrid>
@@ -50,15 +50,15 @@
         {@render rules()}
       </div>
     </Dialog>
-  {:else if model.dialog == "score" && isScoreModel(model) && isScoreDict(dict)}
+  {:else if model.dialog == "score" && isScoreModel(model) && isScoreMethods(methods)}
     <Dialog title="Meilleur score" onOk={() => model.dialog = null}>
-      {@const position = model.scores[dict.scoreHash()][1] }
+      {@const position = model.scores[methods.scoreHash()][1] }
       {@render bestScore?.(position)}
     </Dialog>
   {:else if model.newGameAction}
     <Dialog
       title="Nouvelle Partie"
-      onOk={() => newGame(model, dict)}
+      onOk={() => newGame(model, methods)}
       onCancel={() => model.newGameAction = null}
     >
       Tu es sur le point de créer une nouvelle partie. Ta partie en cours sera perdue. Es-tu sûr(e)?

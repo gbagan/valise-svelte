@@ -1,13 +1,13 @@
 <script lang="ts" generics="Pos,Move">
-  import { type Model, type Dict, redo } from '../../lib/model';
+  import { type Model, type Methods, redo } from '../../lib/model';
   import Icon from "./Icon.svelte";
 
   interface Props {
     model: Model<Pos>;
-    dict: Dict<Pos, Move>;
+    methods: Methods<Pos, Move>;
   }
 
-  const {model=$bindable(), dict}: Props = $props();
+  const {model=$bindable(), methods}: Props = $props();
 </script>
 
 <Icon
@@ -15,5 +15,5 @@
   tooltip="Rejoue le coup annulé"
   style="transform:scaleX(-1);"
   disabled={model.locked || model.redoHistory.length === 0}
-  onclick={() => redo(model, dict)}
+  onclick={() => redo(model, methods)}
 />

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { generate, range } from '../lib/util';
-  import {type Model, type Dict, initModel, playA, newGame, winTitleFor2Player } from '../lib/model';
+  import {type Model, type Methods, initModel, playA, newGame, winTitleFor2Player } from '../lib/model';
   import Template from '../components/Template.svelte';
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
@@ -58,7 +58,7 @@
   const isLosingPosition = () =>
     model.position.reduce((acc, [x, y]) => acc ^ (y - x - 1), 0) === 0
 
-  const dict: Dict<Pos, Move> = { play, isLevelFinished, initialPosition, possibleMoves, isLosingPosition };
+  const methods: Methods<Pos, Move> = { play, isLevelFinished, initialPosition, possibleMoves, isLosingPosition };
 
   let turnMessage = $derived(
     isLevelFinished() 
@@ -71,7 +71,7 @@
    let winTitle = $derived(winTitleFor2Player(model));
 
   // svelte-ignore state_referenced_locally
-    newGame(model, dict);
+    newGame(model, methods);
 </script>
 
 {#snippet row(i: number)}
@@ -85,7 +85,7 @@
     class="square"
     style:transform="translate({5 + 10 * j}px, {15 + 19 * i}px) rotate(45deg)"
     style:cursor={canPlay({pile:i, pos: j}) ? "pointer" : "not-allowed"}
-    onclick={() => playA(model, dict, {pile: i, pos: j})}
+    onclick={() => playA(model, methods, {pile: i, pos: j})}
   />
 {/snippet}
 
@@ -122,9 +122,9 @@
 {#snippet config()}
   <Config title="Bloque moi si tu peux">
     <I.Group title="Options">
-      <I.Undo bind:model={model} {dict} />
-      <I.Redo bind:model={model} {dict} />
-      <I.Reset bind:model={model} {dict} />
+      <I.Undo bind:model={model} {methods} />
+      <I.Redo bind:model={model} {methods} />
+      <I.Reset bind:model={model} {methods} />
       <I.Rules bind:model={model} />
     </I.Group>
   </Config>
@@ -139,7 +139,7 @@
   Tu gagnes la partie si ton adversaire n'a aucun mouvement possible.
 {/snippet}
 
-<Template bind:model={model} {dict} {board} {config} {rules} {winTitle} />
+<Template bind:model={model} {methods} {board} {config} {rules} {winTitle} />
 
 <style>
 .board {

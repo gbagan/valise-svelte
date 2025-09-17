@@ -1,6 +1,6 @@
 <script lang="ts">
   import { range, shuffle, take } from '../lib/util';
-  import {type Model, type Dict, initModel, playA, newGame } from '../lib/model';
+  import {type Model, type Methods, initModel, playA, newGame } from '../lib/model';
   import Template from '../components/Template.svelte';
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
@@ -33,7 +33,7 @@
     missingPeg = Math.random() * (2 * nbBases) | 0
   }
 
-  const dict: Dict<Pos, Move> = { play, isLevelFinished, initialPosition, onNewGame };
+  const methods: Methods<Pos, Move> = { play, isLevelFinished, initialPosition, onNewGame };
 
   const colors = [ "blue", "red", "green", "magenta", "orange", "black", "cyan", "gray" ];
 
@@ -53,7 +53,7 @@
   const levelFinished = $derived(isLevelFinished());
 
   // svelte-ignore state_referenced_locally
-  newGame(model, dict);
+  newGame(model, methods);
 
 </script>
 
@@ -81,7 +81,7 @@
               width="7"
               height="7"
               fill={colors[peg / 2 | 0]}
-              onclick={() => playA(model, dict, peg)}
+              onclick={() => playA(model, methods, peg)}
               style:cursor={play(peg) !== null ? "pointer" : "not-allowed"}
               style:animation={
                 levelFinished 
@@ -102,13 +102,13 @@
       title="Nombre de bases"
       values={[4, 5, 6, 7, 8]}
       selected={nbBases}
-      setter={i => newGame(model, dict, () => nbBases = i)}
+      setter={i => newGame(model, methods, () => nbBases = i)}
     />
 
     <I.Group title="Options">
-      <I.Undo bind:model={model} {dict} />
-      <I.Redo bind:model={model} {dict} />
-      <I.Reset bind:model={model} {dict} />
+      <I.Undo bind:model={model} {methods} />
+      <I.Redo bind:model={model} {methods} />
+      <I.Reset bind:model={model} {methods} />
       <I.Rules bind:model={model} />
     </I.Group>
   </Config>
@@ -121,7 +121,7 @@
 {/snippet}
 
 
-<Template bind:model={model} {dict} {board} {config} {rules} />
+<Template bind:model={model} {methods} {board} {config} {rules} />
 
 <style>
 .board {

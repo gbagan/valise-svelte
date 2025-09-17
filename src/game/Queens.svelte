@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { initModel, newGame, playA, updateScore, type Dict, type Model, type ScoreDict, type ScoreModel } from "../lib/model";
+  import { initModel, newGame, playA, updateScore, type Methods, type Model, type ScoreMethods, type ScoreModel } from "../lib/model";
   import { dCoords, generate, gridStyle, range, repeat } from "../lib/util";
   import Template from '../components/Template.svelte';
   import * as I from '../components/Icons';
@@ -14,8 +14,8 @@
   
   let model: Model<Pos> & ScoreModel<Pos> = $state({
     ...initModel([]),
-    nbRows: 8,
-    nbColumns: 8,
+    rows: 8,
+    columns: 8,
     scores: {}
   });
 
@@ -91,11 +91,11 @@
   const score = () => isValidPosition ? model.position.filter(p => p !== null).length : 0;
   const scoreHash = () => `${model.rows},${model.columns},${allowedPieces[0]}`;
 
-  const dict: Dict<Pos, Move> & ScoreDict = {
+  const methods: Methods<Pos, Move> & ScoreMethods = {
     play, isLevelFinished, initialPosition, onNewGame,
     objective, score, scoreHash
   };
-  dict.updateScore = () => updateScore(model, dict, false, "never")
+  methods.updateScore = () => updateScore(model, methods, false, "never")
 
   function tooltip(piece: Piece): string {
     switch (piece) {
@@ -109,7 +109,7 @@
   }
 
   function changeAllowedPieces(piece: Piece) {
-    newGame(model, dict, () => {
+    newGame(model, methods, () => {
       if (multiPieces) {
         const pieces = piecesList.filter(p2 => (p2 === piece) !== allowedPieces.includes(p2));
         if (pieces.length > 0) {
@@ -122,7 +122,7 @@
   }
 
   // svelte-ignore state_referenced_locally
-  newGame(model, dict);
+  newGame(model, methods);
 </script>
 
 {#snippet pieceSelector()}
@@ -160,7 +160,7 @@
               attacked: i === selectedSquare || attackedBySelected[i],
               capturable: model.help && (piece !== null || capturable[i])
             }]}
-            onclick={() => playA(model, dict, i)}
+            onclick={() => playA(model, methods, i)}
             onpointerenter={() => selectedSquare = i}
             onpointerleave={() => selectedSquare = null}
           />
@@ -190,7 +190,7 @@
 
 {#snippet config()}
   <Config title="Les reines">
-    <I.SizesGroup bind:model={model} {dict}
+    <I.SizesGroup bind:model={model} {methods}
       values={[[4, 4], [5, 5], [7, 7], [8, 8]]}
       customSize={true}
     />
@@ -212,10 +212,10 @@
         onclick={() => multiPieces = !multiPieces}
       />
       <I.Help bind:model={model} />
-      <I.Reset bind:model={model} {dict} />
+      <I.Reset bind:model={model} {methods} />
       <I.Rules bind:model={model} />
     </I.Group>
-    <I.BestScore bind:model={model} {dict} />
+    <I.BestScore bind:model={model} {methods} />
   </Config>
 {/snippet}
 
@@ -251,7 +251,7 @@
   </div>
 {/snippet}
 
-<Template bind:model={model} {dict} {board} {config} {rules} {bestScore} />
+<Template bind:model={model} {methods} {board} {config} {rules} {bestScore} />
 
 <style>
   .board-container {

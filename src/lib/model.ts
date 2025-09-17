@@ -44,7 +44,7 @@ export interface SizeLimit {
   maxCols: number;
 }
 
-export interface Dict<Pos, Move> {
+export interface Methods<Pos, Move> {
   play: (m: Move) => (Pos | null),
   isLevelFinished: () => boolean,
   initialPosition: () => Pos,
@@ -54,8 +54,8 @@ export interface Dict<Pos, Move> {
   isLosingPosition?: () => boolean;
 }
 
-function playHelper<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>, move: Move): boolean {
-  const position = dict.play(move);
+function playHelper<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>, move: Move): boolean {
+  const position = methods.play(move);
   if (position === null)
     return false;
   model.history.push(model.position);
@@ -65,12 +65,12 @@ function playHelper<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>, move: M
   return true;
 }
 
-export async function playA<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>, move: Move) {
-  if (!playHelper(model, dict, move)) {
+export async function playA<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>, move: Move) {
+  if (!playHelper(model, methods, move)) {
     return
   }
 
-  const {isNewRecord, showWin} = dict.updateScore ? dict.updateScore() : defaultUpdateScore(dict);
+  const {isNewRecord, showWin} = methods.updateScore ? methods.updateScore() : defaultUpdateScore(methods);
   if (isNewRecord) {
     // save to storage
   }
@@ -81,9 +81,9 @@ export async function playA<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>,
   } else if (model.mode === "expert" || model.mode === "random") {
     model.locked = true;
     await delay(1000);
-    const move = computerMove(model, dict)!;
-    playHelper(model, dict, move);
-    if (dict.isLevelFinished()) {
+    const move = computerMove(model, methods)!;
+    playHelper(model, methods, move);
+    if (methods.isLevelFinished()) {
       model.showWin = true;
       await delay(1000);
       model.showWin = false;
@@ -92,27 +92,27 @@ export async function playA<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>,
   }
 }
 
-export function defaultUpdateScore<Pos, Move>(dict: Dict<Pos, Move>): { isNewRecord: boolean, showWin: boolean } {
+export function defaultUpdateScore<Pos, Move>(methods: Methods<Pos, Move>): { isNewRecord: boolean, showWin: boolean } {
   return {
     isNewRecord: false,
-    showWin: dict.isLevelFinished()
+    showWin: methods.isLevelFinished()
   }
 }
 
-export function newGame<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>, action?: () => void) {
-  if (!model.newGameAction && action && model.history.length > 0 && !dict.isLevelFinished()) {
+export function newGame<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>, action?: () => void) {
+  if (!model.newGameAction && action && model.history.length > 0 && !methods.isLevelFinished()) {
     model.newGameAction = action || (() => {})
     return;
   }
 
   (action || model.newGameAction || (() => {}))();
 
-  if (dict.onNewGame) {
-    dict.onNewGame();
+  if (methods.onNewGame) {
+    methods.onNewGame();
   }
   do {
-    model.position = dict.initialPosition();
-  } while (dict.isLevelFinished())
+    model.position = methods.initialPosition();
+  } while (methods.isLevelFinished())
   model.history = [];
   model.redoHistory = [];
   model.help = false;
@@ -128,7 +128,7 @@ function changeTurn<Pos>(model: Model<Pos>) {
   }
 }
 
-export function undo<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>) {
+export function undo<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>) {
   if (model.mode === "duel" || model.mode === "solo") {
     if (model.history.length === 0) {
       return;
@@ -150,7 +150,7 @@ export function undo<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>) {
   // onPositionChange
 }
 
-export function redo<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>) {
+export function redo<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>) {
   if (model.redoHistory.length === 0) {
     return;
   }
@@ -162,7 +162,7 @@ export function redo<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>) {
   // onPositionChange
 }
 
-export function reset<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>) {
+export function reset<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>) {
   if (model.history.length === 0) {
     return;
   }
@@ -175,17 +175,17 @@ export function reset<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>) {
   // onPositionChange
 }
 
-function computerMove<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>): Move | null {
-  if (dict.isLevelFinished()) {
+function computerMove<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>): Move | null {
+  if (methods.isLevelFinished()) {
     return null;
   }
-  const moves = dict.possibleMoves!();
+  const moves = methods.possibleMoves!();
   let bestMove = null;
   if (model.mode === "expert") {
     for (const move of moves) {
       let found = false;
-      playHelper(model, dict, move);
-      if (dict.isLosingPosition!()) {
+      playHelper(model, methods, move);
+      if (methods.isLosingPosition!()) {
         found = true;
       }
       model.position = model.history.pop()!;
@@ -203,20 +203,20 @@ function computerMove<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>): Move
   }
 }
 
-export function setGridSize<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>, nbRows: number,
-                                      nbColumns: number, sizeLimit?: SizeLimit) {
+export function setGridSize<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>, rows: number,
+                                      columns: number, sizeLimit?: SizeLimit) {
   if (!sizeLimit) {
     return
   }
   const {minRows, maxRows, minCols, maxCols} = sizeLimit;
   
-  if (nbRows < minRows || nbRows > maxRows || nbColumns < minCols || nbColumns > maxCols) {
+  if (rows < minRows || rows > maxRows || columns < minCols || columns > maxCols) {
     return;
   }
   
-  newGame(model, dict, () => {
-    model.rows = nbRows;
-    model.columns = nbColumns;
+  newGame(model, methods, () => {
+    model.rows = rows;
+    model.columns = columns;
   });
 }
 
@@ -228,14 +228,14 @@ export function isScoreModel<Pos>(model: Model<Pos>): model is Model<Pos> & Scor
   return !!(model as any).scores
 }
 
-export interface ScoreDict {
+export interface ScoreMethods {
   score: () => number;
   scoreHash: () => string;
   objective: "minimize" | "maximize";
 }
 
-export function isScoreDict<Pos, Move>(dict: Dict<Pos, Move>): dict is Dict<Pos, Move> & ScoreDict {
-  return !!(dict as any).score && !!(dict as any).scoreHash && !!(dict as any).objective;
+export function isScoreMethods<Pos, Move>(methods: Methods<Pos, Move>): methods is Methods<Pos, Move> & ScoreMethods {
+  return !!(methods as any).score && !!(methods as any).scoreHash && !!(methods as any).objective;
 }
 
 
@@ -243,16 +243,16 @@ type ShowWinPolicy = "onNewRecord" | "always" | "never";
 
 export function updateScore<Pos, Move>(
   model: Model<Pos> & ScoreModel<Pos>,
-  dict: Dict<Pos, Move> & ScoreDict,
+  methods: Methods<Pos, Move> & ScoreMethods,
   onlyWhenFinished: boolean,
   showWin: ShowWinPolicy)
 {
-  if (onlyWhenFinished && !dict.isLevelFinished()) {
+  if (onlyWhenFinished && !methods.isLevelFinished()) {
     return { isNewRecord: false, showWin: false }
   } else {
-    const score = dict.score();
-    const hash = dict.scoreHash();
-    const cmp = (a: number, b: number) => dict.objective === "minimize" ? a < b : a > b;
+    const score = methods.score();
+    const hash = methods.scoreHash();
+    const cmp = (a: number, b: number) => methods.objective === "minimize" ? a < b : a > b;
     const oldScore = model.scores[hash];
     const isNewRecord = !oldScore || cmp(score, oldScore[0]);
     if (isNewRecord) {
@@ -266,8 +266,8 @@ export function updateScore<Pos, Move>(
 }
 
 // un message qui indique à qui est le tour ou si la partie est finie
-export function turnMessage<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>) {
-  if (dict.isLevelFinished()) {
+export function turnMessage<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>) {
+  if (methods.isLevelFinished()) {
     return "Partie finie"
   } else if (model.turn === 1) {
     return "Tour du premier joueur"

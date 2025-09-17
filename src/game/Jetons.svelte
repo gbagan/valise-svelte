@@ -1,6 +1,6 @@
 <script lang="ts">
   import { dCoords, gridStyle, repeat } from '../lib/util';
-  import {type Model, type ScoreModel, type Dict, type ScoreDict, initModel, newGame, updateScore } from '../lib/model';
+  import {type Model, type ScoreModel, type Methods, type ScoreMethods, initModel, newGame, updateScore } from '../lib/model';
   import Template from '../components/Template.svelte';
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
@@ -12,10 +12,10 @@
 
   let model: Model<Pos> & ScoreModel<Pos> = $state({
     ...initModel([]),
-    nbRows: 4,
-    nbColumns: 4,
-    scores: {},
+    rows: 4,
+    columns: 4,
     customSize: true,
+    scores: {},
   });
 
   let dragged: number | null = $state(null);
@@ -48,22 +48,22 @@
   const scoreHash = () => `${model.rows},${model.columns}`;
   const objective = "minimize";
 
-  const dict: Dict<Pos, Move> & ScoreDict = {
+  const methods: Methods<Pos, Move> & ScoreMethods = {
     play, isLevelFinished, initialPosition,
     score, scoreHash, objective
   };
-  dict.updateScore = () => updateScore(model, dict, true, "always");
+  methods.updateScore = () => updateScore(model, methods, true, "always");
 
   const sizeLimit = {minRows: 2, minCols: 2, maxCols: 6, maxRows: 6};
 
   let winTitle = $derived.by(() => {
-    const score = dict.score();
+    const score = methods.score();
     const s = score > 1 ? "s" : "";
     return `${score} case${s} restante${s}`;
   });
 
   // svelte-ignore state_referenced_locally
-    newGame(model, dict);
+    newGame(model, methods);
 </script>
 
 {#snippet peg(i: number, val: number, dragged: boolean, droppable: boolean,
@@ -96,7 +96,7 @@
       >
         {#each model.position as val, i}
           {#if val !== 0}
-            <DndItem bind:model={model} bind:dragged={dragged} {dict}
+            <DndItem bind:model={model} bind:dragged={dragged} {methods}
               id={i}
               params={val}
               draggable={true}
@@ -113,13 +113,17 @@
 
 {#snippet config()}
   <Config title="Jeu d'acquisition">
+    <I.SizesGroup bind:model={model} {methods}
+      values={[[2, 2], [4, 4], [5, 5], [6, 6]]}
+      customSize={true}
+    />
     <I.Group title="Options">
-      <I.Undo bind:model={model} {dict} />
-      <I.Redo bind:model={model} {dict} />
-      <I.Reset bind:model={model} {dict} />
+      <I.Undo bind:model={model} {methods} />
+      <I.Redo bind:model={model} {methods} />
+      <I.Reset bind:model={model} {methods} />
       <I.Rules bind:model={model} />
     </I.Group>
-    <I.BestScore bind:model={model} {dict} />
+    <I.BestScore bind:model={model} {methods} />
   </Config>
 {/snippet}
 
@@ -145,7 +149,7 @@
   Le but est de finir la partie avec le moins de cases contenant des piles de jetons.
 {/snippet}
 
-<Template bind:model={model} {dict} {board} {config} {rules} {bestScore} {winTitle} {sizeLimit} />
+<Template bind:model={model} {methods} {board} {config} {rules} {bestScore} {winTitle} {sizeLimit} />
 
 <style>
   .board-container {

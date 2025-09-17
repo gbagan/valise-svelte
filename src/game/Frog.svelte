@@ -1,6 +1,6 @@
 <script lang="ts">
   import { generate, range, repeat } from '../lib/util';
-  import {type Model, type Dict, initModel, playA, turnMessage, type SizeLimit, newGame, winTitleFor2Player } from '../lib/model';
+  import {type Model, type Methods, initModel, playA, turnMessage, type SizeLimit, newGame, winTitleFor2Player } from '../lib/model';
   import Template from '../components/Template.svelte';
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
@@ -11,7 +11,7 @@
   let model: Model<Pos> = $state({
     ...initModel(20),
     mode: 'expert',
-    nbRows: 20,
+    rows: 20,
     customSize: true,
   });
 
@@ -41,7 +41,7 @@
   const isLosingPosition = () => losingPositions[model.position];
   const onNewGame = () => marked = repeat(model.rows, false);
 
-  const dict: Dict<Pos, Move> = { play, isLevelFinished, initialPosition, onNewGame, possibleMoves, isLosingPosition };   
+  const methods: Methods<Pos, Move> = { play, isLevelFinished, initialPosition, onNewGame, possibleMoves, isLosingPosition };   
 
   let reachable = $derived(generate(model.rows+1, canPlay));
 
@@ -55,7 +55,7 @@
   function movesSetter(move: number) {
     const next = [1, 2, 3, 4, 5].filter(m => (m === move) != moves.includes(m));
     if (next.length > 0) {
-      newGame(model, dict, () => moves = next);
+      newGame(model, methods, () => moves = next);
     }
   }
 
@@ -109,19 +109,19 @@
   let cartesianPoints = $derived(polarPoints.map(polarToCartesian));
   let frogPoint = $derived(polarPoints[model.position]);
 
-  let message = $derived(turnMessage(model, dict));
+  let message = $derived(turnMessage(model, methods));
   let winTitle = $derived(winTitleFor2Player(model));
 
   const onLilyClick = (e: MouseEvent, i: number) => {
     if (e.shiftKey) {
       marked[i] = !marked[i];
     } else {
-      playA(model, dict, i)
+      playA(model, methods, i)
     }
   }
 
   // svelte-ignore state_referenced_locally
-    newGame(model, dict);
+    newGame(model, methods);
 </script>
 
 
@@ -202,9 +202,9 @@
     />
     <I.Group title="Options">
       <I.Help bind:model={model} />
-      <I.Undo bind:model={model} {dict} />
-      <I.Redo bind:model={model} {dict} />
-      <I.Reset bind:model={model} {dict} />
+      <I.Undo bind:model={model} {methods} />
+      <I.Redo bind:model={model} {methods} />
+      <I.Reset bind:model={model} {methods} />
       <I.Rules bind:model={model} />
     </I.Group>
   </Config>
@@ -220,7 +220,7 @@
   Tu peux placer des indices sur les nénuphars avec un clic droit ou shift + clic gauche.
 {/snippet}
 
-<Template bind:model={model} {dict} {board} {config} {rules} {winTitle} {sizeLimit} />
+<Template bind:model={model} {methods} {board} {config} {rules} {winTitle} {sizeLimit} />
 
 <style>
 .board {
