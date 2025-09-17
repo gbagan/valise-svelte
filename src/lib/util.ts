@@ -51,10 +51,33 @@ export function randomPick<A>(arr: A[]): A | null {
   }
 }
 
+export function clone<A>(value: A): A {
+  if (value === null || typeof value !== "object") {
+    return value;
+  }
+
+  if (Array.isArray(value)) {
+    return value.map(item => clone(item)) as A;
+  }
+
+  const clonedObj = {} as any;
+  for (const key in value) {
+    if (Object.prototype.hasOwnProperty.call(value, key)) {
+      clonedObj[key] = clone(value[key]);
+    }
+  }
+  return clonedObj;
+}
+
 export function dCoords(cols: number, x: number, y: number): [number, number] {
   const row1 = x / cols | 0;
   const col1 = x % cols;
   const row2 = y / cols | 0;
   const col2 = y % cols;
   return [row1 - row2, col1 - col2];
+}
+
+export function gridStyle(rows: number, columns: number, limit: number): string {
+  const m = Math.max(limit, rows, columns);
+  return `height:${100*rows/m}%;width:${100*columns/m}%;`
 }

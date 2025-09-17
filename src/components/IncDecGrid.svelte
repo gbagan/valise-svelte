@@ -40,14 +40,6 @@
   </div>
   {#if showColButtons}
     <div class="columns">
-      <Icon
-        round={true}
-        text="#plus"
-        disabled={locked}
-        hidden={!customSize}
-        onclick={() => resize(nbRows, nbColumns+1)}
-      />
-      <div class="text">{nbColumns}</div>
       <Icon 
         round={true}
         text="#minus"
@@ -55,14 +47,23 @@
         hidden={!customSize}
         onclick={() => resize(nbRows, nbColumns-1)}
       />
+      <div class="text">{nbColumns}</div>
+      <Icon
+        round={true}
+        text="#plus"
+        disabled={locked}
+        hidden={!customSize}
+        onclick={() => resize(nbRows, nbColumns+1)}
+      />
     </div>
+    
   {/if}
 </div>
 
 <style>
 .grid {
     display: flex;
-    align-items: center;
+    align-items: stretch;
     justify-content: center;
     flex-direction: column;
     gap: 1rem;

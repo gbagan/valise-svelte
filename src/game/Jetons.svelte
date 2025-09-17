@@ -1,19 +1,21 @@
 <script lang="ts">
-  import { dCoords, range, repeat } from '../lib/util';
-  import {type Model, type Dict, initModel, newGame } from '../lib/model';
+  import { dCoords, gridStyle, repeat } from '../lib/util';
+  import {type Model, type ScoreModel, type Dict, type ScoreDict, initModel, newGame, updateScore } from '../lib/model';
   import Template from '../components/Template.svelte';
-  //import * as I from '../components/Icons';
-  //import Config from '../components/Config.svelte';
+  import * as I from '../components/Icons';
+  import Config from '../components/Config.svelte';
   import DndBoard from '../components/DndBoard.svelte';
   import DndItem from '../components/DndItem.svelte';
 
   type Pos = number[];
   type Move = {from: number, to: number};
 
-  let model: Model<Pos> = $state({
-    ...initModel(range(0, 10)),
+  let model: Model<Pos> & ScoreModel<Pos> = $state({
+    ...initModel([]),
     nbRows: 4,
     nbColumns: 4,
+    scores: {},
+    customSize: true,
   });
 
   let dragged: number | null = $state(null);
@@ -42,9 +44,23 @@
     })
   }
 
-  const dict: Dict<Pos, Move> = { play, isLevelFinished, initialPosition };
+  const score = () => model.position.filter(v => v > 0).length;
+  const scoreHash = () => `${model.nbRows},${model.nbColumns}`;
+  const objective = "minimize";
+
+  const dict: Dict<Pos, Move> & ScoreDict = {
+    play, isLevelFinished, initialPosition,
+    score, scoreHash, objective
+  };
+  dict.updateScore = () => updateScore(model, dict, true, "onNewRecord");
 
   const sizeLimit = {minRows: 2, minCols: 2, maxCols: 6, maxRows: 6};
+
+  let winTitle = $derived.by(() => {
+    const score = dict.score();
+    const s = score > 1 ? "s" : "";
+    return `${score} case${s} restante${s}`;
+  });
 
   // svelte-ignore state_referenced_locally
     newGame(model, dict);
@@ -53,12 +69,13 @@
 {#snippet peg(i: number, val: number, dragged: boolean, droppable: boolean,
   onpointerdown?: (e: PointerEvent) => void, onpointerup?: (e: PointerEvent) => void)
 }
-  {@const row = i / model.nbRows | 0}
+  {@const row = i / model.nbColumns | 0}
   {@const col = i % model.nbColumns}
   <g style:transform="translate({25+50*col}px,{25+50*row}px)">
     <rect
       class={["peg", {dragged, droppable}]}
       fill="rgb(255 {255 * (1 - Math.sqrt(val / (model.nbRows * model.nbColumns)))} 0)"
+      filter="drop-shadow({val/2}px {val/2}px 0.5px #656565)"
       {onpointerdown} {onpointerup}
     />
     <text y="3" class="peg-text">{val}</text>
@@ -66,30 +83,61 @@
 {/snippet}
 
 {#snippet draggedElement(style: string)}
-  <rect x="-15" y="-15" width="30" height="30" fill="orange" class="dragged" {style}/> 
+  <rect x="-15" y="-15" width="30" height="30" class="cursor" {style}/> 
 {/snippet}
 
 {#snippet board()}
-  <div class="ui-board board">
-    <DndBoard viewBox="0 0 200 200" bind:dragged={dragged} {draggedElement}>
-      {#each model.position as val, i}
-        {#if val !== 0}
-          <DndItem bind:model={model} bind:dragged={dragged} {dict}
-            id={i}
-            params={val}
-            draggable={true}
-            droppable={true}
-            render={peg}
-          />
-        {/if}
-      {/each}
-    </DndBoard>
+  <div class="board-container">
+    <div class="ui-board" style={gridStyle(model.nbRows, model.nbColumns, 3)}>
+      <DndBoard
+        viewBox="0 0 {50 * model.nbColumns} {50 * model.nbRows}"
+        bind:dragged={dragged}
+        {draggedElement}
+      >
+        {#each model.position as val, i}
+          {#if val !== 0}
+            <DndItem bind:model={model} bind:dragged={dragged} {dict}
+              id={i}
+              params={val}
+              draggable={true}
+              droppable={true}
+              render={peg}
+            />
+         {/if}
+        {/each}
+      </DndBoard>
+    </div>
+    
   </div>
 {/snippet}
 
 {#snippet config()}
-  <div></div>
+  <Config title="Jeu d'acquisition">
+    <I.Group title="Options">
+      <I.Undo bind:model={model} {dict} />
+      <I.Redo bind:model={model} {dict} />
+      <I.Reset bind:model={model} {dict} />
+      <I.Rules bind:model={model} />
+    </I.Group>
+    <I.BestScore bind:model={model} {dict} />
+  </Config>
 {/snippet}
+
+{#snippet bestScore(position: Pos)}
+  <div class="bestscore-container">
+    <div class="ui-board" style={gridStyle(model.nbRows, model.nbColumns, 3)}>
+      <svg viewBox="0 0 {50 * model.nbColumns} {50 * model.nbRows}">
+        {#each position as val, i}
+          {#if val !== 0}
+            {@render peg(i, val, false, false)}
+          {/if}
+        {/each}
+      </svg>
+    </div>
+  </div>
+{/snippet}
+
+
 
 {#snippet rules()}
   À chaque tour de ce jeu, tu peux déplacer une pile de jetons vers une case adjacente
@@ -97,15 +145,18 @@
   Le but est de finir la partie avec le moins de cases contenant des piles de jetons.
 {/snippet}
 
-<Template bind:model={model} {dict} {board} {config} {rules} {sizeLimit} />
+<Template bind:model={model} {dict} {board} {config} {rules} {bestScore} {winTitle} {sizeLimit} />
 
 <style>
-.board {
-  width: 60vmin;
-  height: 60vmin;
-}
+  .board-container {
+    width: 75vmin;
+    height: 75vmin;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-.peg {
+  .peg {
     cursor: pointer;
     x: -18px;
     y: -18px;
@@ -115,31 +166,37 @@
     ry: 5px;
 
     &.dragged {
-        opacity: 0.3;
+      opacity: 0.3;
     }
 
     &.droppable {
-        stroke: green;
-        stroke-width: 2;
-        &:hover {
-            stroke: red;
-        }
+      stroke: green;
+      stroke-width: 2;
+      &:hover {
+          stroke: red;
+      }
     }
-}
+  }
 
-.peg-text {
-  font: bold 20px sans-serif;
-  pointer-events: none;
-  text-anchor: middle;
-  dominant-baseline: middle;
-}
-
-.dragged {
+  .peg-text {
+    font: bold 20px sans-serif;
+    fill: rgba(0, 0, 0, 0.65);
     pointer-events: none;
-}
+    text-anchor: middle;
+    dominant-baseline: middle;
+  }
 
-.jetons-bestscore-grid-container {
+  .cursor {
+    pointer-events: none;
+    fill: orange;
+    opacity: 0.7;
+  }
+
+  .bestscore-container {
     width: 60vmin;
     height: 60vmin;
-}
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 </style>

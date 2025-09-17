@@ -112,13 +112,15 @@
   let message = $derived(turnMessage(model, dict));
 
   const onLilyClick = (e: MouseEvent, i: number) => {
-    console.log(e.button);
-    if (e.button === 2 || e.shiftKey) {
+    if (e.shiftKey) {
       marked[i] = !marked[i];
     } else {
       playA(model, dict, i)
     }
   }
+
+  // svelte-ignore state_referenced_locally
+    newGame(model, dict);
 </script>
 
 

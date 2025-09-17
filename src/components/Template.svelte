@@ -1,5 +1,5 @@
 <script lang="ts" generics="Pos, Move">
-  import { setGridSize, type Model, type Dict, type SizeLimit, newGame } from '../lib/model';
+  import { setGridSize, type Model, type Dict, type SizeLimit, newGame, isScoreModel, isScoreDict } from '../lib/model';
   import Dialog from './Dialog.svelte';
   import IncDecGrid from './IncDecGrid.svelte';
 
@@ -9,12 +9,13 @@
     board: () => any;
     config: () => any;
     rules: () => any;
+    bestScore?: (position: Pos) => any;
     winTitle?: string;
     sizeLimit?: SizeLimit;
   }
   
 
-  const { board, config, rules, winTitle, sizeLimit, model=$bindable(), dict}: Props = $props();
+  const { board, config, rules, bestScore, winTitle, sizeLimit, model=$bindable(), dict}: Props = $props();
 </script>
 
 {#snippet winPanel(title: string, visible: boolean)}
@@ -48,6 +49,11 @@
       <div class="rules">
         {@render rules()}
       </div>
+    </Dialog>
+  {:else if model.dialog == "score" && isScoreModel(model) && isScoreDict(dict)}
+    <Dialog title="Meilleur score" onOk={() => model.dialog = null}>
+      {@const position = model.scores[dict.scoreHash()][1] }
+      {@render bestScore?.(position)}
     </Dialog>
   {:else if model.newGameAction}
     <Dialog

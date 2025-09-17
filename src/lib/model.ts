@@ -1,4 +1,4 @@
-import {delay, randomPick} from "./util";
+import {clone, delay, randomPick} from "./util";
 
 type Turn = 1 | 2;
 type Mode = "solo" | "random" | "expert" | "duel"
@@ -14,7 +14,7 @@ export interface Model<Pos> {
   mode: Mode;
   help: boolean;
   showWin: boolean;
-  dialog: "rules" | null;
+  dialog: "rules" | "score" | null;
   newGameAction: (() => void) | null
   locked: boolean;
 }
@@ -69,7 +69,6 @@ export async function playA<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>,
   if (!playHelper(model, dict, move)) {
     return
   }
-
 
   const {isNewRecord, showWin} = dict.updateScore ? dict.updateScore() : defaultUpdateScore(dict);
   if (isNewRecord) {
@@ -219,6 +218,51 @@ export function setGridSize<Pos, Move>(model: Model<Pos>, dict: Dict<Pos, Move>,
     model.nbRows = nbRows;
     model.nbColumns = nbColumns;
   });
+}
+
+export interface ScoreModel<Pos> {
+  scores: Record<string, [number, Pos]>
+}
+
+export function isScoreModel<Pos>(model: Model<Pos>): model is Model<Pos> & ScoreModel<Pos> {
+  return !!(model as any).scores
+}
+
+export interface ScoreDict {
+  score: () => number;
+  scoreHash: () => string;
+  objective: "minimize" | "maximize";
+}
+
+export function isScoreDict<Pos, Move>(dict: Dict<Pos, Move>): dict is Dict<Pos, Move> & ScoreDict {
+  return !!(dict as any).score && !!(dict as any).scoreHash && !!(dict as any).objective;
+}
+
+
+type ShowWinPolicy = "onNewRecord" | "always";
+
+export function updateScore<Pos, Move>(
+  model: Model<Pos> & ScoreModel<Pos>,
+  dict: Dict<Pos, Move> & ScoreDict,
+  onlyWhenFinished: boolean,
+  showWin: ShowWinPolicy)
+{
+  if (onlyWhenFinished && !dict.isLevelFinished()) {
+    return { isNewRecord: false, showWin: false }
+  } else {
+    const score = dict.score();
+    const hash = dict.scoreHash();
+    const cmp = (a: number, b: number) => dict.objective === "minimize" ? a < b : a > b;
+    const oldScore = model.scores[hash];
+    const isNewRecord = !oldScore || cmp(score, oldScore[0]);
+    if (isNewRecord) {
+      model.scores[hash] = [score, clone(model.position)];
+    }
+    return {
+      isNewRecord,
+      showWin: isNewRecord && showWin === "onNewRecord" || showWin === "always"
+    }
+  }
 }
 
 // un message qui indique à qui est le tour ou si la partie est finie

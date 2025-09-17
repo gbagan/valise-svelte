@@ -12,7 +12,7 @@
   let position: {x: number, y: number} | null = $state(null);
 
   const onpointermove = (e: PointerEvent) => {
-    if (!dragged) return;
+    if (dragged === null) return;
     const rect = (e.currentTarget as Element).getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width;
     const y = (e.clientY - rect.top) / rect.height;
