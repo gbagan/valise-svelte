@@ -69,6 +69,9 @@ export function clone<A>(value: A): A {
   return clonedObj;
 }
 
+export const generate2 = <A>(n: number,  m: number, f: (i: number, j: number) => A) => 
+  generate(n * m, i => f(i / m | 0, i % m));
+
 export function dCoords(cols: number, x: number, y: number): [number, number] {
   const row1 = x / cols | 0;
   const col1 = x % cols;

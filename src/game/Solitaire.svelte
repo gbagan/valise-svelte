@@ -1,0 +1,289 @@
+<script lang="ts">
+  import { dCoords, generate, generate2, gridStyle, repeat } from '../lib/util';
+  import {type Model, type ScoreModel, type Methods, type ScoreMethods, type SizeModel,
+    initModel, newGame, updateScore } from '../lib/model';
+  import Template from '../components/Template.svelte';
+  import * as I from '../components/Icons';
+  import Config from '../components/Config.svelte';
+  import DndBoard from '../components/DndBoard.svelte';
+  import DndItem from '../components/DndItem.svelte';
+  
+
+  type Board = "french" | "english" | "circle" | "grid3" | "random";
+
+  type Pos = boolean[];
+  type Move = {from: number, to: number};
+
+  let model: Model<Pos> & SizeModel & ScoreModel<Pos> = $state({
+    ...initModel([]),
+    rows: 5,
+    columns: 1,
+    customSize: false,
+    scores: {},
+  });
+
+  let holes: boolean[] = $state([]);
+  let help: 0 | 1 | 2 = $state(0);
+  let boardType: Board = $state("circle");
+
+  let dragged: number | null = $state(null);
+
+  // retourne la position du trou situé entre les deux positions d'un coup si celui est valide
+  function betweenMove({ from, to }: Move): number | null {
+    const [row, col] = dCoords(model.columns, from, to);
+    return row * row + col * col == 4 ? (from + to) / 2 | 0 : null;
+  }
+  
+  // même chose que betweenMove mais dans un plateau circulaire    
+  // ne traite pas le cas du plateau de taille 4
+  // todo: à vérifier
+  const betweenInCircle = (from: number, to: number, size: number) =>
+    from - to === 2 || to - from === 2
+    ? (from + to) / 2 | 0
+    : (size + to - from) % size === 2
+    ? (from + 1) % size
+    : (from - to) % size == 2
+    ? (to + 1) % size
+    : null;
+
+  // même chose que betweenMove dans un plateau normal ou circuaire.
+  // Traite le cas particulier du plateau circulaire de taille 4
+  function betweenMove2(move: Move): number | null {
+    const {from, to} = move;
+    if (boardType === "circle") {
+      const x = betweenInCircle(from, to, model.rows);
+      if (x === null) {
+        return null;
+      } else {
+        return model.rows === 4 && !model.position[x] ? (x + 2) % 4 : x; 
+    }
+    } else {
+        return betweenMove(move);
+    }
+  }
+
+  function play(move: Move): Pos | null {
+    const {from, to} = move;
+    const between = betweenMove2(move);
+    if (between === null) {
+       return null;
+    }
+    const pbetween = model.position[between];
+    const pfrom = model.position[from];
+    const pto = model.position[to];
+    const hto = holes[to];
+    if (!pfrom || !pbetween || !hto || pto) {
+        return null;
+    }
+    const position = model.position.slice();
+    position[from] = false;
+    position[between] = false;
+    position[to] = true;
+    return position;
+  }
+
+  const initialPosition = () => model.position;
+
+  const isLevelFinished = () => model.position.every((p, i) =>
+    !p || [2, -2, 2 * model.columns, -2 * model.columns, model.rows - 2].every(d =>
+      play({from: i, to: i+d}) === null
+    )
+  );
+
+  function onNewGame() {
+    let columns = model.columns;
+    let rows = model.rows;
+    if (boardType === "english") {
+      holes = generate2(7, 7, (row, col) =>
+        Math.min(row, 6 - row) >= 2 || Math.min(col, 6 - col) >= 2 
+      );
+      model.position = holes.with(24, false);
+      model.customSize = false;
+    } else if (boardType === "french") {
+      holes = generate2(7, 7, (row, col) =>
+        Math.min(row, 6 - row) + Math.min(col, 6 - col) >= 2 
+      );
+      model.position = holes.with(24, false);
+      model.customSize = false;
+    } else if (boardType === "circle") {
+      holes = repeat(rows, true);
+      const empty = Math.random() * rows | 0;
+      model.position = generate(rows, x => x !== empty);     
+      model.customSize = true;
+    } else if (boardType === "grid3") {
+      holes = repeat(3 * columns, true);
+      model.position = generate(3 * columns, i => i < 2 * columns);
+      model.customSize = true;
+    } else { // boardType === "random"
+      holes = repeat(3 * columns, true);
+      const bools = generate(columns, () => Math.random() < 0.5);
+      model.position = bools.concat(repeat(columns, true), bools.map(x => !x));
+      model.customSize = true;
+    }
+  }
+
+  const objective = "minimize";
+  const score = () => model.position.filter(x => x).length;
+  // todo à vérifier
+  const scoreHash = () => `${board},${model.rows},${model.columns}`;
+
+  const methods: Methods<Pos, Move> & ScoreMethods = {
+    play, isLevelFinished, initialPosition, onNewGame,
+    objective, score, scoreHash
+  };
+  methods.updateScore = () => updateScore(model, methods, true, "always");
+
+  function itemTransform(i: number): string {
+    const row = i % model.columns | 0;
+    const col = i % model.columns;
+    if (boardType === "circle") {
+      const x = 125 + Math.sin(2 * Math.PI * i / model.rows) * 90;
+      const y = 125 + Math.cos(2 * Math.PI * i / model.rows) * 90;
+      return `translate(${x}px,${y}px)`;
+    } else {
+      return `translate(${50*col + 25}px,${50*row+25}px)`;
+    }
+  }
+
+  function tricolor(i: number, columns: number, help: 0 | 1 | 2): string {
+    switch ((i % model.columns + help + (i / model.columns | 0)) % 3) {
+      case 0: return "red";
+      case 1: return "blue";
+      default: return "red";
+    }
+  }
+
+  // svelte-ignore state_referenced_locally
+    newGame(model, methods);
+</script>
+
+
+{#snippet hole(i: number, val: null, dragged: boolean, droppable: boolean,
+  onpointerdown?: (e: PointerEvent) => void, onpointerup?: (e: PointerEvent) => void)
+}
+  {#if help > 0 && boardType !== "circle"}
+    <rect
+      x="-25.0"
+      y="-25.0"
+      width="50"
+      height="50"
+      fill={tricolor(i, model.columns, help)}
+      style:transform={itemTransform(i)}
+    />
+  {/if}
+  <circle
+    r="17"
+    class={["hole", {droppable}]}
+    style:transform={itemTransform(i)}
+    onpointerdown={onpointerdown}
+    onpointerup={onpointerup}
+  />
+{/snippet}
+
+{#snippet peg(i: number, val: null, dragged: boolean, droppable: boolean,
+  onpointerdown?: (e: PointerEvent) => void, onpointerup?: (e: PointerEvent) => void)
+}
+  <circle
+    r="20"
+    class={["peg", {dragged}]}
+    style:transform={itemTransform(i)}
+    onpointerdown={onpointerdown}
+    onpointerup={onpointerup}
+  />
+{/snippet}
+
+{#snippet draggedElement(style: string)}
+  <circle r="20" width="30" height="30" class="cursor" {style}/> 
+{/snippet}
+
+{#snippet board()}
+  <div class="board-container">
+    {@render genericBoard(model.position, true)}
+  </div>
+{/snippet}
+    
+{#snippet genericBoard(position: boolean[], interactive: boolean)}
+  <div
+    class="ui-board"
+    style={boardType === "circle" ? "width:100%;height:100%;" : gridStyle(model.rows, model.columns, 5)}
+  >
+    <DndBoard
+      viewBox={boardType === "circle" ? "0 0 250 250" : `0 0 ${50 * model.columns} ${50 * model.rows}`}
+      bind:dragged={dragged} {draggedElement}
+    >
+      {#if boardType === "circle"}
+        <circle cx="125" cy="125" r="90" class="circle" />
+      {/if}
+      {#each holes as hasHole, i}
+        {#if hasHole}
+          <DndItem bind:model={model} bind:dragged={dragged} {methods}
+            id={i}
+            params={null}
+            droppable={interactive}
+            render={hole}
+          />
+        {/if}
+      {/each}
+      {#each position as hasPeg, i}
+        {#if hasPeg}
+          <DndItem bind:model={model} bind:dragged={dragged} {methods}
+            id={i}
+            params={null}
+            draggable={interactive}
+            render={peg}
+          />
+        {/if}
+      {/each}
+    </DndBoard>
+  </div>
+{/snippet}
+
+{#snippet config()}
+  todo
+{/snippet}
+
+{#snippet rules()}
+  todo
+{/snippet}
+
+<Template bind:model={model} {methods} {board} {config} {rules} />
+
+<style>
+  .board-container {
+    height: 75vmin;
+    width: 75vmin;
+  }
+
+  .hole {
+    fill: url(#soli-hole);
+
+    &.droppable {
+      stroke: green;
+      stroke-width: 4;
+    }
+  }
+
+  .peg {
+    fill: url(#soli-peg);
+    cursor: pointer;
+    &.dragged {
+      opacity: 0.3;
+    }
+  }
+
+  .circle {
+    stroke: grey;
+    fill: transparent;
+    stroke-width: 5;
+  }
+
+  .cursor {
+    pointer-events: none;
+    fill: url(#soli-peg);
+  }
+
+.solitaire-scoredialog {
+    height: 60vmin;
+    width: 60vmin;
+}
+</style>

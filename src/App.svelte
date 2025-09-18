@@ -5,6 +5,7 @@
   import Frog from './game/Frog.svelte';
   import Jetons from './game/Jetons.svelte';
   import Queens from './game/Queens.svelte';
+  import Solitaire from './game/Solitaire.svelte';
   import { onMount } from 'svelte';
 
   let location = $state(window.location.hash.slice(1) || "main");
@@ -38,6 +39,8 @@ $inspect(location);
     <Jetons />
   {:else if location === "queens"}
     <Queens />
+  {:else if location === "solitaire"}
+    <Solitaire />
   {/if}
 </div>
 
