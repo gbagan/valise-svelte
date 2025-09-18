@@ -6,4 +6,4 @@
 - [ ] queens: ajouter le curseur
 - [ ] queens: quand on quitte le mode mixte, vérifier qu'il ne reste qu'une pièce choisie
 - [x] solitaire: sur le cercle 5, le pion à droite ne peut pas être déplacé 
-- [ ] ajouter les règles
+- [ ] solitaire: ajouter les règles

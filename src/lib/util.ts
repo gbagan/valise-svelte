@@ -13,13 +13,17 @@ export function generate<A>(n: number, f: (i: number) => A): A[] {
 }
 
 
-export function range(start: number, end: number): number[] {
-  if (end <= start) {
-      return [];
-  }
-  const res = new Array(end-start);
-  for (let i = 0; i < end - start; i++) {
-    res[i] = start + i;
+export function range(start: number, end: number, step?: number): number[] {
+  const res = [];
+  step = step ?? 1;
+  if (step > 0) {
+    for (let i = start; i < end; i += step) {
+      res.push(i);
+    }
+  } else {
+    for (let i = start; i > end; i += step) {
+      res.push(i);
+    }
   }
   return res
 }
@@ -68,6 +72,11 @@ export function clone<A>(value: A): A {
   }
   return clonedObj;
 }
+
+export function allDistinct<A>(arr: A[]): boolean {
+  return new Set(arr).size === arr.length;
+}
+
 
 export const generate2 = <A>(n: number,  m: number, f: (i: number, j: number) => A) => 
   generate(n * m, i => f(i / m | 0, i % m));

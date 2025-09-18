@@ -1,9 +1,10 @@
 <script lang="ts">
   import Valise from './game/Valise.svelte';
   import Baseball from './game/Baseball.svelte';
-  import Nim from './game/Nim.svelte';
   import Frog from './game/Frog.svelte';
   import Jetons from './game/Jetons.svelte';
+  import Nim from './game/Nim.svelte';
+  import Paths from './game/Paths.svelte';
   import Queens from './game/Queens.svelte';
   import Solitaire from './game/Solitaire.svelte';
   import { onMount } from 'svelte';
@@ -37,6 +38,8 @@ $inspect(location);
     <Frog />
   {:else if location === "jetons"}
     <Jetons />
+  {:else if location === "paths"}
+    <Paths />
   {:else if location === "queens"}
     <Queens />
   {:else if location === "solitaire"}
