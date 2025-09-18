@@ -204,7 +204,9 @@ export interface SizeModel {
 }
 
 export function isSizeModel<Pos>(model: Model<Pos>): model is Model<Pos> & SizeModel {
-  return !!(model as any).rows && !!(model as any).columns && !!(model as any).customSize
+  return (model as any).rows !== undefined 
+    && (model as any).columns !== undefined
+    && (model as any).customSize !== undefined
 }
 
 export function setGridSize<Pos, Move>(
@@ -246,7 +248,6 @@ export interface ScoreMethods {
 export function isScoreMethods<Pos, Move>(methods: Methods<Pos, Move>): methods is Methods<Pos, Move> & ScoreMethods {
   return !!(methods as any).score && !!(methods as any).scoreHash && !!(methods as any).objective;
 }
-
 
 type ShowWinPolicy = "onNewRecord" | "always" | "never";
 

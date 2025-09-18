@@ -1,13 +1,14 @@
 <script lang="ts">
   import { dCoords, generate, generate2, gridStyle, repeat } from '../lib/util';
   import {type Model, type ScoreModel, type Methods, type ScoreMethods, type SizeModel,
-    initModel, newGame, updateScore } from '../lib/model';
+    initModel, newGame, updateScore, 
+    type SizeLimit} from '../lib/model';
   import Template from '../components/Template.svelte';
+  import Icon from '../components/icons/Icon.svelte';
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
   import DndBoard from '../components/DndBoard.svelte';
   import DndItem from '../components/DndItem.svelte';
-  
 
   type Board = "french" | "english" | "circle" | "grid3" | "random";
 
@@ -36,13 +37,12 @@
   
   // même chose que betweenMove mais dans un plateau circulaire    
   // ne traite pas le cas du plateau de taille 4
-  // todo: à vérifier
   const betweenInCircle = (from: number, to: number, size: number) =>
     from - to === 2 || to - from === 2
     ? (from + to) / 2 | 0
     : (size + to - from) % size === 2
     ? (from + 1) % size
-    : (from - to) % size == 2
+    : (size + from - to) % size == 2
     ? (to + 1) % size
     : null;
 
@@ -122,10 +122,18 @@
     }
   }
 
+  let sizeLimit: SizeLimit = $derived(
+    boardType === "circle"
+    ? { minRows: 3, maxRows: 12, minCols: 1, maxCols: 1 }
+    : boardType === "grid3" || boardType === "random"
+    ? { minRows: 3, maxRows: 3, minCols: 1, maxCols: 12 }
+    : { minRows: 7, maxRows: 7, minCols: 7, maxCols: 7 }
+  );
+
   const objective = "minimize";
   const score = () => model.position.filter(x => x).length;
   // todo à vérifier
-  const scoreHash = () => `${board},${model.rows},${model.columns}`;
+  const scoreHash = () => `${boardType},${model.rows},${model.columns}`;
 
   const methods: Methods<Pos, Move> & ScoreMethods = {
     play, isLevelFinished, initialPosition, onNewGame,
@@ -133,32 +141,57 @@
   };
   methods.updateScore = () => updateScore(model, methods, true, "always");
 
+  let winTitle = $derived.by(() => {
+    const score = methods.score();
+    const s = score > 1 ? "s" : "";
+    return `${score} pièce${s} restante${s}`;
+  });
+
   function itemTransform(i: number): string {
-    const row = i % model.columns | 0;
+    const row = i / model.columns | 0;
     const col = i % model.columns;
     if (boardType === "circle") {
       const x = 125 + Math.sin(2 * Math.PI * i / model.rows) * 90;
       const y = 125 + Math.cos(2 * Math.PI * i / model.rows) * 90;
       return `translate(${x}px,${y}px)`;
     } else {
-      return `translate(${50*col + 25}px,${50*row+25}px)`;
+      return `translate(${50*col+25}px,${50*row+25}px)`;
     }
   }
 
-  function tricolor(i: number, columns: number, help: 0 | 1 | 2): string {
+  function tricolor(i: number): string {
     switch ((i % model.columns + help + (i / model.columns | 0)) % 3) {
       case 0: return "red";
       case 1: return "blue";
-      default: return "red";
+      default: return "green";
+    }
+  }
+
+  function setBoard(b: Board) {
+    boardType = b;
+    switch (b) {
+      case "circle":
+        model.rows = 6;
+        model.columns = 1;
+        break;
+      case "grid3":
+      case "random":
+        model.rows = 3;
+        model.columns = 5;
+        break;
+      default:
+        model.rows = 7;
+        model.columns = 7;
     }
   }
 
   // svelte-ignore state_referenced_locally
-    newGame(model, methods);
+  newGame(model, methods)
+
 </script>
 
 
-{#snippet hole(i: number, val: null, dragged: boolean, droppable: boolean,
+{#snippet hole(i: number, _val: null, _dragged: boolean, droppable: boolean,
   onpointerdown?: (e: PointerEvent) => void, onpointerup?: (e: PointerEvent) => void)
 }
   {#if help > 0 && boardType !== "circle"}
@@ -167,7 +200,7 @@
       y="-25.0"
       width="50"
       height="50"
-      fill={tricolor(i, model.columns, help)}
+      fill={tricolor(i)}
       style:transform={itemTransform(i)}
     />
   {/if}
@@ -180,7 +213,7 @@
   />
 {/snippet}
 
-{#snippet peg(i: number, val: null, dragged: boolean, droppable: boolean,
+{#snippet peg(i: number, _val: null, dragged: boolean, _droppable: boolean,
   onpointerdown?: (e: PointerEvent) => void, onpointerup?: (e: PointerEvent) => void)
 }
   <circle
@@ -194,12 +227,6 @@
 
 {#snippet draggedElement(style: string)}
   <circle r="20" width="30" height="30" class="cursor" {style}/> 
-{/snippet}
-
-{#snippet board()}
-  <div class="board-container">
-    {@render genericBoard(model.position, true)}
-  </div>
 {/snippet}
     
 {#snippet genericBoard(position: boolean[], interactive: boolean)}
@@ -238,20 +265,52 @@
   </div>
 {/snippet}
 
+{#snippet board()}
+  <div class="board-container">
+    {@render genericBoard(model.position, true)}
+  </div>
+{/snippet}
+
+{#snippet bestScore(position: Pos)}
+  <div class="scoredialog">
+    {@render genericBoard(position, false)}
+  </div>
+{/snippet}
+
 {#snippet config()}
-  todo
+  <Config title="Les reines">
+    <I.SelectGroup
+      title="Plateau"
+      values={["circle", "grid3", "random", "english", "french"]}
+      text={["#circle", "3xN", "#shuffle", "#tea", "#bread"]}
+      tooltip={["3xN", "Cercle", "Aléatoire", "Anglais", "Français"]}
+      selected={boardType}
+      setter={(i) => newGame(model, methods, () => setBoard(i as Board))}
+    />
+    <I.Group title="Options">
+      <Icon text="#help" tooltip="Aide" selected={help > 0} onclick={() => help = (help + 1) % 3} />
+      <I.Undo bind:model={model} {methods} />
+      <I.Redo bind:model={model} {methods} />
+      <I.Reset bind:model={model} {methods} />
+      <I.Rules bind:model={model} />
+    </I.Group>
+    <I.BestScore bind:model={model} {methods} />
+  </Config>
 {/snippet}
 
 {#snippet rules()}
   todo
 {/snippet}
 
-<Template bind:model={model} {methods} {board} {config} {rules} />
+<Template bind:model={model} {methods} {board} {config} {rules} {winTitle} {bestScore} {sizeLimit} />
 
 <style>
   .board-container {
     height: 75vmin;
     width: 75vmin;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .hole {
@@ -282,8 +341,11 @@
     fill: url(#soli-peg);
   }
 
-.solitaire-scoredialog {
+  .scoredialog {
     height: 60vmin;
     width: 60vmin;
-}
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 </style>

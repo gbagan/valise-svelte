@@ -13,7 +13,6 @@
     winTitle?: string;
     sizeLimit?: SizeLimit;
   }
-  
 
   const { board, config, rules, bestScore, winTitle, sizeLimit, model=$bindable(), methods}: Props = $props();
 </script>
@@ -31,10 +30,9 @@
     <IncDecGrid
       rows={model.rows}
       columns={model.columns}
-      showRowButtons={sizeLimit.maxRows > 0}
-      showColButtons={sizeLimit.maxCols > 0}
+      showRowButtons={model.customSize && sizeLimit.minRows < sizeLimit.maxRows}
+      showColButtons={model.customSize && sizeLimit.minCols < sizeLimit.maxCols}
       locked={model.locked}
-      customSize={model.customSize}
       resize={(row, col) => setGridSize(model, methods, row, col, sizeLimit)}
     >
       {@render board()}

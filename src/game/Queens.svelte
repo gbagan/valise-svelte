@@ -131,7 +131,7 @@
 </script>
 
 {#snippet pieceSelector()}
-  <div class="gutter2 pieceselector">
+  <div class="pieceselector">
     {#each allowedPieces as piece}
       <Icon
         text="#piece-{piece}"

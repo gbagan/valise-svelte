@@ -71,6 +71,13 @@
         x={533} y={300} width={64} height={64}
         {svg} {setHelp}
       />
+      <ValiseObject
+        symbol="soli-peg2"
+        link="solitaire"
+        help="Jeu: solitaire"
+        x={492} y={350} width={40} height={40}
+        {svg} {setHelp}
+      />
     </g>
   </svg>
 {/snippet}
