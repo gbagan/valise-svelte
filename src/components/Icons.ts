@@ -1,9 +1,9 @@
 export { default as BestScore } from './icons/BestScore.svelte';
 export { default as Help } from './icons/HelpIcon.svelte';
-export { default as Undo } from './icons/UndoIcon.svelte';
-export { default as Redo } from './icons/RedoIcon.svelte';
-export { default as Reset } from './icons/ResetIcon.svelte';
-export { default as Rules } from './icons/RulesIcon.svelte';
+export { default as Undo } from './icons/Undo.svelte';
+export { default as Redo } from './icons/Redo.svelte';
+export { default as Reset } from './icons/Reset.svelte';
+export { default as Rules } from './icons/Rules.svelte';
 export { default as Group } from './icons/IconGroup.svelte';
 export { default as SelectGroup } from './icons/IconSelectGroup.svelte';
 export { default as MultiSelectGroup } from './icons/IconMultiSelectGroup.svelte';

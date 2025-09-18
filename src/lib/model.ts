@@ -12,7 +12,7 @@ export interface Model<Pos> {
   help: boolean;
   showWin: boolean;
   dialog: "rules" | "score" | null;
-  newGameAction: (() => void) | null
+  newGameAction: (() => void) | null;
   locked: boolean;
 }
 

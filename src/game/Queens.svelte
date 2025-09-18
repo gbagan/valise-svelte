@@ -1,12 +1,12 @@
 <script lang="ts">
   import { initModel, newGame, playA, updateScore,
-        type Methods, type Model, type ScoreMethods, type ScoreModel, type SizeModel
+        type Methods, type Model, type ScoreMethods, type ScoreModel, type SizeLimit, type SizeModel
       } from "../lib/model";
   import { dCoords, generate, gridStyle, range, repeat } from "../lib/util";
   import Template from '../components/Template.svelte';
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
-    import Icon from "../components/icons/Icon.svelte";
+  import Icon from "../components/icons/Icon.svelte";
 
   type Piece = "R" | "B" | "K" | "N" | "Q" | "custom" | null;
   type Pos = Piece[];
@@ -38,8 +38,8 @@
     }
   }
 
-   // teste si la pièce de type "piece" à la position index1 peut attaquer la pièce à la position index2
-   // suppose que la pièce est différent de Empty
+  // teste si la pièce de type "piece" à la position index1 peut attaquer la pièce à la position index2
+  // suppose que la pièce est différent de Empty
   function canCapture(piece: Piece, index1: number, index2: number): boolean {
     const [row, col] = dCoords(model.columns, index1, index2);
     if (piece !== "custom") {
@@ -74,7 +74,7 @@
     piece === null || !capturable[i]
   ));
 
-  // ensemble des cases attaquées par l'endroit du pointeur de la souris
+  // ensemble des cases attaquées par la case survolée par le pointeur de la souris
   let attackedBySelected = $derived(
     selectedSquare === null
     ? repeat(model.rows * model.columns, false)
@@ -123,6 +123,8 @@
       }
     })
   }
+
+  const sizeLimit: SizeLimit = { minRows:2, minCols: 2, maxRows: 9, maxCols: 9 };
 
   // svelte-ignore state_referenced_locally
   newGame(model, methods);
@@ -229,17 +231,17 @@
   Tu peux jouer avec une pièce personnalisée si tu le souhaites.
 {/snippet}
 
-{#snippet bestScore(pos: Pos)}
+{#snippet bestScore(position: Pos)}
   <div class="bestscore-container">
     <div class="ui-board" style={gridStyle(model.rows, model.columns, 5)}>
       <svg viewBox="0 0 {50*model.columns} {50*model.rows}">
-        {#each model.position as piece, i}
+        {#each position as piece, i}
           {@const x = 50 * (i % model.columns)}  
           {@const y = 50 * (i / model.columns | 0)}
           <rect {x} {y} class="square" />
           {#if piece !== null}
             <use
-              class={["piece", {capturable: capturable[i]}]}
+              class="piece"
               href="#piece-{piece}"
               x={x + 5}
               y={y + 5}
@@ -254,7 +256,7 @@
   </div>
 {/snippet}
 
-<Template bind:model={model} {methods} {board} {config} {rules} {bestScore} />
+<Template bind:model={model} {methods} {board} {config} {rules} {bestScore} {sizeLimit} />
 
 <style>
   .board-container {
