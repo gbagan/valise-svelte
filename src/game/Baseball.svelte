@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { range, shuffle, take } from '../lib/util';
+  import { random, range, shuffle, take } from '../lib/util';
   import {type Model, type Methods, initModel, playA, newGame } from '../lib/model';
   import Template from '../components/Template.svelte';
   import * as I from '../components/Icons';
@@ -25,13 +25,10 @@
   }
 
   const isLevelFinished = () =>
-    model.position.every((i, j) => i >> 1 == j >> 1)
+    model.position.every((i, j) => i >> 1 == j >> 1);
 
   const initialPosition = () => shuffle(range(0, 2*nbBases))
-
-  function onNewGame() {
-    missingPeg = Math.random() * (2 * nbBases) | 0
-  }
+  const onNewGame = () => missingPeg = random(0, 2 * nbBases);
 
   const methods: Methods<Pos, Move> = { play, isLevelFinished, initialPosition, onNewGame };
 

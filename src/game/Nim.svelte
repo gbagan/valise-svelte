@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { generate, range } from '../lib/util';
+  import { generate, random, range } from '../lib/util';
   import {type Model, type Methods, initModel, playA, newGame, winTitleFor2Player } from '../lib/model';
   import Template from '../components/Template.svelte';
   import * as I from '../components/Icons';
@@ -26,11 +26,8 @@
     return model.position.with(move.pile, model.turn === 1 ? [move.pos, p2] : [p1, move.pos]);
   }
 
-  function initialPosition(): Pos {
-    return generate(nbPiles, () =>
-      [Math.random() * 5 | 0, 5 + Math.random() * 5 | 0]
-    )
-  }
+  const initialPosition = () =>
+    generate(nbPiles, () => [random(0, 5), random(5, 10)]);
 
   const isLevelFinished = () => 
     model.position.every(([p1, p2]) =>

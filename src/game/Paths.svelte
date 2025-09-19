@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { allDistinct, dCoords, gridStyle, range, repeat } from '../lib/util';
+  import { allDistinct, dCoords, gridStyle, random, range, repeat } from '../lib/util';
   import {type Model, type Methods, type SizeLimit, type SizeModel, 
     initModel, newGame, playA} from '../lib/model';
   import Template from '../components/Template.svelte';
@@ -76,7 +76,7 @@
   const initialPosition = () => exit === null ? [] : [exit];
   
   function onNewGame() {
-    exit = mode === 1 ? Math.random() * model.rows * model.columns | 0 : null; 
+    exit = mode === 1 ? random(0, model.rows * model.columns) : null; 
   }
 
   const sizeLimit: SizeLimit = { minRows: 2, minCols: 2, maxRows: 9, maxCols: 9 };

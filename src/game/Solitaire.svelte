@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { dCoords, generate, generate2, gridStyle, repeat } from '../lib/util';
+  import { dCoords, generate, generate2, gridStyle, random, repeat } from '../lib/util';
   import {type Model, type ScoreModel, type Methods, type ScoreMethods, type SizeModel,
     initModel, newGame, updateScore, 
     type SizeLimit} from '../lib/model';
@@ -107,7 +107,7 @@
       model.customSize = false;
     } else if (boardType === "circle") {
       holes = repeat(rows, true);
-      const empty = Math.random() * rows | 0;
+      const empty = random(0, rows);
       model.position = generate(rows, x => x !== empty);     
       model.customSize = true;
     } else if (boardType === "grid3") {

@@ -28,6 +28,21 @@ export function range(start: number, end: number, step?: number): number[] {
   return res
 }
 
+export function take<A>(arr: A[], n: number): A[] {
+  return arr.slice(0, n);
+}
+
+export const random = (start: number, end: number) =>
+  start + (end - start) * Math.random() | 0;
+
+export function randomPick<A>(arr: A[]): A | null {
+  if (arr.length === 0) {
+    return null;
+  } else {
+    return arr[Math.random() * arr.length | 0];
+  }
+}
+
 export function shuffle<A>(arr: A[]): A[] {
   const res = arr.slice();
   for (let i = res.length-1; i >= 0; i--) {
@@ -39,21 +54,7 @@ export function shuffle<A>(arr: A[]): A[] {
   return res;
 }
 
-export function take<A>(arr: A[], n: number): A[] {
-  return arr.slice(0, n);
-}
-
-export function delay(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-export function randomPick<A>(arr: A[]): A | null {
-  if (arr.length === 0) {
-    return null;
-  } else {
-    return arr[Math.random() * arr.length | 0];
-  }
-}
+export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export function clone<A>(value: A): A {
   if (value === null || typeof value !== "object") {
