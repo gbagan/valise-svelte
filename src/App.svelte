@@ -1,6 +1,7 @@
 <script lang="ts">
   import Valise from './game/Valise.svelte';
   import Baseball from './game/Baseball.svelte';
+  import Chocolate from './game/Chocolate.svelte';
   import Frog from './game/Frog.svelte';
   import Hanoi from './game/Hanoi.svelte';
   import Jetons from './game/Jetons.svelte';
@@ -33,14 +34,16 @@ $inspect(location);
     <Valise />
   {:else if location === "baseball"}
     <Baseball />
-  {:else if location === "nim"}
-    <Nim />
+  {:else if location === "chocolate"}
+    <Chocolate />
   {:else if location === "frog"}
     <Frog />
   {:else if location === "hanoi"}
     <Hanoi />
   {:else if location === "jetons"}
     <Jetons />
+  {:else if location === "nim"}
+    <Nim />
   {:else if location === "paths"}
     <Paths />
   {:else if location === "queens"}

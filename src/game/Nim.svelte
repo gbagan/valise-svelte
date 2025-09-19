@@ -27,7 +27,7 @@
   }
 
   const initialPosition = () =>
-    generate(nbPiles, () => [random(0, 5), random(5, 10)]);
+    generate(nbPiles, () => [random(0, 5), random(5, 10)]) as Pos;
 
   const isLevelFinished = () => 
     model.position.every(([p1, p2]) =>
