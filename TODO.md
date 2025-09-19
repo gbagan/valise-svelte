@@ -7,3 +7,4 @@
 - [ ] queens: quand on quitte le mode mixte, vérifier qu'il ne reste qu'une pièce choisie
 - [x] solitaire: sur le cercle 5, le pion à droite ne peut pas être déplacé 
 - [ ] solitaire: ajouter les règles
+- [ ] chemins: ajouter les curseurs

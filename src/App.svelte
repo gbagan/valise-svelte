@@ -2,6 +2,7 @@
   import Valise from './game/Valise.svelte';
   import Baseball from './game/Baseball.svelte';
   import Frog from './game/Frog.svelte';
+  import Hanoi from './game/Hanoi.svelte';
   import Jetons from './game/Jetons.svelte';
   import Nim from './game/Nim.svelte';
   import Paths from './game/Paths.svelte';
@@ -36,6 +37,8 @@ $inspect(location);
     <Nim />
   {:else if location === "frog"}
     <Frog />
+  {:else if location === "hanoi"}
+    <Hanoi />
   {:else if location === "jetons"}
     <Jetons />
   {:else if location === "paths"}

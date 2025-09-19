@@ -7,10 +7,9 @@
     id: D;
     draggable?: boolean;
     droppable?: boolean;
-    params: P;
+    argument: P;
     render: (
-        id: D,
-        param: P,
+        argument: P,
         draggable: boolean,
         candrop: boolean,
         onpointerdown?: (e: PointerEvent) => void,
@@ -18,7 +17,7 @@
     ) => any;
   }
 
-  let { model=$bindable(), dragged=$bindable(), draggable, droppable, methods, id, params, render }: Props = $props();
+  let { model=$bindable(), dragged=$bindable(), draggable, droppable, methods, id, argument, render }: Props = $props();
   
   let candrop = $derived(
     !!droppable && dragged !== null
@@ -40,7 +39,7 @@
 </script>
 
 <g>
-  {@render render(id, params, dragged === id, candrop,
+  {@render render(argument, dragged === id, candrop,
     draggable ? onpointerdown : undefined,
     droppable ? onpointerup : undefined
   )}

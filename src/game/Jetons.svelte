@@ -67,7 +67,7 @@
     newGame(model, methods);
 </script>
 
-{#snippet peg(i: number, val: number, dragged: boolean, droppable: boolean,
+{#snippet peg([i, val]: [number, number], dragged: boolean, droppable: boolean,
   onpointerdown?: (e: PointerEvent) => void, onpointerup?: (e: PointerEvent) => void)
 }
   {@const row = i / model.columns | 0}
@@ -99,7 +99,7 @@
           {#if val !== 0}
             <DndItem bind:model={model} bind:dragged={dragged} {methods}
               id={i}
-              params={val}
+              argument={[i, val]}
               draggable={true}
               droppable={true}
               render={peg}
@@ -134,7 +134,7 @@
       <svg viewBox="0 0 {50 * model.columns} {50 * model.rows}">
         {#each position as val, i}
           {#if val !== 0}
-            {@render peg(i, val, false, false)}
+            {@render peg([i, val], false, false)}
           {/if}
         {/each}
       </svg>

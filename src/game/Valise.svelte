@@ -85,7 +85,21 @@
         x={492} y={350} width={40} height={40}
         {svg} {setHelp}
       />
-      
+      <ValiseObject
+        symbol="hanoibot"
+        link="hanoi"
+        help="Jeu: tours de Hanoi"
+        x={500} y={430} width={75} height={51}
+        rectX="30%" rectY="20%" rectWidth="40%" rectHeight="40%"
+        {svg} {setHelp}
+      />
+      <ValiseObject
+        symbol="hanoitop"
+        help="Quelque chose se cache sous cette tour"
+        drag={true}
+        x={507} y={409} width={60} height={57}
+        {svg} {setHelp}
+      />
     </g>
   </svg>
 {/snippet}

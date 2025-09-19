@@ -191,7 +191,7 @@
 </script>
 
 
-{#snippet hole(i: number, _val: null, _dragged: boolean, droppable: boolean,
+{#snippet hole(i: number, _dragged: boolean, droppable: boolean,
   onpointerdown?: (e: PointerEvent) => void, onpointerup?: (e: PointerEvent) => void)
 }
   {#if help > 0 && boardType !== "circle"}
@@ -213,7 +213,7 @@
   />
 {/snippet}
 
-{#snippet peg(i: number, _val: null, dragged: boolean, _droppable: boolean,
+{#snippet peg(i: number, dragged: boolean, _droppable: boolean,
   onpointerdown?: (e: PointerEvent) => void, onpointerup?: (e: PointerEvent) => void)
 }
   <circle
@@ -245,7 +245,7 @@
         {#if hasHole}
           <DndItem bind:model={model} bind:dragged={dragged} {methods}
             id={i}
-            params={null}
+            argument={i}
             droppable={interactive}
             render={hole}
           />
@@ -255,7 +255,7 @@
         {#if hasPeg}
           <DndItem bind:model={model} bind:dragged={dragged} {methods}
             id={i}
-            params={null}
+            argument={i}
             draggable={interactive}
             render={peg}
           />
