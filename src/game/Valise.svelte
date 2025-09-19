@@ -28,6 +28,14 @@
     <g class="valise-open">
       <use href="#openvalise"/>
         <ValiseObject
+          symbol="chocolate"
+          link="chocolate"
+          help="Jeu: chocolat"
+          x={200} y={200} width={60} height={60}
+          style="transform:rotate(40deg);"
+          {svg} {setHelp}
+        />
+        <ValiseObject
           symbol="knight"
           link="queens"
           help="Jeu: les 8 reines"

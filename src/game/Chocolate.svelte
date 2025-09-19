@@ -1,6 +1,7 @@
 <script lang="ts">
   import { generate2, gridStyle, random, range } from '../lib/util';
   import {type Model, type Methods, type SizeModel, initModel, playA, newGame, winTitleFor2Player, turnMessage } from '../lib/model';
+  import PointerTracker from '../components/PointerTracker.svelte';
   import Template from '../components/Template.svelte';
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
@@ -97,6 +98,13 @@
   let message = $derived(soap === null ? "Place le savon" : turnMessage(model, methods));
   let winTitle = $derived(winTitleFor2Player(model));
 
+  function putSoap(s: [number, number]) {
+    if (soap === null) {
+      soap = s;
+    }
+  }
+
+
   // svelte-ignore state_referenced_locally
   newGame(model, methods);
 </script>
@@ -115,34 +123,45 @@
   />
 {/snippet}
 
+{#snippet pointer(style: string)}
+  {#if soap === null}
+    <use
+      href="#skull"
+      class="pointer"
+      {style}
+      x="-20"
+      y="-20"
+      width="26"
+      height="26"
+    />
+  {/if}
+{/snippet}
+
 {#snippet board()}
   {@const {left, right, top, bottom} = model.position}
   <div class="board-container">
     <div class="turn-message">{message}</div>
     <div class="ui-board" style={gridStyle(model.rows, model.columns, 3)}>
-      <svg viewBox="-7 -7 {50 * model.columns + 14} {50 * model.rows + 14}">
+      <PointerTracker {pointer} viewBox="-7 -7 {50 * model.columns + 14} {50 * model.rows + 14}">
         {#each grid as [row, col]}
+          <!-- svelte-ignore a11y_click_events_have_key_events -->
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
           <rect
             class={["square", {
               soap: soap !== null && soap[0] === row && soap[1] === col,
               hidden: !isInside(row, col)
             }]}
             style:transform="translate({50*col}px, {50*row}px)"
+            onclick={() => putSoap([row, col])  }
           />
         {/each}
         {#each pmoves as [dir, i]}
-          {#if dir === "left"}
-            {@render cutter(top, i, ["left", i])}
-            {@render cutter(bottom, i, ["left", i])}
-          {:else if dir === "right"}
-            {@render cutter(top, i, ["right", i])}
-            {@render cutter(bottom, i, ["right", i])}
-          {:else if dir === "top"}
-            {@render cutter(i, left, ["top", i])}
-            {@render cutter(i, right, ["top", i])}
+          {#if dir === "left" || dir === "right"}
+            {@render cutter(top, i, [dir, i])}
+            {@render cutter(bottom, i, [dir, i])}
           {:else}
-            {@render cutter(i, left, ["bottom", i])}
-            {@render cutter(i, right, ["bottom", i])}
+            {@render cutter(i, left, [dir, i])}
+            {@render cutter(i, right, [dir, i])}
           {/if}
         {/each}
 
@@ -161,13 +180,21 @@
           {@const {x1, x2, y1, y2} = cutLine}
           <line x1={50*x1} x2={50*x2} y1={50*y1} y2={50*y2} class="cut-line" />
         {/if}
-      </svg>
+      </PointerTracker>
     </div>
   </div>
 {/snippet}
 
 {#snippet config()}
   <Config title="Chocolat">
+    <I.SelectGroup
+      title="Emplacement du savon"
+      values={["corner", "border", "standard", "custom"]}
+      text={["#choc-mode0", "#choc-mode1", "#choc-mode2", "#customize"]}
+      tooltip={["Dans le coin", "Sur le bord", "N'importe où", "Personnalisé"]}
+      selected={soapMode}
+      setter={(m: SoapMode) => newGame(model, methods, () => soapMode = m)}
+    />
     <I.Group title="Options">
       <I.Undo bind:model={model} {methods} />
       <I.Redo bind:model={model} {methods} />
@@ -237,4 +264,9 @@
     pointer-events: none;
     opacity: 0.6;
   }
+
+  .pointer {
+    opacity: 0.6;
+    pointer-events: none;
+}
 </style>
