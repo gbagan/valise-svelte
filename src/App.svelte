@@ -5,6 +5,7 @@
   import Frog from './game/Frog.svelte';
   import Hanoi from './game/Hanoi.svelte';
   import Jetons from './game/Jetons.svelte';
+  import NoirBlanc from './game/NoirBlanc.svelte';
   import Nim from './game/Nim.svelte';
   import Paths from './game/Paths.svelte';
   import Queens from './game/Queens.svelte';
@@ -42,6 +43,8 @@ $inspect(location);
     <Hanoi />
   {:else if location === "jetons"}
     <Jetons />
+  {:else if location === "noirblanc"}
+    <NoirBlanc />
   {:else if location === "nim"}
     <Nim />
   {:else if location === "paths"}

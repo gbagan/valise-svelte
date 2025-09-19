@@ -118,6 +118,7 @@
 
 {#snippet config()}
   <Config title="Bloque moi si tu peux">
+    <I.TwoPlayers bind:model={model} {methods} />
     <I.Group title="Options">
       <I.Undo bind:model={model} {methods} />
       <I.Redo bind:model={model} {methods} />

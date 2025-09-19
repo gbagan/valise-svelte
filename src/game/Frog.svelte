@@ -202,6 +202,7 @@
       selected={moves}
       setter={movesSetter}
     />
+    <I.TwoPlayers bind:model={model} {methods} />
     <I.Group title="Options">
       <I.Help bind:model={model} />
       <I.Undo bind:model={model} {methods} />

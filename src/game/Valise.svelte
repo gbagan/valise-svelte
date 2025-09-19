@@ -80,6 +80,13 @@
         {svg} {setHelp}
       />
       <ValiseObject
+        symbol="bulbon"
+        link="noirblanc"
+        help="Jeu: tout noir, tout blanc"
+        x={477} y={280} width={48} height={48}
+        {svg} {setHelp}
+      />
+      <ValiseObject
         symbol="race"
         link="paths"
         help="Jeu: chemins"

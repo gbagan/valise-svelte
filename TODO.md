@@ -2,7 +2,6 @@
 - [ ] désactiver SelectGroup et MultiSelectGroup quand locked=true
 - [ ] ajouter les icones manquantes pour nim et frog
 - [x] changer le message de victoire pour nim et frog
-- [x] implémenter I.SizeGroup
 - [ ] gérer le cas des parties personnalisées: le score ne doit pas être sauvegardé
 - [ ] queens: ajouter le curseur
 - [ ] queens: quand on quitte le mode mixte, vérifier qu'il ne reste qu'une pièce choisie
@@ -10,3 +9,4 @@
 - [ ] solitaire: ajouter les règles
 - [ ] chemins: ajouter les curseurs
 - [ ] problème d'affichage du joueur quand l'IA commence
+- [ ] bug de undo/redo pour les jeux à deux joueurs
