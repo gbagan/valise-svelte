@@ -80,6 +80,24 @@
     }
   }
 
+  const changeMode = (i: Mode) => newGame(model, methods, () => {
+    mode = i;
+    level = 0;
+  });
+
+  const changeLevel = (i: number) => newGame(model, methods, () => level = i);
+
+
+  const levelTexts = ["3x3", "4x4", "2x10", "3x10", "5x5", "NxM", "#lo-rand"];
+  const levelText = (i: number, unblocked: boolean) => unblocked ? levelTexts[i] : "#locked";
+
+
+  const levelTooltips: (string | undefined)[] = [
+    undefined, undefined, undefined, undefined, undefined,
+    "Dimensions personnalisées", "Grille aléatoire"
+  ];
+  const levelTooltip = (i: number, unblocked: boolean) => unblocked ? levelTooltips[i] : "Difficulté non débloquée";
+
   // svelte-ignore state_referenced_locally
   newGame(model, methods);
 </script>
@@ -120,6 +138,23 @@
 
 {#snippet config()}
   <Config title="Tout noir, tout blanc">
+    <I.SelectGroup
+      title="Mode de jeu"
+      values={[0, 1, 2, 3] as Mode[]}
+      text={i => `#lo-mode${i+1}`}
+      selected={mode}
+      setter={changeMode}
+    />
+    <I.SelectGroup
+      title="Difficulté"
+      values={[0, 1, 2, 3, 4, 5, 6]}
+      text={i => levelText(i, i <= maxLevels[mode])}
+      tooltip={i => levelTooltip(i, i <= maxLevels[mode])}
+      disabled={i => i > maxLevels[mode]}
+      selected={level}
+      setter={changeLevel}
+    />
+
     <I.Group title="Options">
       <I.Help bind:model={model} />
       <I.Reset bind:model={model} {methods} />
@@ -187,6 +222,6 @@
     width: 100%;
     height: 100%;
     opacity: 0.7;
-    fill: blue;
+    stroke: blue;
   }
 </style>
