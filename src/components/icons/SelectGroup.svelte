@@ -9,9 +9,10 @@
     text?: string[] | ((v: A) => string);
     tooltip?: string[] | ((v: A) => string);
     setter: (val: A) => void;
+    children?: () => any;
   }
   
-  const {title, values, selected, text, tooltip, setter}: Props = $props();
+  const {title, values, selected, text, tooltip, setter, children}: Props = $props();
 </script>
 
 <IconGroup {title}>
@@ -23,4 +24,5 @@
       onclick={() => setter(val)}
     />
   {/each}
+  {@render children?.()}
 </IconGroup>

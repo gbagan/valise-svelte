@@ -9,3 +9,4 @@
 - [x] solitaire: sur le cercle 5, le pion à droite ne peut pas être déplacé 
 - [ ] solitaire: ajouter les règles
 - [ ] chemins: ajouter les curseurs
+- [ ] problème d'affichage du joueur quand l'IA commence

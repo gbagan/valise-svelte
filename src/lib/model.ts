@@ -1,7 +1,7 @@
 import {clone, delay, randomPick} from "./util";
 
-type Turn = 1 | 2;
-type Mode = "solo" | "random" | "expert" | "duel"
+export type Turn = 1 | 2;
+export type Mode = "solo" | "random" | "expert" | "duel"
 
 export interface Model<Pos> {
   position: Pos;
@@ -75,16 +75,24 @@ export async function playA<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, 
   } else if (model.mode === "expert" || model.mode === "random") {
     model.locked = true;
     await delay(1000);
-    const move = computerMove(model, methods)!;
-    playHelper(model, methods, move);
-    if (methods.isLevelFinished()) {
-      model.showWin = true;
-      await delay(1000);
-      model.showWin = false;
-    }
+    computerPlays(model, methods);
     model.locked = false;
   }
 }
+
+export async function computerPlays<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>) {
+  const move = computerMove(model, methods);
+  if (move === null) {
+    return;
+  }
+  playHelper(model, methods, move);
+  if (methods.isLevelFinished()) {
+    model.showWin = true;
+    await delay(1000);
+    model.showWin = false;
+  }
+}
+
 
 export function defaultUpdateScore<Pos, Move>(methods: Methods<Pos, Move>): { isNewRecord: boolean, showWin: boolean } {
   return {

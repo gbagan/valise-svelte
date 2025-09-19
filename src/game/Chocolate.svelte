@@ -1,6 +1,6 @@
 <script lang="ts">
   import { generate2, gridStyle, random, range } from '../lib/util';
-  import {type Model, type Methods, type SizeModel, initModel, playA, newGame, winTitleFor2Player, turnMessage } from '../lib/model';
+  import {type Model, type Methods, type SizeModel, initModel, playA, newGame, winTitleFor2Player, turnMessage, type SizeLimit } from '../lib/model';
   import PointerTracker from '../components/PointerTracker.svelte';
   import Template from '../components/Template.svelte';
   import * as I from '../components/Icons';
@@ -98,6 +98,8 @@
   let message = $derived(soap === null ? "Place le savon" : turnMessage(model, methods));
   let winTitle = $derived(winTitleFor2Player(model));
 
+  const sizeLimit: SizeLimit = { minRows: 4, minCols: 4, maxRows: 10, maxCols: 10 };
+
   function putSoap(s: [number, number]) {
     if (soap === null) {
       soap = s;
@@ -187,6 +189,7 @@
 
 {#snippet config()}
   <Config title="Chocolat">
+    <I.SizesGroup bind:model={model} {methods} values={[[6, 7]]} customSize={true} />
     <I.SelectGroup
       title="Emplacement du savon"
       values={["corner", "border", "standard", "custom"]}
@@ -195,6 +198,7 @@
       selected={soapMode}
       setter={(m: SoapMode) => newGame(model, methods, () => soapMode = m)}
     />
+    <I.TwoPlayers bind:model={model} {methods} />
     <I.Group title="Options">
       <I.Undo bind:model={model} {methods} />
       <I.Redo bind:model={model} {methods} />
@@ -210,7 +214,7 @@
   Lorsqu'il ne reste que le carré empoisonné, le joueur qui doit jouer a perdu.
 {/snippet}
 
-<Template bind:model={model} {methods} {board} {config} {rules} {winTitle} />
+<Template bind:model={model} {methods} {board} {config} {rules} {winTitle} {sizeLimit} />
 
 <style>
   .board-container {
@@ -227,7 +231,7 @@
     color: blue;
     font-weight: bold;
     font-size: 1.5rem;
-    top: -1rem;
+    top: -2rem;
     left: 0;
   }
 
