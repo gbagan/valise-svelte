@@ -10,3 +10,5 @@
 - [ ] chemins: ajouter les curseurs
 - [ ] problème d'affichage du joueur quand l'IA commence
 - [ ] bug de undo/redo pour les jeux à deux joueurs
+- [ ] sans mot: implémenter d'autres preuves
+- [ ] roue des couleurs: gérer les rotations négatives

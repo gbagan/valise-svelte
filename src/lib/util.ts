@@ -32,6 +32,14 @@ export function take<A>(arr: A[], n: number): A[] {
   return arr.slice(0, n);
 }
 
+export function swap<A>(arr: A[], i: number, j: number): A[] {
+  const res = arr.slice();
+  const tmp = res[i];
+  res[i] = res[j];
+  res[j] = tmp;
+  return res; 
+}
+
 export const random = (start: number, end: number) =>
   start + (end - start) * Math.random() | 0;
 

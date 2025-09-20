@@ -198,17 +198,15 @@
   .pytha-svg {
     display: inline-block;
     width: 20vmin;
-    height: 25vmin;
   }
 
   .pytha-svg2 {
     display: inline-block;
     width: 84vmin;
-    height: 36vmin;
   }
 
   .caroll-svg {
-    display: inlinde-block;
+    display: inline-block;
     width: 90vw;
   }
 

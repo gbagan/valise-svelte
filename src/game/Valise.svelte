@@ -91,6 +91,7 @@
         link="paths"
         help="Jeu: chemins"
         x={450} y={445} width={64} height={64}
+        style="transform:rotate(40deg);"
         {svg} {setHelp}
       />
       <ValiseObject
@@ -120,6 +121,14 @@
         help="Quelque chose se cache sous cette tour"
         drag={true}
         x={507} y={409} width={60} height={57}
+        {svg} {setHelp}
+      />
+      <ValiseObject
+        symbol="wheel"
+        link="roue"
+        help="Jeu: roue des couleurs"
+        x={400} y={205} width={50} height={50}
+        style="transform:scale(1,0.8);"
         {svg} {setHelp}
       />
     </g>

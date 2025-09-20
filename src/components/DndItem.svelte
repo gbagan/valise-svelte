@@ -7,6 +7,7 @@
     id: D;
     draggable?: boolean;
     droppable?: boolean;
+    equals?: (x: D, y: D) => boolean;
     argument: P;
     render: (
         argument: P,
@@ -17,7 +18,8 @@
     ) => any;
   }
 
-  let { model=$bindable(), dragged=$bindable(), draggable, droppable, methods, id, argument, render }: Props = $props();
+  let { model=$bindable(), dragged=$bindable(), draggable, droppable, equals,
+        methods, id, argument, render }: Props = $props();
   
   let candrop = $derived(
     !!droppable && dragged !== null
@@ -39,7 +41,7 @@
 </script>
 
 <g>
-  {@render render(argument, dragged === id, candrop,
+  {@render render(argument, dragged !== null && (equals ? equals(dragged, id) : dragged === id), candrop,
     draggable ? onpointerdown : undefined,
     droppable ? onpointerup : undefined
   )}

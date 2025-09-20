@@ -11,6 +11,7 @@
   import Queens from './game/Queens.svelte';
   import SansMot from './game/SansMot.svelte';
   import Solitaire from './game/Solitaire.svelte';
+  import Wheel from './game/Wheel.svelte';
   import { onMount } from 'svelte';
 
   let location = $state(window.location.hash.slice(1) || "main");
@@ -50,6 +51,8 @@ $inspect(location);
     <Nim />
   {:else if location === "paths"}
     <Paths />
+  {:else if location === "roue"}
+    <Wheel />
   {:else if location === "queens"}
     <Queens />
   {:else if location === "sansmot"}
