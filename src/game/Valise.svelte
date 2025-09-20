@@ -94,6 +94,13 @@
         {svg} {setHelp}
       />
       <ValiseObject
+        symbol="quiet"
+        link="sansmot"
+        help="Preuves sans mot"
+        x={180} y={130} width={50} height={50}
+        {svg} {setHelp}
+      />
+      <ValiseObject
         symbol="soli-peg2"
         link="solitaire"
         help="Jeu: solitaire"

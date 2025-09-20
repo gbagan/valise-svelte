@@ -9,6 +9,7 @@
   import Nim from './game/Nim.svelte';
   import Paths from './game/Paths.svelte';
   import Queens from './game/Queens.svelte';
+  import SansMot from './game/SansMot.svelte';
   import Solitaire from './game/Solitaire.svelte';
   import { onMount } from 'svelte';
 
@@ -51,6 +52,8 @@ $inspect(location);
     <Paths />
   {:else if location === "queens"}
     <Queens />
+  {:else if location === "sansmot"}
+    <SansMot />
   {:else if location === "solitaire"}
     <Solitaire />
   {/if}
