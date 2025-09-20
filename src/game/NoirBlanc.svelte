@@ -98,6 +98,8 @@
   ];
   const levelTooltip = (i: number, unblocked: boolean) => unblocked ? levelTooltips[i] : "Difficulté non débloquée";
 
+  const sizeLimit: SizeLimit = { minRows: 2, minCols: 2, maxRows: 12, maxCols: 12 };
+
   // svelte-ignore state_referenced_locally
   newGame(model, methods);
 </script>
@@ -170,7 +172,7 @@
   Selon le mode choisi, les règles pour retourner les tuiles changent.
 {/snippet}
 
-<Template bind:model={model} {methods} {board} {config} {rules} />
+<Template bind:model={model} {methods} {board} {config} {rules} {sizeLimit} />
 
 
 <style>

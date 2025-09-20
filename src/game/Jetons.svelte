@@ -15,7 +15,7 @@
     ...initModel([]),
     rows: 4,
     columns: 4,
-    customSize: true,
+    customSize: false,
     scores: {},
   });
 
@@ -55,7 +55,7 @@
   };
   methods.updateScore = () => updateScore(model, methods, true, "always");
 
-  const sizeLimit = {minRows: 2, minCols: 2, maxCols: 6, maxRows: 6};
+  const sizeLimit = { minRows: 1, minCols: 2, maxRows: 6, maxCols: 12 };
 
   let winTitle = $derived.by(() => {
     const score = methods.score();

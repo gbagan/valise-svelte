@@ -124,7 +124,7 @@
     })
   }
 
-  const sizeLimit: SizeLimit = { minRows:2, minCols: 2, maxRows: 9, maxCols: 9 };
+  const sizeLimit: SizeLimit = { minRows:3, minCols: 3, maxRows: 9, maxCols: 9 };
 
   // svelte-ignore state_referenced_locally
   newGame(model, methods);
