@@ -1,6 +1,9 @@
+- [ ] PWA
 - [ ] valise: le tooltip doit être affiché quand on survole le <a> et non l'image entière
 - [ ] désactiver SelectGroup et MultiSelectGroup quand locked=true
-- [ ] ajouter les icones manquantes pour nim et frog
+- [ ] Konami code ?
+- [ ] nim: ajouter les icones manquantes
+- [x] frog: ajouter les icones manquantes
 - [x] changer le message de victoire pour nim et frog
 - [ ] gérer le cas des parties personnalisées: le score ne doit pas être sauvegardé
 - [ ] queens: ajouter le curseur
@@ -13,5 +16,5 @@
 - [ ] sans mot: implémenter d'autres preuves
 - [x] roue des couleurs: gérer les rotations négatives
 - [ ] roue des couleurs: ajouter un indicateur pour savoir si la rotation est valide
-- [ ] ce sont les bonnes règles?
-- [x] refaire la roue extérieure
+- [ ] roue des couleurs: ce sont les bonnes règles?
+- [x] roue des couleurs: refaire la roue extérieure
