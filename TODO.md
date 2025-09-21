@@ -1,6 +1,7 @@
 - [ ] PWA
+- [ ] Vérifier que ça marche bien sur tablette
 - [ ] valise: le tooltip doit être affiché quand on survole le <a> et non l'image entière
-- [ ] désactiver SelectGroup et MultiSelectGroup quand locked=true
+- [x] désactiver SelectGroup et MultiSelectGroup quand locked=true
 - [ ] Konami code ?
 - [ ] nim: ajouter les icones manquantes
 - [x] frog: ajouter les icones manquantes

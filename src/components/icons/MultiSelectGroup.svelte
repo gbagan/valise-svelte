@@ -7,9 +7,10 @@
     values: A[];
     selected: A[];
     setter: (val: A) => void;
+    disabled?: boolean;
   }
   
-  const {title, values, selected, setter}: Props = $props();
+  const {title, values, disabled, selected, setter}: Props = $props();
 </script>
 
 <IconGroup {title}>
@@ -18,6 +19,7 @@
       text={""+val}
       selected={selected.includes(val)}
       onclick={() => setter(val)}
+      disabled={disabled}
     />
   {/each}
 </IconGroup>

@@ -200,6 +200,7 @@
       title="Déplacements autorisés"
       values={[1, 2, 3, 4, 5]}
       selected={moves}
+      disabled={model.locked}
       setter={movesSetter}
     />
     <I.TwoPlayers bind:model={model} {methods} />

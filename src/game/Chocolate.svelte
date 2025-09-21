@@ -196,6 +196,7 @@
       text={["#choc-mode0", "#choc-mode1", "#choc-mode2", "#customize"]}
       tooltip={["Dans le coin", "Sur le bord", "N'importe où", "Personnalisé"]}
       selected={soapMode}
+      disabled={model.locked}
       setter={(m: SoapMode) => newGame(model, methods, () => soapMode = m)}
     />
     <I.TwoPlayers bind:model={model} {methods} />

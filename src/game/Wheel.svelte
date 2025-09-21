@@ -235,6 +235,7 @@
       title="Nombre de couleurs"
       values={[4, 5, 6, 7, 8]}
       selected={size}
+      disabled={model.locked}
       setter={s => newGame(model, methods, () => size = s)}
     />
     <I.Group title="Options">

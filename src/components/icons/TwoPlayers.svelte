@@ -17,6 +17,7 @@
   text={["#school", "#enstein", "#duel"]}
   tooltip={["IA mode facile", "IA mode expert", "Affronte un autre joueur"]}
   selected={model.mode}
+  disabled={model.locked}
   setter={mode => newGame(model, methods, () => model.mode = mode)}
 >
   <Icon
