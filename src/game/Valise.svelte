@@ -29,7 +29,7 @@
       <use href="#openvalise"/>
         <ValiseObject
           symbol="chocolate"
-          link="chocolate"
+          link="chocolat"
           help="Jeu: chocolat"
           x={200} y={200} width={60} height={60}
           style="transform:rotate(40deg);"

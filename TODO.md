@@ -1,5 +1,9 @@
-- [ ] PWA
+- [x] PWA
 - [ ] Vérifier que ça marche bien sur tablette
+- [ ] Safari: queens: bug d'affichage des cases grises
+- [ ] Safari: roue des couleurs: les contours des parties survolés de
+       la roue extérieure lors d'un drag and drop n'appaissent pas en vert 
+- [ ] Safari: jetons: l'ombre sur les cases n'apparait pas
 - [ ] valise: le tooltip doit être affiché quand on survole le <a> et non l'image entière
 - [x] désactiver SelectGroup et MultiSelectGroup quand locked=true
 - [ ] Konami code ?
