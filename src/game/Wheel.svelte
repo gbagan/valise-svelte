@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { delay, range, repeat, swap } from '../lib/util';
+  import { delay, mod, range, repeat, swap } from '../lib/util';
   import {type Model, type Methods, initModel, newGame} from '../lib/model';
   import Template from '../components/Template.svelte';
   import * as I from '../components/Icons';
@@ -19,8 +19,10 @@
   // tableau indiquant quelles sont les balles alignées avec leur couleur
   let aligned = $derived(model.position.map((v, i) =>
     // todo vérifier le mod 
-    v !== null && (i + rotation) % size === v 
+    v !== null && mod(i + rotation, size) === v
   ));
+
+  $inspect(model.position);
 
   // comme isValidRotation mais avec seconde conditition en moins 
   let isValidRotation2 = $derived(aligned.filter(x => x).length === 1);
@@ -97,6 +99,14 @@
   newGame(model, methods)
 </script>
 
+{#snippet board2(_: null, _dragged: boolean, _droppable: boolean,
+   onpointerdown?: (e: PointerEvent) => void, onpointerup?: (e: PointerEvent) => void)
+}
+  <rect x="-100" y="-120" width="100%" height="100%" fill="transparent"
+    {onpointerdown} {onpointerup}
+  />
+{/snippet}
+
 {#snippet wheelPart([i, aligned]: [number, boolean], _dragged: boolean, droppable: boolean,
    onpointerdown?: (e: PointerEvent) => void, onpointerup?: (e: PointerEvent) => void)
 }
@@ -108,7 +118,7 @@
   />
 {/snippet}
 
-{#snippet disk([color, x, y]: [number, number, number], dragged: boolean, droppable: boolean,
+{#snippet disk([color, x, y]: [number, number, number], dragged2: boolean, droppable: boolean,
    onpointerdown?: (e: PointerEvent) => void, onpointerup?: (e: PointerEvent) => void)
 }
   <circle cx={x} cy={y} r="8"
@@ -116,7 +126,8 @@
     {onpointerup}
     fill={colors[color]}
     stroke="black"
-    opacity={dragged ? "20%" : "100%"}
+    opacity={dragged2 ? "20%" : "100%"}
+    pointer-events={dragged ? "none" : ""}
   />
 {/snippet}
 
@@ -139,6 +150,13 @@
       bind:dragged={dragged}
       draggedElement={draggedDisk} 
     >
+      <DndItem bind:model={model} {methods}
+        id={{kind: "board"}}
+        argument={null}
+        bind:dragged={dragged}
+        droppable={true}
+        render={board2}
+      />
       {#each range(0, size) as color}
         {#if !usedColors[color]}  
           <DndItem bind:model={model} {methods}
@@ -261,56 +279,6 @@
     transition: all linear 0.5s;
   }
 
-.roue-inner {
-    position: absolute;
-    width: 50%;
-    height: 50%;
-    left: 25%;
-    top: 25%; 
-    pointer-events: none;
-}
-
-.roue-outer-piece {
-    position: absolute;
-    width: 12%;
-    height: 12%;
-    border: thin solid gray;
-    border-radius: 50%;
-    pointer-events: none;
-}
-
-.roue-select-color {
-    width: 6vmin;
-    height: 6vmin;
-    border: thin solid gray;
-    border-radius: 50%;
-    color: green;
-    font-weight: bold;
-    font-size: 1.5em;
-}
-
-.roue-button {
-    width: 6vmin;
-    height: 6vmin;
-    font-size: 4vmin;
-    padding: 0;
-}
-
-.roue-validate {
-    position: absolute;
-    right: 0.5rem;
-    bottom: 0.5rem;
-    font-size: 4vmin;
-    padding: 0;
-}
-
-.roue-buttons {
-    height: 7.5vmin;
-    width: 75vmin;
-    display: flex;
-    justify-content: space-around;
-}
-
   .wheel-part {
     stroke: black;
     &.droppable:hover {
@@ -320,7 +288,7 @@
     }
   }
 
-.roue-valid-rotation {
+  .roue-valid-rotation {
     position: absolute;
     font-size: 4em;
     right: 0.5em;
@@ -332,9 +300,5 @@
     .invalid {
         color: red;
     }
-}
-
-.roue-cursor {
-    opacity: 0.7;
-}
+  }
 </style>

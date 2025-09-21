@@ -86,9 +86,17 @@ export function allDistinct<A>(arr: A[]): boolean {
   return new Set(arr).size === arr.length;
 }
 
+export function mod(x: number, y: number) {
+  const z = x % y;
+  return z < 0 ? z + y : z;  
+}
+
 
 export const generate2 = <A>(n: number,  m: number, f: (i: number, j: number) => A) => 
   generate(n * m, i => f(i / m | 0, i % m));
+
+
+
 
 export function dCoords(cols: number, x: number, y: number): [number, number] {
   const row1 = x / cols | 0;
