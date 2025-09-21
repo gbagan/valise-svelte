@@ -22,8 +22,6 @@
     v !== null && mod(i + rotation, size) === v
   ));
 
-  $inspect(model.position);
-
   // comme isValidRotation mais avec seconde conditition en moins 
   let isValidRotation2 = $derived(aligned.filter(x => x).length === 1);
   // une rotation est valide si exactement une couleur est alignée et il y a une balle pour chaque couleur 
@@ -95,6 +93,17 @@
     return `M${cx} ${cy}L${ex} ${ey}A${radius} ${radius} 0 0 0 ${sx} ${sy}L${cx} ${cy}`;
   }
 
+  function pizza2(cx: number, cy: number, innerRadius: number, outerRadius: number,
+    startAngle: number, endAngle: number) 
+  {
+    const [isx, isy] = polarToCartesian(cx, cy, innerRadius, startAngle);
+    const [iex, iey] = polarToCartesian(cx, cy, innerRadius, endAngle);
+    const [osx, osy] = polarToCartesian(cx, cy, outerRadius, startAngle);
+    const [oex, oey] = polarToCartesian(cx, cy, outerRadius, endAngle);
+    return `M${isx} ${isy}L${osx} ${osy}A${outerRadius} ${outerRadius} 0 0 1 ${oex} ${oey}`
+      + `L${iex} ${iey}A${innerRadius} ${innerRadius} 0 0 0 ${isx} ${isy}`;
+  }
+
   // svelte-ignore state_referenced_locally
   newGame(model, methods)
 </script>
@@ -111,7 +120,7 @@
    onpointerdown?: (e: PointerEvent) => void, onpointerup?: (e: PointerEvent) => void)
 }
   <path
-    d={pizza(0, 0, 80, 2 * Math.PI * (i - 0.5) / size, 2 * Math.PI * (i + 0.5) / size)}
+    d={pizza2(0, 0, 50, 80, 2 * Math.PI * (i - 0.5) / size, 2 * Math.PI * (i + 0.5) / size)}
     class={["wheel-part", {droppable}]}
     fill={!aligned ? "#F0B27A" : isValidRotation2 ? "lightgreen" : "#F5B7B1"}
     {onpointerdown} {onpointerup}
@@ -168,6 +177,14 @@
           />
         {/if}
       {/each}
+      {#each colors.slice(0, size) as color, i}
+        <path
+          d={pizza(0, 0, 50, 2 * Math.PI * (i - 0.5) / size, 2 * Math.PI * (i + 0.5) / size)}
+          fill={color}
+          stroke="black"
+          pointer-events="none"
+        />
+      {/each}
       <g class="outer-wheel" style:transform="rotate({360 * rotation / size}deg)">
        {#each aligned as align, i (i)}
           <DndItem bind:model={model} {methods}
@@ -193,23 +210,22 @@
           {/if}
         {/each}
       </g>
-      {#each colors.slice(0, size) as color, i}
-        <path
-          d={pizza(0, 0, 50, 2 * Math.PI * (i - 0.5) / size, 2 * Math.PI * (i + 0.5) / size)}
-          fill={color}
-          stroke="black"
-        />
-      {/each}
     </DndBoard>
-    <button class="ui-button ui-button-primary btn-left" onclick={() => rotation -= 1}>↶</button>
-    <button class="ui-button ui-button-primary btn-right" onclick={() => rotation += 1}>↷</button>
+    <button
+      class="ui-button ui-button-primary btn-left"
+      disabled={model.locked}
+      onclick={() => rotation -= 1}
+    >↶</button>
+    <button
+      class="ui-button ui-button-primary btn-right"
+      disabled={model.locked}
+      onclick={() => rotation += 1}
+    >↷</button>
     <button
       class="ui-button ui-button-primary btn-validate"
       disabled={model.locked || !isValidRotation}
       onclick={check}
-    >
-      Valider
-    </button>
+    >Valider</button>
   </div>
 {/snippet}
 

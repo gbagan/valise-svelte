@@ -11,4 +11,7 @@
 - [ ] problème d'affichage du joueur quand l'IA commence
 - [ ] bug de undo/redo pour les jeux à deux joueurs
 - [ ] sans mot: implémenter d'autres preuves
-- [ ] roue des couleurs: gérer les rotations négatives
+- [x] roue des couleurs: gérer les rotations négatives
+- [ ] roue des couleurs: ajouter un indicateur pour savoir si la rotation est valide
+- [ ] ce sont les bonnes règles?
+- [x] refaire la roue extérieure
