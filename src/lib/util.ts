@@ -12,7 +12,6 @@ export function generate<A>(n: number, f: (i: number) => A): A[] {
   return res;
 }
 
-
 export function range(start: number, end: number, step?: number): number[] {
   const res = [];
   step = step ?? 1;
@@ -28,6 +27,17 @@ export function range(start: number, end: number, step?: number): number[] {
   return res
 }
 
+export function countBy<A>(arr: A[], pred: (x: A, i: number) => boolean): number {
+  let count = 0;
+  const n = arr.length;
+  for (let i = 0; i < n; i++) {
+    if (pred(arr[i], i)) {
+      count += 1;
+    }
+  }
+  return count;
+}
+
 export function take<A>(arr: A[], n: number): A[] {
   return arr.slice(0, n);
 }
@@ -39,6 +49,35 @@ export function swap<A>(arr: A[], i: number, j: number): A[] {
   res[j] = tmp;
   return res; 
 }
+
+export function minBy<A>(arr: A[], fn: (x: A) => number) {
+  let min = null;
+  let bestScore = Infinity;
+  let n = arr.length;
+  for (let i = 0; i < n; i++) {
+    const x = arr[i];
+    const score = fn(x);
+    if (score < bestScore) {
+      bestScore = score;
+      min = x;
+    } 
+  }
+  return min;
+}
+
+export const maxBy = <A>(arr: A[], fn: (x: A) => number) => minBy(arr, x => -fn(x))
+
+// renvoie les sous listes de taille k de [0, ... n-1]
+export function sublists(n: number, k: number): number[][] {
+  if (k === 0) {
+    return [[]]
+  } else if (k > n) {
+    return []
+  } else {
+    return sublists(n - 1, k).concat(sublists(n - 1, k - 1));
+  }
+}
+
 
 export const random = (start: number, end: number) =>
   start + (end - start) * Math.random() | 0;
