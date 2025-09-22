@@ -23,8 +23,6 @@
       location = window.location.hash.slice(1) || "main";
     })
   )
-
-$inspect(location);
 </script>
 
 <div class="container {location === "main" ? "valise" : "game"}">

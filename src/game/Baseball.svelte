@@ -12,7 +12,7 @@
   let nbBases = $state(5);
   let missingPeg = $state(1);
 
-  const levelFinished = $derived(model.position.every((i, j) => i >> 1 == j >> 1));
+  let levelFinished = $derived(model.position.every((i, j) => i >> 1 == j >> 1));
 
   function play(i: number): Position | null {
     const position = model.position;

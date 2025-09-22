@@ -48,19 +48,21 @@ export interface Methods<Pos, Move> {
   isLosingPosition?: () => boolean;
 }
 
-function playHelper<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>, move: Move): boolean {
+function playHelper<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>, move: Move, push?: boolean): boolean {
   const position = methods.play(move);
   if (position === null)
     return false;
-  model.history.push(model.position);
-  model.redoHistory = [];
+  if (push) {
+    model.history.push(model.position);
+    model.redoHistory = [];
+  }
   model.position = position;
   model.turn = model.turn == 1 ? 2 : 1;
   return true;
 }
 
 export async function playA<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>, move: Move) {
-  if (!playHelper(model, methods, move)) {
+  if (!playHelper(model, methods, move, true)) {
     return
   }
 
@@ -131,24 +133,13 @@ function changeTurn<Pos>(model: Model<Pos>) {
 }
 
 export function undo<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>) {
-  if (model.mode === "duel" || model.mode === "solo") {
-    if (model.history.length === 0) {
-      return;
-    }
-    const position = model.history.pop()!;
-    model.redoHistory.push(model.position);
-    model.position = position;
-    model.turn = model.turn === 1 ? 2 : 1;
-  } else {
-    if (model.history.length <= 1) {
-      return;
-    }
-    model.history.pop();
-    const position = model.history.pop()!;
-    model.redoHistory.push(model.position);
-    model.position = position;
+  if (model.history.length === 0) {
+    return;
   }
-
+  const position = model.history.pop()!;
+  model.redoHistory.push(model.position);
+  model.position = position;
+  changeTurn(model);
   // onPositionChange
 }
 
@@ -184,14 +175,16 @@ function computerMove<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>)
   const moves = methods.possibleMoves!();
   let bestMove = null;
   if (model.mode === "expert") {
+    const position = model.position;
     for (const move of moves) {
       let found = false;
       playHelper(model, methods, move);
       if (methods.isLosingPosition!()) {
         found = true;
       }
-      model.position = model.history.pop()!;
+      model.position = position;
       model.turn = model.turn == 1 ? 2 : 1;
+      // onPositionChange
       if (found) {
         bestMove = move;
         break;

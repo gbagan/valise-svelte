@@ -4,20 +4,20 @@
 - [ ] Safari: roue des couleurs: les contours des parties survolés de
        la roue extérieure lors d'un drag and drop n'appaissent pas en vert 
 - [ ] Safari: jetons: l'ombre sur les cases n'apparait pas
+- [ ] problème d'affichage du joueur quand l'IA commence
+- [x] bug de undo/redo pour les jeux à deux joueurs
+- [ ] gérer le cas des parties personnalisées: le score ne doit pas être sauvegardé
 - [ ] valise: le tooltip doit être affiché quand on survole le <a> et non l'image entière
 - [x] désactiver SelectGroup et MultiSelectGroup quand locked=true
 - [ ] Konami code ?
 - [ ] nim: ajouter les icones manquantes
 - [x] frog: ajouter les icones manquantes
 - [x] changer le message de victoire pour nim et frog
-- [ ] gérer le cas des parties personnalisées: le score ne doit pas être sauvegardé
 - [ ] queens: ajouter le curseur
 - [ ] queens: quand on quitte le mode mixte, vérifier qu'il ne reste qu'une pièce choisie
 - [x] solitaire: sur le cercle 5, le pion à droite ne peut pas être déplacé 
 - [ ] solitaire: ajouter les règles
 - [ ] chemins: ajouter les curseurs
-- [ ] problème d'affichage du joueur quand l'IA commence
-- [ ] bug de undo/redo pour les jeux à deux joueurs
 - [ ] sans mot: implémenter d'autres preuves
 - [x] roue des couleurs: gérer les rotations négatives
 - [ ] roue des couleurs: ajouter un indicateur pour savoir si la rotation est valide
