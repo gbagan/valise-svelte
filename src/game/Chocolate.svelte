@@ -125,12 +125,12 @@
   />
 {/snippet}
 
-{#snippet pointer(style: string)}
+{#snippet pointer(x: number, y: number)}
   {#if soap === null}
     <use
       href="#skull"
       class="pointer"
-      {style}
+      style:transform="translate({x*100}%,{y*100}%)"
       x="-20"
       y="-20"
       width="26"

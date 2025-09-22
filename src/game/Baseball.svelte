@@ -12,6 +12,8 @@
   let nbBases = $state(5);
   let missingPeg = $state(1);
 
+  const levelFinished = $derived(model.position.every((i, j) => i >> 1 == j >> 1));
+
   function play(i: number): Pos | null {
     const position = model.position;
     const j = missingPeg;
@@ -24,9 +26,7 @@
     }
   }
 
-  const isLevelFinished = () =>
-    model.position.every((i, j) => i >> 1 == j >> 1);
-
+  const isLevelFinished = () => levelFinished;
   const initialPosition = () => shuffle(range(0, 2*nbBases))
   const onNewGame = () => missingPeg = random(0, 2 * nbBases);
 
@@ -46,8 +46,6 @@
     const y = 0.50 + 0.35 * Math.sin(2.0 * i * Math.PI / nbBases);
     return `translate(${x * 100}%, ${y * 100}%) rotate(45deg)`;
   }
-
-  const levelFinished = $derived(isLevelFinished());
 
   // svelte-ignore state_referenced_locally
   newGame(model, methods);

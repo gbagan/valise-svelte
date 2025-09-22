@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { addEdge, addVertex, getCoordsOfEdge, removeEdge, removeVertex, type Graph, type Position } from "../lib/graph";
+  import { addEdge, addVertex, getCoordsOfEdge, removeEdge, removeVertex,
+    type Graph, type Position } from "../lib/graph";
   import Dialog from "./Dialog.svelte";
   import Icon from "./icons/Icon.svelte";
 

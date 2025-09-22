@@ -36,6 +36,13 @@
           {svg} {setHelp}
         />
         <ValiseObject
+          symbol="pen"
+          link="dessin"
+          help="Jeu: dessin"
+          x={610} y={400} width={60} height={60}
+          {svg} {setHelp}
+        />
+        <ValiseObject
           symbol="knight"
           link="queens"
           help="Jeu: les 8 reines"

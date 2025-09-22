@@ -4,7 +4,7 @@
     class?: string;
     style?: string;
     children: () => any;
-    pointer: (style: string) => any;
+    pointer: (x: number, y: number) => any;
   }
 
   let { viewBox, class: className, style, children, pointer }: Props = $props();
@@ -28,6 +28,6 @@
 >
   {@render children()}
   {#if position}
-    {@render pointer(`transform:translate(${100*position.x}%,${100*position.y}%);`)}
+    {@render pointer(position.x, position.y)}
   {/if}
 </svg>
