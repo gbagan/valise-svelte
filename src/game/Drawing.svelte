@@ -228,9 +228,9 @@
   const graphs = [ house, house2, hourglass, interlace, grid, konisberg, ex1, ex3, city, owl, rabbit];
   
   type Move = number | "raise";
-  type Pos = Move[];
+  type Position = Move[];
 
-  let model: Model<Pos> & ScoreModel<Pos> = $state({
+  let model: Model<Position> & ScoreModel<Position> = $state({
     ...initModel([]),
     scores: {}
   });
@@ -249,7 +249,7 @@
     }
   });
 
-  function edgesOf(position: Pos): Edge[] {
+  function edgesOf(position: Position): Edge[] {
     const res: Edge[] = [];
     let n = position.length - 1;
     for (let i = 0; i < n; i++) {
@@ -277,7 +277,7 @@
     return edges.findIndex(e => e[0] === u && e[1] === v) !== -1;
   }
 
-  function play(x: Move): Pos | null {
+  function play(x: Move): Position | null {
     const last = model.position.at(-1);
     if (x === "raise") {
       return typeof last === "number" ? [...model.position, x] : null;
@@ -288,14 +288,14 @@
     }
   }
 
-  const initialPosition = () => [] as Pos;
+  const initialPosition = () => [] as Position;
   const isLevelFinished = () => levelFinished;
 
   const objective = "minimize";
   const score = () => nbRaises;
   const scoreHash = () => "" + graphIndex;
 
-  const methods: Methods<Pos, Move> & ScoreMethods = {
+  const methods: Methods<Position, Move> & ScoreMethods = {
     play, isLevelFinished, initialPosition,
     objective, score, scoreHash
   };
@@ -396,7 +396,7 @@
   </Config>
 {/snippet}
 
-{#snippet bestScore(position: Pos)}
+{#snippet bestScore(position: Position)}
   <div class="bestscore">
     <svg viewBox="0 0 100 100">
       {#each edgesOf(position) as [u, v], i}

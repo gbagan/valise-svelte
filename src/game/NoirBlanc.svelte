@@ -7,11 +7,11 @@
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
 
-  type Pos = {light: boolean[], played: boolean[]};
+  type Position = {light: boolean[], played: boolean[]};
   type Move = number;
   type Mode = 0 | 1 | 2 | 3;
   
-  let model: Model<Pos> & SizeModel & ScoreModel<Pos> = $state({
+  let model: Model<Position> & SizeModel & ScoreModel<Position> = $state({
     ...initModel({light: [], played: []}),
     rows: 3,
     columns: 3,
@@ -35,7 +35,7 @@
   const toggleCell = (light: boolean[], index: number) =>
     light.map((b, i) => b !== neighbor(index, i)); 
  
-  function play(move: Move): Pos | null {
+  function play(move: Move): Position | null {
     const {light, played} = model.position;
     return {
       light: toggleCell(light, move),
@@ -43,7 +43,7 @@
     }
   };
 
-  function initialPosition(): Pos {
+  function initialPosition(): Position {
     const size = model.rows * model.columns;
     // todo
     const light = repeat(size, true);
@@ -67,7 +67,7 @@
     }
   }
 
-  const methods: Methods<Pos, Move> = { play, isLevelFinished, initialPosition, onNewGame }; 
+  const methods: Methods<Position, Move> = { play, isLevelFinished, initialPosition, onNewGame }; 
 
   // si le niveau est fini, on met à jour les nivaux débloqués
   // et on passe au niveau suivant

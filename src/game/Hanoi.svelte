@@ -7,10 +7,10 @@
   import DndBoard from '../components/DndBoard.svelte';
   import DndItem from '../components/DndItem.svelte';
 
-  type Pos = number[][];
+  type Position = number[][];
   type Move = {from: number, to: number};
 
-  let model: Model<Pos> = $state(initModel([]));
+  let model: Model<Position> = $state(initModel([]));
   let nbDisks = $state(4);
   let dragged: number | null = $state(null);
 
@@ -28,7 +28,7 @@
   const initialPosition = () => [range(0, nbDisks), [], []];
   const isLevelFinished = () => model.position[0].length === 0 && model.position[1].length === 0;
 
-  const methods: Methods<Pos, Move> = {play, initialPosition, isLevelFinished};
+  const methods: Methods<Position, Move> = {play, initialPosition, isLevelFinished};
 
   const colors = [ "blue", "red", "green", "magenta", "orange", "gray", "cyan" ];
 

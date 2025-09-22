@@ -5,10 +5,10 @@
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
 
-  type Pos = [number, number][];
+  type Position = [number, number][];
   type Move = {pile: number, pos: number};
 
-  let model: Model<Pos> = $state({...initModel([]), mode: 'expert'});
+  let model: Model<Position> = $state({...initModel([]), mode: 'expert'});
   let length = $state(10);
   let nbPiles = $state(4);
 
@@ -18,7 +18,7 @@
         && (model.turn === 1 ? move.pos < p2 : move.pos > p1)
   }
 
-  function play(move: Move): Pos | null {
+  function play(move: Move): Position | null {
     if (!canPlay(move)) {
       return null;
     }
@@ -27,7 +27,7 @@
   }
 
   const initialPosition = () =>
-    generate(nbPiles, () => [random(0, 5), random(5, 10)]) as Pos;
+    generate(nbPiles, () => [random(0, 5), random(5, 10)]) as Position;
 
   const isLevelFinished = () => 
     model.position.every(([p1, p2]) =>
@@ -55,7 +55,7 @@
   const isLosingPosition = () =>
     model.position.reduce((acc, [x, y]) => acc ^ (y - x - 1), 0) === 0
 
-  const methods: Methods<Pos, Move> = { play, isLevelFinished, initialPosition, possibleMoves, isLosingPosition };
+  const methods: Methods<Position, Move> = { play, isLevelFinished, initialPosition, possibleMoves, isLosingPosition };
 
   let turnMessage = $derived(
     isLevelFinished() 

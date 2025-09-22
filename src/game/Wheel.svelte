@@ -7,11 +7,11 @@
   import DndBoard from '../components/DndBoard.svelte';
   import DndItem from '../components/DndItem.svelte';
 
-  type Pos = (number | null)[];
+  type Position = (number | null)[];
   type Location = { kind: "panel", id: number } | { kind: "wheel", id: number } | {kind: "board"};
   type Move = {from: Location, to: Location};
 
-  let model: Model<Pos> = $state(initModel([]));
+  let model: Model<Position> = $state(initModel([]));
   let size = $state(5);
   let rotation = $state(0);
   let dragged: Location | null = $state.raw(null);
@@ -47,7 +47,7 @@
     return used;
   })
 
-  function play({from, to}: Move): Pos | null {
+  function play({from, to}: Move): Position | null {
     if (from.kind === "panel" && to.kind === "wheel") {
       return model.position.with(to.id, from.id);
     } else if (from.kind === "wheel" && to.kind === "wheel") {
@@ -63,7 +63,7 @@
   const isLevelFinished = () => false;
   const onNewGame = () => rotation = 0;
 
-  const methods: Methods<Pos, Move> = { play, initialPosition, isLevelFinished, onNewGame };
+  const methods: Methods<Position, Move> = { play, initialPosition, isLevelFinished, onNewGame };
 
   const colors = [ "blue", "red", "magenta", "orange", "brown", "cyan", "gray", "black" ];
 

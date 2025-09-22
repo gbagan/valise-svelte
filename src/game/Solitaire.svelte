@@ -12,10 +12,10 @@
 
   type Board = "french" | "english" | "circle" | "grid3" | "random";
 
-  type Pos = boolean[];
+  type Position = boolean[];
   type Move = {from: number, to: number};
 
-  let model: Model<Pos> & SizeModel & ScoreModel<Pos> = $state({
+  let model: Model<Position> & SizeModel & ScoreModel<Position> = $state({
     ...initModel([]),
     rows: 5,
     columns: 1,
@@ -62,7 +62,7 @@
     }
   }
 
-  function play(move: Move): Pos | null {
+  function play(move: Move): Position | null {
     const {from, to} = move;
     const between = betweenMove2(move);
     if (between === null) {
@@ -135,7 +135,7 @@
   // todo à vérifier
   const scoreHash = () => `${boardType},${model.rows},${model.columns}`;
 
-  const methods: Methods<Pos, Move> & ScoreMethods = {
+  const methods: Methods<Position, Move> & ScoreMethods = {
     play, isLevelFinished, initialPosition, onNewGame,
     objective, score, scoreHash
   };
@@ -271,7 +271,7 @@
   </div>
 {/snippet}
 
-{#snippet bestScore(position: Pos)}
+{#snippet bestScore(position: Position)}
   <div class="scoredialog">
     {@render genericBoard(position, false)}
   </div>

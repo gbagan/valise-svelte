@@ -9,12 +9,12 @@
   import Icon from "../components/icons/Icon.svelte";
 
   type Piece = "R" | "B" | "K" | "N" | "Q" | "custom" | null;
-  type Pos = Piece[];
+  type Position = Piece[];
   type Move = number;
 
   const piecesList: Piece[] = ["R", "B", "K", "N", "Q"];
   
-  let model: Model<Pos> & ScoreModel<Pos> & SizeModel = $state({
+  let model: Model<Position> & ScoreModel<Position> & SizeModel = $state({
     ...initModel([]),
     rows: 8,
     columns: 8,
@@ -81,7 +81,7 @@
     : attackedBy(selectedPiece, selectedSquare)
   );
 
-  function play(i: Move): Pos | null {
+  function play(i: Move): Position | null {
     const p = model.position[i] === null ? selectedPiece : null;
     return model.position.with(i, p);
   }
@@ -94,7 +94,7 @@
   const score = () => isValidPosition ? model.position.filter(p => p !== null).length : 0;
   const scoreHash = () => `${model.rows},${model.columns},${allowedPieces[0]}`;
 
-  const methods: Methods<Pos, Move> & ScoreMethods = {
+  const methods: Methods<Position, Move> & ScoreMethods = {
     play, isLevelFinished, initialPosition, onNewGame,
     objective, score, scoreHash
   };
@@ -231,7 +231,7 @@
   Tu peux jouer avec une pièce personnalisée si tu le souhaites.
 {/snippet}
 
-{#snippet bestScore(position: Pos)}
+{#snippet bestScore(position: Position)}
   <div class="bestscore-container">
     <div class="ui-board" style={gridStyle(model.rows, model.columns, 5)}>
       <svg viewBox="0 0 {50*model.columns} {50*model.rows}">

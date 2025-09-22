@@ -5,16 +5,16 @@
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
 
-  type Pos = number[];
+  type Position = number[];
   type Move = number;
 
-  let model: Model<Pos> = $state(initModel(range(0, 10)));
+  let model: Model<Position> = $state(initModel(range(0, 10)));
   let nbBases = $state(5);
   let missingPeg = $state(1);
 
   const levelFinished = $derived(model.position.every((i, j) => i >> 1 == j >> 1));
 
-  function play(i: number): Pos | null {
+  function play(i: number): Position | null {
     const position = model.position;
     const j = missingPeg;
     const x = position[i];
@@ -30,7 +30,7 @@
   const initialPosition = () => shuffle(range(0, 2*nbBases))
   const onNewGame = () => missingPeg = random(0, 2 * nbBases);
 
-  const methods: Methods<Pos, Move> = { play, isLevelFinished, initialPosition, onNewGame };
+  const methods: Methods<Position, Move> = { play, isLevelFinished, initialPosition, onNewGame };
 
   const colors = [ "blue", "red", "green", "magenta", "orange", "black", "cyan", "gray" ];
 

@@ -8,10 +8,10 @@
   import DndBoard from '../components/DndBoard.svelte';
   import DndItem from '../components/DndItem.svelte';
 
-  type Pos = number[];
+  type Position = number[];
   type Move = {from: number, to: number};
 
-  let model: Model<Pos> & SizeModel & ScoreModel<Pos> = $state({
+  let model: Model<Position> & SizeModel & ScoreModel<Position> = $state({
     ...initModel([]),
     rows: 4,
     columns: 4,
@@ -49,7 +49,7 @@
   const scoreHash = () => `${model.rows},${model.columns}`;
   const objective = "minimize";
 
-  const methods: Methods<Pos, Move> & ScoreMethods = {
+  const methods: Methods<Position, Move> & ScoreMethods = {
     play, isLevelFinished, initialPosition,
     score, scoreHash, objective
   };
@@ -128,7 +128,7 @@
   </Config>
 {/snippet}
 
-{#snippet bestScore(position: Pos)}
+{#snippet bestScore(position: Position)}
   <div class="bestscore-container">
     <div class="ui-board" style={gridStyle(model.rows, model.columns, 3)}>
       <svg viewBox="0 0 {50 * model.columns} {50 * model.rows}">

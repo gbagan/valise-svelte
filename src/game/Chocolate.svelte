@@ -6,11 +6,11 @@
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
 
-  type Pos = {left: number, right: number, top: number, bottom: number};
+  type Position = {left: number, right: number, top: number, bottom: number};
   type Move = ["left" | "right" | "top" | "bottom", number];
   type SoapMode = "corner" | "border" | "standard" | "custom";
 
-  let model: Model<Pos> & SizeModel = $state({
+  let model: Model<Position> & SizeModel = $state({
     ...initModel({left: 0, right: 0, top: 0, bottom: 0}),
     rows: 6,
     columns: 7,
@@ -21,7 +21,7 @@
   let soapMode: SoapMode = $state("corner");
   let moveWhenHover: Move | null = $state(null);
 
-  function play([dir, x]: Move): Pos | null {
+  function play([dir, x]: Move): Position | null {
     switch (dir) {
         case "left": return {...model.position, left: x};
         case "right": return {...model.position, right: x};
@@ -69,7 +69,7 @@
     return l.concat(r, t, b);
   }
 
-  const methods: Methods<Pos, Move> = {
+  const methods: Methods<Position, Move> = {
     play, isLevelFinished, initialPosition, onNewGame,
     isLosingPosition, possibleMoves
   }

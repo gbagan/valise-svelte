@@ -6,11 +6,11 @@
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
 
-  type Pos = number[];
+  type Position = number[];
   type Move = number;
   type Mode = 1 | 2;
 
-  let model: Model<Pos> & SizeModel = $state({
+  let model: Model<Position> & SizeModel = $state({
     ...initModel([]),
     rows: 4,
     columns: 6,
@@ -53,7 +53,7 @@
             )
   }
 
-  function play(v: Move): Pos | null {
+  function play(v: Move): Position | null {
     if (model.position.length === 0) {
       return mode === 2 ? [v] : null;
     } else {
@@ -81,7 +81,7 @@
 
   const sizeLimit: SizeLimit = { minRows: 2, minCols: 2, maxRows: 9, maxCols: 9 };
   
-  const methods: Methods<Pos, Move> = {play, isLevelFinished, initialPosition, onNewGame};
+  const methods: Methods<Position, Move> = {play, isLevelFinished, initialPosition, onNewGame};
 
   let grid = $derived.by(() => {
     const g = repeat(model.rows * model.columns, false);

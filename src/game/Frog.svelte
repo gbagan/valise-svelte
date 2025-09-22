@@ -6,10 +6,10 @@
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
 
-  type Pos = number;
+  type Position = number;
   type Move = number;
   
-  let model: Model<Pos> & SizeModel = $state({
+  let model: Model<Position> & SizeModel = $state({
     ...initModel(20),
     mode: 'expert',
     rows: 20,
@@ -43,7 +43,7 @@
   const isLosingPosition = () => losingPositions[model.position];
   const onNewGame = () => marked = repeat(model.rows, false);
 
-  const methods: Methods<Pos, Move> = { play, isLevelFinished, initialPosition, onNewGame, possibleMoves, isLosingPosition };   
+  const methods: Methods<Position, Move> = { play, isLevelFinished, initialPosition, onNewGame, possibleMoves, isLosingPosition };   
 
   let reachable = $derived(generate(model.rows+1, canPlay));
 

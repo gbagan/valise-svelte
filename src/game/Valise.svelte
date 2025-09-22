@@ -5,8 +5,6 @@
   let isOpen = $state(false);
   let help: string | null = $state(null);
   let helpVisible = $state(false);
-  //let drag: {name: string, x: number, y: number} | null = $state(null);
-  // let positions: Record<string, {x: number, y: number}> = $state({});
 
   function setHelp(s: string | null) {
     if (s === null) {
@@ -149,53 +147,53 @@
 </div>
 
 <style>
-.main-container {
+  .main-container {
     height: 100vh;
     width: 100vw;
-}
+  }
 
-.container {
+  .container {
     height: calc(69vmin * 1.1);
     width: calc(82.5vmin * 1.1);
     position: relative;
-}
+  }
 
-.valise-open {
+  .valise-open {
     opacity: 0;
-}
+  }
 
-.valise-close {
+  .valise-close {
     width: 100%;
     height: 100%;
     opacity: 1;
-}
+  }
 
-.logo {
+  .logo {
     height: calc(18vmin * 1.1);
     width: calc(82.5vmin * 1.1);
     opacity: 0;
-}
+  }
 
-.main-container {
+  .main-container {
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
-}
+  }
 
-.main-container.open  {
+  .main-container.open  {
     & .valise-open, & .logo {
-        opacity: 1;
-        transition: opacity 0.5s ease-in 0.5s;
+      opacity: 1;
+      transition: opacity 0.5s ease-in 0.5s;
     }
 
     .valise-close {
-        opacity: 0;
-        transition: opacity 0.5s ease-out;
+      opacity: 0;
+      transition: opacity 0.5s ease-out;
     }
-}
+  }
 
-.help {
+  .help {
     position: absolute;
     left: 67%;
     top: 18%;
@@ -209,7 +207,7 @@
     pointer-events: none;
 
     &.visible {
-        opacity: 1;
+      opacity: 1;
     }
-}
+  }
 </style>
