@@ -27,116 +27,108 @@
     <use href="#valise" class="valise-close" /> 
     <g class="valise-open">
       <use href="#openvalise"/>
-        <ValiseObject
-          symbol="chocolate"
-          link="chocolat"
-          help="Jeu: chocolat"
-          x={200} y={200} width={60} height={60}
-          style="transform:rotate(40deg);"
-          {svg} {setHelp}
-        />
-        <ValiseObject
-          symbol="pen"
-          link="dessin"
-          help="Jeu: dessin"
-          x={610} y={400} width={60} height={60}
-          {svg} {setHelp}
-        />
-        <ValiseObject
-          symbol="knight"
-          link="queens"
-          help="Jeu: les 8 reines"
-          x={461} y={380} width={24} height={48}
-          style="transform:rotate(40deg);"
-          {svg} {setHelp}
-        />
-      <ValiseObject
+      <ValiseObject {svg} {setHelp}
+        symbol="chocolate"
+        link="chocolat"
+        help="Jeu: chocolat"
+        x={200} y={200} width={60} height={60}
+        style="transform:rotate(40deg);"  
+      />
+      <ValiseObject {svg} {setHelp}
+        symbol="pen"
+        link="dessin"
+        help="Jeu: dessin"
+        x={610} y={400} width={60} height={60}
+      />
+      <ValiseObject {svg} {setHelp}
+        symbol="knight"
+        link="queens"
+        help="Jeu: les 8 reines"
+        x={461} y={380} width={24} height={48}
+        style="transform:rotate(40deg);"  
+      />
+      <ValiseObject {svg} {setHelp}
         symbol="stack"
         link="jetons"
         help="Jeu: acquisition"
         x={350} y={500} width={50} height={50}
-        {svg} {setHelp}
       />
-      <ValiseObject
+      <ValiseObject {svg} {setHelp}
         symbol="block2"
         link="nim"
         help="Jeu: bloque moi si tu peux"
         x={380} y={120} width={40} height={40}
-        {svg} {setHelp}
       />
-      <ValiseObject
+      <ValiseObject {svg} {setHelp}
         symbol="tricolor2"
         link="baseball"
         help="Jeu: baseball multicolore"
         x={350} y={330} width={90} height={60}
-        {svg} {setHelp}
+        
       />
-      <ValiseObject
+      <ValiseObject {svg} {setHelp}
+        symbol="traffic"
+        link="tricolor"
+        help="Jeu: feu tricolore"
+        x={250} y={280} width={64} height={64}
+      />
+      <ValiseObject {svg} {setHelp}
         symbol="frog2"
         link="frog"
         help="Jeu: la grenouille"
         x={549} y={320} width={40} height={40}
         style="fill:#bcd35f;"
-        {svg} {setHelp}
       />
-      <ValiseObject
+      <ValiseObject {svg} {setHelp}
         symbol="flowerpot"
         help="Quelque chose se cache derrière ce pot"
         drag={true}
         x={533} y={300} width={64} height={64}
-        {svg} {setHelp}
       />
-      <ValiseObject
+      <ValiseObject {svg} {setHelp}
         symbol="bulbon"
         link="noirblanc"
         help="Jeu: tout noir, tout blanc"
         x={477} y={280} width={48} height={48}
-        {svg} {setHelp}
       />
-      <ValiseObject
+      <ValiseObject {svg} {setHelp}
         symbol="race"
         link="paths"
         help="Jeu: chemins"
         x={450} y={445} width={64} height={64}
         style="transform:rotate(40deg);"
-        {svg} {setHelp}
       />
-      <ValiseObject
+      <ValiseObject {svg} {setHelp}
         symbol="quiet"
         link="sansmot"
         help="Preuves sans mot"
         x={180} y={130} width={50} height={50}
-        {svg} {setHelp}
       />
-      <ValiseObject
+      <ValiseObject {svg} {setHelp}
         symbol="soli-peg2"
         link="solitaire"
         help="Jeu: solitaire"
         x={492} y={350} width={40} height={40}
-        {svg} {setHelp}
       />
-      <ValiseObject
+      <ValiseObject {svg} {setHelp}
         symbol="hanoibot"
         link="hanoi"
         help="Jeu: tours de Hanoi"
         x={500} y={430} width={75} height={51}
         rectX="30%" rectY="20%" rectWidth="40%" rectHeight="40%"
-        {svg} {setHelp}
       />
-      <ValiseObject
+      <ValiseObject {svg} {setHelp}
         symbol="hanoitop"
         help="Quelque chose se cache sous cette tour"
         drag={true}
         x={507} y={409} width={60} height={57}
-        {svg} {setHelp}
       />
-      <ValiseObject
+      <ValiseObject {svg} {setHelp}
         symbol="wheel"
         link="roue"
         help="Jeu: roue des couleurs"
         x={400} y={205} width={50} height={50}
         style="transform:scale(1,0.8);"
-        {svg} {setHelp}
       />
     </g>
   </svg>

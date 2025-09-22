@@ -13,6 +13,7 @@
   import SansMot from './game/SansMot.svelte';
   import Solitaire from './game/Solitaire.svelte';
   import Wheel from './game/Wheel.svelte';
+  import Tricolor from './game/Tricolor.svelte';
   import { onMount } from 'svelte';
 
   let location = $state(window.location.hash.slice(1) || "main");
@@ -62,6 +63,8 @@ $inspect(location);
     <SansMot />
   {:else if location === "solitaire"}
     <Solitaire />
+  {:else if location === "tricolor"}
+    <Tricolor />
   {/if}
 </div>
 
