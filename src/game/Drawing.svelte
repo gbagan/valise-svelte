@@ -168,7 +168,64 @@
             [9,16], [12,16], [13,16], [14,18], [15,19], [16,20], [17,21], [18,19], [20,21]]
   }
 
-  const graphs = [ house, house2, hourglass, interlace, grid, konisberg, ex1, ex3, city ];
+  const owl: Graph = {
+    title: "Hibou",
+    vertices: [
+      { x: 0, y: 0 },
+      { x: 2, y: 0 },
+      { x: 0, y: 1 },
+      { x: 1, y: 1 },
+      { x: 2, y: 1 },
+      { x: 3, y: 1 },
+      { x: 0, y: 2 },
+      { x: 1, y: 2 },
+      { x: 2, y: 2 },
+      { x: 3, y: 2 },
+      { x: 1, y: 3 },
+      { x: 2, y: 3 },
+      { x: 4, y: 3 },
+      { x: 1, y: 4 },
+      { x: 2, y: 4 },
+      { x: 3, y: 4 },
+      { x: 4, y: 4 },
+      { x: 1, y: 5 },
+      { x: 3, y: 5 },
+    ].map(({ x, y }) => ({ x: x * 0.8 + 0.5, y: y * 0.8 + 0.6 })),
+    edges: [ [0,2], [0,3], [1,3], [1,4], [2,3], [3,4], [4,5], [2,6], [2,7], [3,7], [3,8],
+          [4,8], [4,9], [5,9], [6,7], [7,8], [7,10], [7,11], [8,11], [9,11], [9,12], [10,14],
+          [11,15], [12,15], [9,15], [13,14], [14,15], [15,16], [13,17], [14,17], [15,18],
+          [16,18] ]
+  }
+
+  const rabbit: Graph = {
+    title: "Lièvre bondissant",
+    vertices: [
+      { x: 1, y: 0 },
+      { x: 2, y: 0 },
+      { x: 4, y: 0 },
+      { x: 2, y: 1 },
+      { x: 3, y: 1 },
+      { x: 4, y: 1 },
+      { x: 1, y: 2 },
+      { x: 2, y: 2 },
+      { x: 3, y: 2 },
+      { x: 4, y: 2 },
+      { x: 0, y: 3 },
+      { x: 2, y: 3 },
+      { x: 3, y: 3 },
+      { x: 4, y: 3 },
+      { x: 0, y: 4 },
+      { x: 1, y: 4 },
+      { x: 2, y: 4 },
+      { x: 3, y: 4 },
+      { x: 1, y: 5 },
+    ].map(({ x, y }) => ({ x: x * 0.8 + 1, y: y * 0.8 + 0.8 })),
+    edges: [ [0,1], [0,3], [1,4], [2,4], [2,5], [3,4], [4,5], [3, 6], [3,7], [4,7], [4,8],
+          [5,8], [5,9], [7,8], [8,9], [6,10], [6,11], [7,11], [9,12], [12,13], [6,15],
+          [10,15], [11,15], [14,15], [15,16], [12,16], [12,17], [13,17], [14,18], [15, 18]]
+  }
+
+  const graphs = [ house, house2, hourglass, interlace, grid, konisberg, ex1, ex3, city, owl, rabbit];
 
   type Move = number | "raise";
   type Pos = Move[];
@@ -188,12 +245,12 @@
     }
   });
 
-  let positionEdges: Edge[] = $derived.by(() => {
+  function edgesOf(position: Pos): Edge[] {
     const res: Edge[] = [];
-    let n = model.position.length - 1;
+    let n = position.length - 1;
     for (let i = 0; i < n; i++) {
-      let u = model.position[i];
-      let v = model.position[i+1];
+      let u = position[i];
+      let v = position[i+1];
       if (u !== "raise" && v !== "raise") {
         if (u > v) {
           [v, u] = [u, v];
@@ -202,7 +259,9 @@
       }
     }
     return res;
-  });
+  }
+
+  let positionEdges: Edge[] = $derived(edgesOf(model.position))
 
   let nbRaises = $derived(model.position.filter(x => x === "raise").length);
   let levelFinished = $derived(positionEdges.length === graph.edges.length);
@@ -304,7 +363,7 @@
   <Config title="Dessin">
     <I.SelectGroup
       title="Niveau"
-      values={[0, 1, 2, 3, 4, 5, 6, 7, 8]}
+      values={[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
       selected={graphIndex}
       text={i => "" + (i + 1)}
       tooltip={i => graphs[i].title}
@@ -320,13 +379,30 @@
   </Config>
 {/snippet}
 
+{#snippet bestScore(position: Pos)}
+  <div class="bestscore">
+    <svg viewBox="0 0 100 100">
+      {#each edgesOf(position) as [u, v], i}
+        {@const {x1, x2, y1, y2} = getCoordsOfEdge(graph, u, v)}
+        <line
+          x1={x1*100}
+          x2={x2*100}
+          y1={y1*100}
+          y2={y2*100}
+          class="line2"
+        />
+        <text x={50*(x1+x2)} y={50*(y1+y2)} class="edge-no">{i+1}</text>
+      {/each}
+    </svg>
+  </div>
+{/snippet}
 
 {#snippet rules()}
   Le but du jeu est de dessiner le motif indiqué en pointillé en levant le moins souvent possible le crayon.<br/>
   Pour lever le crayon, tu peux cliquer sur le bouton prévu pour ou utiliser le clic droit.
 {/snippet}
 
-<Template bind:model={model} {methods} {board} {config} {rules} {winTitle} />
+<Template bind:model={model} {methods} {board} {config} {rules} {bestScore} {winTitle} />
 
 <style>
   .board {
@@ -387,5 +463,6 @@
     font-weight: bold;
     font-size: 6px;
     text-anchor: middle;
+    dominant-baseline: middle;
   }
 </style>

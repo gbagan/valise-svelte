@@ -23,3 +23,5 @@
 - [ ] roue des couleurs: ajouter un indicateur pour savoir si la rotation est valide
 - [ ] roue des couleurs: ce sont les bonnes règles?
 - [x] roue des couleurs: refaire la roue extérieure
+- [x] dessin: implémenter les meilleurs scores
+- [ ] dessin: implémenter le dessin personnalisé
