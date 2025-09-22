@@ -1,3 +1,4 @@
+export { default as Icon } from './icons/Icon.svelte';
 export { default as BestScore } from './icons/BestScore.svelte';
 export { default as Help } from './icons/HelpIcon.svelte';
 export { default as Undo } from './icons/Undo.svelte';

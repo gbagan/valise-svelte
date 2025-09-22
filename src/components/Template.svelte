@@ -10,11 +10,13 @@
     config: () => any;
     rules: () => any;
     bestScore?: (position: Pos) => any;
+    custom?: () => any;
     winTitle?: string;
     sizeLimit?: SizeLimit;
   }
 
-  const { board, config, rules, bestScore, winTitle, sizeLimit, model=$bindable(), methods}: Props = $props();
+  const { board, config, rules, bestScore, custom, winTitle, sizeLimit,
+          model=$bindable(), methods}: Props = $props();
 </script>
 
 {#snippet winPanel(title: string, visible: boolean)}
@@ -48,6 +50,8 @@
         {@render rules()}
       </div>
     </Dialog>
+  {:else if model.dialog === "customize"}
+    {@render custom?.()}
   {:else if model.dialog == "score" && isScoreModel(model) && isScoreMethods(methods)}
     <Dialog title="Meilleur score" onOk={() => model.dialog = null}>
       {@const position = model.scores[methods.scoreHash()][1] }

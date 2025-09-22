@@ -1,24 +1,18 @@
 <script lang="ts">
   import { addEdge, addVertex, getCoordsOfEdge, removeEdge, removeVertex,
-    type Graph, type Position } from "../lib/graph";
+  type Graph, type Position } from "../lib/graph";
   import Dialog from "./Dialog.svelte";
   import Icon from "./icons/Icon.svelte";
 
+  type Mode = "vertex" | "addedge" | "delete";
+
   interface Props {
-    onOk: (graph: Graph) => void;
+    graph: Graph,
+    onOk: () => void;
   }
 
-  let {onOk}: Props = $props();
+  let {graph = $bindable(), onOk}: Props = $props();
 
-  type Mode = "vertex" | "addedge" | "delete";
-  
-  const emptyGraph = () => ({
-    title: "Graphe personnalisé",
-    vertices: [],
-    edges: [],
-  })
-
-  let graph: Graph = $state(emptyGraph());
   let mode: Mode = $state("vertex");
   let selectedVertex: number | null = $state(null);
   let currentPosition: Position | null = $state.raw(null);
@@ -84,7 +78,7 @@
 
 </script>
 
-<Dialog title="Créé ton graphe" onOk={() => onOk(graph)}>
+<Dialog title="Créé ton graphe" onOk={onOk}>
   <div class="container">
     <div class="board">
       <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -132,7 +126,9 @@
       <Icon text="#trash" selected={mode === "delete"} tooltip="Retire un sommet ou une arête"
         onclick={() => mode = "delete"}
       />
-      <Icon text="#clear" tooltip="Efface tout le graphe" onclick={() => graph = emptyGraph()} />
+      <Icon text="#clear" tooltip="Efface tout le graphe"
+        onclick={() => {graph.vertices = []; graph.edges = []}}
+      />
     </div>
 
   </div>

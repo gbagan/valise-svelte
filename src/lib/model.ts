@@ -11,7 +11,7 @@ export interface Model<Pos> {
   mode: Mode;
   help: boolean;
   showWin: boolean;
-  dialog: "rules" | "score" | null;
+  dialog: "rules" | "score" | "customize" | null;
   newGameAction: (() => void) | null;
   locked: boolean;
 }

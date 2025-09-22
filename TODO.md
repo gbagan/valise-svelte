@@ -24,4 +24,5 @@
 - [ ] roue des couleurs: ce sont les bonnes règles?
 - [x] roue des couleurs: refaire la roue extérieure
 - [x] dessin: implémenter les meilleurs scores
-- [ ] dessin: implémenter le dessin personnalisé
+- [x] dessin: implémenter le dessin personnalisé
+- [ ] dessin: ajouter le graphe "Croix"

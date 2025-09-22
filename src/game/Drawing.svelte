@@ -226,7 +226,7 @@
   }
 
   const graphs = [ house, house2, hourglass, interlace, grid, konisberg, ex1, ex3, city, owl, rabbit];
-
+  
   type Move = number | "raise";
   type Pos = Move[];
 
@@ -234,14 +234,18 @@
     ...initModel([]),
     scores: {}
   });
-  let graphIndex = $state(0);
-  
+  let graphIndex: number | "custom" = $state(0);
+  let customGraph = $state({ title: "Graphe personnalisé", vertices: [], edges: []});
   
   let graph: Graph = $derived.by(() => {
-    const g = graphs[graphIndex];
-    return {
-      ...g,
-      vertices: g.vertices.map(({x, y}) => ({x: x/5, y: y/5}))
+    if (graphIndex === "custom") {
+      return customGraph;
+    } else {
+      const g = graphs[graphIndex];
+      return {
+        ...g,
+        vertices: g.vertices.map(({x, y}) => ({x: x/5, y: y/5}))
+      }
     }
   });
 
@@ -298,6 +302,12 @@
   methods.updateScore = () => updateScore(model, methods, true, "onNewRecord");
 
   let winTitle = $derived(`Tu as réussi en ${nbRaises} levé${nbRaises > 1 ? "s" : ""}`);
+
+  function selectCustomGraph() {
+    graphIndex = "custom";
+    model.dialog = "customize";
+  }
+
 
   // svelte-ignore state_referenced_locally
   newGame(model, methods);
@@ -365,10 +375,17 @@
       title="Niveau"
       values={[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
       selected={graphIndex}
-      text={i => "" + (i + 1)}
-      tooltip={i => graphs[i].title}
+      text={i => "" + (i as number + 1)}
+      tooltip={i => graphs[i as number].title}
       setter={i => newGame(model, methods, () => graphIndex = i)}
-    />
+    >
+      <I.Icon
+        text="#customize"
+        tooltip="Créé ton propre graphe"
+        selected={graphIndex === "custom"}
+        onclick={selectCustomGraph}
+      />
+    </I.SelectGroup>
     <I.Group title="Options">
       <I.Undo bind:model={model} {methods} />
       <I.Redo bind:model={model} {methods} />
@@ -397,12 +414,16 @@
   </div>
 {/snippet}
 
+{#snippet custom()}
+  <GraphEditor bind:graph={customGraph} onOk={() => model.dialog = null} />
+{/snippet}
+
 {#snippet rules()}
   Le but du jeu est de dessiner le motif indiqué en pointillé en levant le moins souvent possible le crayon.<br/>
   Pour lever le crayon, tu peux cliquer sur le bouton prévu pour ou utiliser le clic droit.
 {/snippet}
 
-<Template bind:model={model} {methods} {board} {config} {rules} {bestScore} {winTitle} />
+<Template bind:model={model} {methods} {board} {config} {rules} {bestScore} {custom} {winTitle} />
 
 <style>
   .board {
