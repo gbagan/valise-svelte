@@ -1,9 +1,11 @@
 <script lang="ts">
-  import { initModel, playA, type Methods, type Model, type SizeModel } from "../lib/model";
-  import { allDistinct, countBy, generate, minBy, range, sublists } from "../lib/util";
+  import { initModel, newGame, playA, type Methods, type Model, type SizeModel } from "../lib/model";
+  import { allDistinct, countBy, generate, generate2, minBy, range, sublists } from "../lib/util";
   import { answer, makeArenaGraph, type Arena, type ArenaGraph } from "../lib/arena";
   import { getCoordsOfEdge, type Edge, type Graph } from "../lib/graph";
   import Template from "../components/Template.svelte";
+  import * as I from '../components/Icons';
+  import Config from '../components/Config.svelte';
 
   type Conf = number[];
   type AdjGraph = number[][];
@@ -21,9 +23,9 @@
       for (const conf2 of multiMoves(graph, conf, i + 1)) {
         yield conf2;
         for (const nbor of graph[conf2[i]]) {
-          const conf3 = conf2.slice()
-          conf3[i] = nbor
-          yield conf3
+          //const conf3 = conf2.slice();
+          //conf3[i] = nbor;
+          yield conf2.with(i, nbor);
         }
       }
     } 
@@ -54,7 +56,7 @@
     const attack = gconf.pop()!;
     for (const conf2 of multiMoves(graph, gconf, 0)) {
       const conf3 = conf2.slice()
-      conf3.sort((a, b) => a - b)
+      conf3.sort((a, b) => a - b) // todo nécessaire ?
       if (allDistinct(conf3) && conf3.includes(attack)) {
         yield conf3
       }
@@ -142,12 +144,39 @@
     edges: generate(n - 1, i => [i, i+1])
   }) as Graph;
 
+
   function cycle(n: number): Graph {
     const g = path(n);
     g.title = "Cycle";
     g.edges.push([0, n-1]);
     return g;
   }
+
+  // generate a grid graph
+  function grid(n: number, m: number): Graph {
+    const p = Math.max(n, m);
+    return {
+      title: "Grille",
+      vertices: generate2(n, m, (i, j) => ({
+        x: 0.15 + 0.7 * i / (p - 1),
+        y: 0.1 + 0.7 * j / (p - 1)
+      })),
+      edges: [
+        ...generate2(n, m - 1, (i, j) => [i * m + j, i * m + j + 1] as Edge),
+        ...generate2(n - 1, m, (i, j) => [i * m + j, i * m + j + m] as Edge)
+      ]
+    }
+  }
+
+  // generate a biclique graph
+  const biclique = (m: number, n: number) => ({
+    title: "Biclique",
+    vertices: generate(n + m, i => ({
+      x: i < n ? 0.2 : 0.8,
+      y: 0.75 - 0.7 * (i < n ? i : i - n) / (i < n ? n : m)
+    })),
+    edges: generate2(n, m, (i, j) => [i, j + n]),
+  }) as Graph;
 
   function addEdge(graph: AdjGraph, u: number, v: number) {
     graph[u].push(v);
@@ -208,6 +237,8 @@
     switch (graphKind) {
       case "path": return path(model.rows);
       case "cycle": return cycle(model.rows);
+      case "biclique": return biclique(model.rows, model.columns);
+      case "grid": return grid(model.rows, model.columns);
       default: return path(model.rows);
     }
   })
@@ -218,6 +249,16 @@
   let arena: EdsGraph | null = $derived(
     model.mode === "duel"  ? null : makeEDS(adjGraph, rulesName, nbGuards)
   );
+
+  let sizeLimit = $derived.by(() => {
+    switch (graphKind) {
+      case "grid": return {minRows: 2, minCols: 2, maxRows: 5, maxCols: 5};
+      case "sun": return {minRows: 3, minCols: 0, maxRows: 6, maxCols: 0};
+      case "biclique": return {minRows: 1, minCols: 1, maxRows: 6, maxCols: 0};
+      case "custom": return {minRows: 0, minCols: 0, maxRows: 0, maxCols: 0};
+      default: return {minRows: 3, minCols: 0, maxRows: 11, maxCols: 0};
+    }
+  });
 
   function startGame() {
     phase = "game";
@@ -262,7 +303,6 @@
   const initialPosition = () => ({ guards: [], attacked: null });
 
   function onNewGame() {
-    initialGuards = [];
     nextMove = [];
     phase = "preparation";
     // draggedGuard
@@ -378,7 +418,32 @@
 {/snippet}
 
 {#snippet config()}
-  <div></div>
+  <Config title="Domination éternelle">
+    <I.SelectGroup
+      title="Type de graphe"
+      values={["path", "cycle", "biclique", "grid"] as GraphKind[]}
+      selected={graphKind}
+      text={["#graph-path", "#graph-cycle", "#graph-biclique", "#graph-grid"]}
+      disabled={model.locked}
+      tooltip={["Chemin", "Cycle", "Biclique", "Grille"]}
+      setter={i => newGame(model, methods, () => graphKind = i)}
+    />
+    <I.SelectGroup
+      title="Règles"
+      values={["one", "all"] as Rules[]}
+      selected={rulesName}
+      text={["1", "∞", "#graph-biclique"]}
+      disabled={model.locked}
+      tooltip={["Un seul garde peut se déplacer", "Plusieurs gardes peuvent se déplacer"]}
+      setter={i => newGame(model, methods, () => rulesName = i)}
+    />
+    <I.Group title="Options">
+      <I.Undo bind:model={model} {methods} />
+      <I.Redo bind:model={model} {methods} />
+      <I.Reset bind:model={model} {methods} />
+      <I.Rules bind:model={model} />
+    </I.Group>
+  </Config>
 {/snippet}
 
 {#snippet rules()}
