@@ -39,7 +39,6 @@ export function makeArenaGraph<Conf>(arena: Arena<Conf>): ArenaGraph<Conf> {
   for (const conf of confs) {
     for (const conf2 of arena.neighbors(conf)) {
       adj[arena.encode(conf)].push(conf2);
-      //console.log("meuh", conf, conf2, arena.encode(conf2));
       reverseAdj[arena.encode(conf2)].push(conf);
     }
   }

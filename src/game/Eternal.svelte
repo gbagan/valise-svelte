@@ -13,9 +13,6 @@
 
   const hasEdge = (graph: AdjGraph, v: number, w: number) => graph[v].includes(w)
 
-  // étant donné un graphe et une configuration, renvoit l'ensemble des configurations
-  // accessibles depuis le déplacement de plusieurs gardes
-  // doit être appelé avec i = 0
   function * multiMoves(graph: AdjGraph, conf: Conf, i=0): Generator<Conf> {
     if (i === conf.length) {
       yield conf
@@ -230,6 +227,8 @@
   let phase: Phase = $state("preparation");
   let graphKind: GraphKind = $state("path");
   let rulesName: Rules = $state("one");
+  let draggedGuard: number | null = $state(null);
+  let pointerPosition: {x: number, y: number} | null = $state(null);
 
   // derived
 
@@ -260,11 +259,14 @@
     }
   });
 
-  function startGame() {
-    phase = "game";
+  function validate() {
+    if (phase === "preparation") {
+      phase = "game";
+    } else {
+      playA(model, methods, nextMove);
+    }
   }
 
-  //addToNextMove ∷ Array Edge → Int → Int → Array Int → Array Int → Array Int
   function addToNextMove(from: number, to: number, srcs: number[], dests: number[]) {
     if (from === to || hasEdge(adjGraph, from, to)) {
       const idx = srcs.indexOf(from);
@@ -313,6 +315,11 @@
     return attacked !== null && model.position.guards.every(guard => !hasEdge(adjGraph, guard, attacked));
   }
 
+
+  function onPositionChange() {
+    nextMove = model.position.guards.slice();
+  }
+
   function randomMove() : Move | null {
     if (isLevelFinished()) {
       return null;
@@ -350,7 +357,9 @@
     }
   }
 
-  const methods: Methods<Position, Move> = {play, initialPosition, onNewGame, isLevelFinished, computerMove};
+  const methods: Methods<Position, Move> = {
+    play, initialPosition, onNewGame, isLevelFinished, computerMove, onPositionChange
+  };
 
   type Coords = {x: number, y: number};
   const translateGuard = ({ x, y }: Coords) => `translate(${100*x}%,${100*y}%)`;
@@ -369,7 +378,9 @@
     return `M${x2} ${y2}L${x3} ${y3}L${x4} ${y4}z`;
   }
 
-    function selectVertex(x: number) {
+  // callbacks
+
+  function selectVertex(x: number) {
     const {guards, attacked} = model.position;
     if (phase === "preparation") {
       const idx = guards.indexOf(x);
@@ -378,12 +389,39 @@
       } else {
         guards.splice(idx, 1);
       }
-    } else if (attacked !== null) {
+    } else if (attacked === null) {
+      playA(model, methods, x);
+    } else if (rulesName === "one") {
       const move = guards.slice();
       addToNextMove(x, attacked, move, move);
       playA(model, methods, move) // todo
-    } else {
-      playA(model, methods, x);
+    }
+  }
+
+  function setPointer(e: PointerEvent) {
+    if (draggedGuard === null) return;
+    const rect = (e.currentTarget as Element).getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    pointerPosition = {x, y};
+  }
+
+  function dropGuard(to: number | null) {
+    if (draggedGuard !== null) {
+      addToNextMove(draggedGuard, to ?? draggedGuard, model.position.guards, nextMove);
+      draggedGuard = null;
+    }
+  }
+
+  function vertexPointerDown(i: number) {
+    if (phase === "game" && rulesName === "many" && model.position.guards.includes(i)) {
+      draggedGuard = i;
+    }
+  }
+
+  function vertexPointerUp(i: number) {
+    if (draggedGuard !== null) {
+      dropGuard(i);
     }
   }
 
@@ -392,17 +430,44 @@
 </script>
 
 {#snippet arrow(x1: number, y1: number, x2: number, y2: number)}
-  <line {x1} {y1} {x2} {y2} class="line" />
+  <line {x1} {y1} {x2} {y2} class="line2" />
   <path d={arrowPath(x1, y1, x2, y2)} fill="red" />
+{/snippet}
+
+{#snippet cursor(x: number, y: number)}
+  <use
+    href="#roman"
+    width="6"
+    height="12"
+    x="-3"
+    y="-6"
+    pointer-events="none"
+    style:transform="translate({100*x}px, {100*y}px)"
+  />
 {/snippet}
 
 {#snippet board()}
   <div class="ui-board board">
-    <svg viewBox="0 0 100 100">
+    <svg
+      viewBox="0 0 100 100"
+      onpointerdown={setPointer}
+      onpointermove={setPointer}
+      onpointerup={() => dropGuard(null)}
+      onpointerleave={() => draggedGuard = null}
+    >
       {#each graph.edges as [u, v]}
         {@const {x1, x2, y1, y2} = getCoordsOfEdge(graph, u, v)}
         <line x1={100*x1} x2={100*x2} y1={100*y1} y2={100*y2} class="line1" />
       {/each}
+      {#if rulesName == "many"}
+        {#each nextMove as to, i}
+          {@const from = model.position.guards[i]}
+          {#if from !== to}
+            {@const {x1, y1, x2, y2} = getCoordsOfEdge(graph, from, to)}
+            {@render arrow(100*x1, 100*y1, 100*x2, 100*y2)}
+          {/if}
+        {/each}
+      {/if}
       {#each graph.vertices as {x, y}}
         <circle cx={100*x} cy={100*y} r="3" fill="blue" />
       {/each}
@@ -439,18 +504,24 @@
           fill="transparent"
           style:transform={translateGuard(pos)}
           onclick={() => selectVertex(i)}
+          onpointerdown={() => vertexPointerDown(i)}
+          onpointerup={() => vertexPointerUp(i)}
           class={{sel: phase === "preparation" 
                   || model.position.attacked !== null && model.position.guards.includes(i)
                   || model.position.attacked === null && !model.position.guards.includes(i)
+                  // todo
                 }}
         />
       {/each}
+      {#if draggedGuard !== null && pointerPosition !== null}
+        {@render cursor(pointerPosition.x, pointerPosition.y)}
+      {/if}
     </svg>
     <button
       class="ui-button ui-button-primary validate"
       disabled={nbGuards === 0 || phase === "game" 
                 && (rulesName === "one")}
-      onclick={() => startGame()}
+      onclick={() => validate()}
     >Valider</button>
   </div>
 {/snippet}
@@ -468,7 +539,7 @@
     />
     <I.SelectGroup
       title="Règles"
-      values={["one", "all"] as Rules[]}
+      values={["one", "many"] as Rules[]}
       selected={rulesName}
       text={["1", "∞", "#graph-biclique"]}
       disabled={model.locked}
@@ -507,6 +578,11 @@
   .line1 {
     stroke: grey;
     stroke-dasharray: 3,1;
+  }
+
+  .line2 {
+    stroke: red;
+    stroke-width: 2;
   }
 
   .guard {
