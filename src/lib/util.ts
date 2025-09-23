@@ -69,15 +69,24 @@ export const maxBy = <A>(arr: A[], fn: (x: A) => number) => minBy(arr, x => -fn(
 
 // renvoie les sous listes de taille k de [0, ... n-1]
 export function sublists(n: number, k: number): number[][] {
-  if (k === 0) {
-    return [[]]
-  } else if (k > n) {
-    return []
-  } else {
-    return sublists(n - 1, k).concat(sublists(n - 1, k - 1));
-  }
-}
+  const res: number[][] = [];
+  const current: number[] = [];
 
+  function backtrack(start: number) {
+    if (current.length === k) {
+      res.push(current.slice());
+      return;
+    }
+    for (let i = start; i < n; i++) {
+      current.push(i);
+      backtrack(i + 1);
+      current.pop();
+    }
+  }
+
+  backtrack(0);
+  return res;
+}
 
 export const random = (start: number, end: number) =>
   start + (end - start) * Math.random() | 0;

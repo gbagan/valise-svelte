@@ -39,6 +39,7 @@ export function makeArenaGraph<Conf>(arena: Arena<Conf>): ArenaGraph<Conf> {
   for (const conf of confs) {
     for (const conf2 of arena.neighbors(conf)) {
       adj[arena.encode(conf)].push(conf2);
+      //console.log("meuh", conf, conf2, arena.encode(conf2));
       reverseAdj[arena.encode(conf2)].push(conf);
     }
   }
@@ -76,8 +77,8 @@ function computeAttractor<Conf>(arena: Arena<Conf>, adj: Conf[][], reverseAdj: C
   return attractor
 }
 
- export function answer<Conf>(arenaGraph: ArenaGraph<Conf>, conf: Conf) {
-  const defs = arenaGraph.adj[arenaGraph.encode(conf)]
+ export function answer<Conf>(arena: ArenaGraph<Conf>, conf: Conf) {
+  const defs = arena.adj[arena.encode(conf)];
   // on prilivégie les sommets qui ne sont pas dans l'attracteur
-  return maxBy(defs, conf2 => arenaGraph.attractor[arenaGraph.encode(conf2)] || 1000)
+  return maxBy(defs, conf2 => arena.attractor.at(arena.encode(conf2)) ?? 1000)
 }

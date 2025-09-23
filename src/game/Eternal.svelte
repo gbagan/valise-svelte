@@ -1,6 +1,6 @@
 <script lang="ts">
   import { initModel, newGame, playA, type Methods, type Model, type SizeModel } from "../lib/model";
-  import { allDistinct, countBy, generate, generate2, minBy, range, sublists } from "../lib/util";
+  import { allDistinct, countBy, generate, generate2, minBy, randomPick, range, sublists } from "../lib/util";
   import { answer, makeArenaGraph, type Arena, type ArenaGraph } from "../lib/arena";
   import { getCoordsOfEdge, type Edge, type Graph } from "../lib/graph";
   import Template from "../components/Template.svelte";
@@ -31,27 +31,27 @@
     } 
   }
 
-  function attackerPossibilities(graph: AdjGraph, guards: Conf): Conf[] {
+  function attackerMoves(graph: AdjGraph, guards: Conf): Conf[] {
     return range(0, graph.length)
       .filter(attack => !guards.includes(attack))
       .map(attack => ([...guards, attack]));
   }
 
-  function * oneGuardPossibilities (graph: AdjGraph, conf: Conf): Generator<Conf> {
+  function * oneGuardMoves (graph: AdjGraph, conf: Conf): Generator<Conf> {
     const attack = conf[conf.length - 1];
-    const guards = conf.slice(0, conf.length - 1);
+    const guards = conf.slice(0, -1);
     
     for (let i = 0; i < guards.length; i++) {
       if (hasEdge(graph, guards[i], attack)) {
-        const guards2 = guards.slice()
-        guards2[i] = attack
+        const guards2 = guards.with(i, attack);
+        // todo nécessaire ?
         guards2.sort((a, b) => a - b)
         yield guards2;
       }
     }
   }
 
-  function * allGuardsPossibilities (graph: AdjGraph, conf: Conf): Generator<Conf> {
+  function * allGuardsMoves (graph: AdjGraph, conf: Conf): Generator<Conf> {
     const gconf = conf.slice()
     const attack = gconf.pop()!;
     for (const conf2 of multiMoves(graph, gconf, 0)) {
@@ -64,37 +64,38 @@
   }
 
   const oneRules = {
-    attackerPossibilities,
-    guardsPossibilities: oneGuardPossibilities
+    attackerMoves,
+    guardsMoves: oneGuardMoves
   }
     
   const allRules = {
-    attackerPossibilities,
-    guardsPossibilities: allGuardsPossibilities
+    attackerMoves,
+    guardsMoves: allGuardsMoves
   };
 
   const makeRules = (name: Rules) => name === 'one' ? oneRules : allRules;
 
-  type EdsGraph = ArenaGraph<Conf>;
+  type EdsArena = ArenaGraph<Conf>;
 
-  const guardsAnswer = (edsgraph: EdsGraph, guards: Conf, attack: number) =>
-    answer(edsgraph, guards.concat(attack));
+  const guardsAnswer = (arena: EdsArena, guards: Conf, attack: number) =>
+    answer(arena, guards.concat(attack));
   
-  function attackerAnswer(arenaGraph: EdsGraph, conf: Conf): number | null {
-    const econf = arenaGraph.encode(conf);
-    if(!arenaGraph.attractor[econf]) {
+  function attackerAnswer(arena: EdsArena, conf: Conf): number | null {
+    const econf = arena.encode(conf);
+    if(!arena.attractor[econf]) {
       return null;
     }
-    const attacks = arenaGraph.adj[econf];
-    const minattack = minBy(attacks, attack => arenaGraph.attractor[arenaGraph.encode(attack)] || 1000)!;
+    const attacks = arena.adj[econf];
+    const minattack = minBy(attacks, attack => arena.attractor[arena.encode(attack)] || 1000)!;
     return minattack.at(-1)!;
   }
 
   function makeEDS(graph: AdjGraph, rulesName: Rules, k: number) {
     const n = graph.length;
     const rules = makeRules(rulesName);
-    const bconfs = []
-    for (const conf of sublists(graph.length, k)) {
+    const aconfs = sublists(graph.length, k);
+    const bconfs = [];
+    for (const conf of aconfs) {
       for (let i = 0; i < n; i++) {
         if (!conf.includes(i)) {
           bconfs.push(conf.concat(i))
@@ -104,21 +105,21 @@
 
     const arena: Arena<Conf> = {
       size: (n+1) << k,
-      AConfs: sublists(graph.length, k),
+      AConfs: aconfs,
       BConfs: bconfs,
       isAConf: (conf => conf.length === k),
       neighbors: (conf => conf.length === k
-            ? rules.attackerPossibilities(graph, conf)
-            : Array.from(rules.guardsPossibilities(graph, conf))
-        ),
-        // encode a configuration into an integer between 0 and size - 1
+        ? rules.attackerMoves(graph, conf)
+        : Array.from(rules.guardsMoves(graph, conf))
+      ),
+      // encode a configuration into an integer between 0 and size - 1
       encode: array => {
         let acc = 0
-        const last = array[k] 
+        const last = array[k]
         for (let i = 0; i < k; i++) {
           acc += (1 << array[i])
         }
-        if (last != null) {
+        if (last !== undefined) {
           acc += (last + 1) << n;
         }
         return acc
@@ -127,13 +128,11 @@
     return makeArenaGraph(arena)
   }
 
-
   type GraphKind = "path" | "cycle" |"grid" | "biclique" | "custom";
   type Position = { guards: number[], attacked: number | null };
   type Move = number | number[]   // attack | defense;
 
   type Phase = "preparation" | "game";
-
 
   const path = (n: number) => ({
     title: "Chemin",
@@ -212,7 +211,7 @@
   // et qui minimize le nombre de déplacements de gardes (i.e. le nombre de ui ≠ gi
   function goodPermutation(graph: AdjGraph, guards: Conf, answer: Conf): number[] | null {
     const perms = permutations(answer).filter(guards2 => guards2.every((u, i) =>
-      u == guards[i] || hasEdge(graph, u, guards[i])
+      u === guards[i] || hasEdge(graph, u, guards[i])
     ));
     return minBy(perms, guards2 => countBy(guards2, (v, i) => v !== guards[i]));
   }
@@ -224,6 +223,7 @@
     rows: 6,
     columns: 0,
     customSize: true,
+    mode: "duel",
   });
 
   let nextMove: number[] = $state([]);
@@ -246,14 +246,14 @@
   let nbGuards = $derived(model.position.guards.length);
   let adjGraph: AdjGraph = $derived(edgesToGraph(graph.vertices.length, graph.edges));
 
-  let arena: EdsGraph | null = $derived(
+  let arena: EdsArena | null = $derived(
     model.mode === "duel"  ? null : makeEDS(adjGraph, rulesName, nbGuards)
   );
 
   let sizeLimit = $derived.by(() => {
     switch (graphKind) {
       case "grid": return {minRows: 2, minCols: 2, maxRows: 5, maxCols: 5};
-      case "sun": return {minRows: 3, minCols: 0, maxRows: 6, maxCols: 0};
+      //case "sun": return {minRows: 3, minC  ols: 0, maxRows: 6, maxCols: 0};
       case "biclique": return {minRows: 1, minCols: 1, maxRows: 6, maxCols: 0};
       case "custom": return {minRows: 0, minCols: 0, maxRows: 0, maxCols: 0};
       default: return {minRows: 3, minCols: 0, maxRows: 11, maxCols: 0};
@@ -313,6 +313,45 @@
     return attacked !== null && model.position.guards.every(guard => !hasEdge(adjGraph, guard, attacked));
   }
 
+  function randomMove() : Move | null {
+    if (isLevelFinished()) {
+      return null;
+    }
+    const {guards, attacked} = model.position;
+    if (attacked !== null) {
+      // cannot be empty
+      const candidates = guards.filter(g => hasEdge(adjGraph, g, attacked));
+      const move = guards.slice();
+      addToNextMove(randomPick(candidates)!, attacked, move, move);
+      return move;
+    } else {
+      const candidates = range(0, graph.vertices.length).filter(x => !guards.includes(x));
+      return randomPick(candidates);
+    }
+  }
+
+  function computerMove(): Move | null {
+    if (isLevelFinished()) {
+      return null;
+    } else if (!arena || model.mode === "random") {
+      return randomMove();
+    }
+    const {guards, attacked} = model.position;
+    if (attacked !== null) {
+      const ans = guardsAnswer(arena, guards, attacked);
+      return !ans || rulesName === "one" ? ans : goodPermutation(adjGraph, guards, ans);
+    } else {
+      const ans = attackerAnswer(arena, guards);
+      if (ans !== null) {
+        return ans;
+      } else {
+        return randomMove();
+      }
+    }
+  }
+
+  const methods: Methods<Position, Move> = {play, initialPosition, onNewGame, isLevelFinished, computerMove};
+
   type Coords = {x: number, y: number};
   const translateGuard = ({ x, y }: Coords) => `translate(${100*x}%,${100*y}%)`;
 
@@ -330,7 +369,7 @@
     return `M${x2} ${y2}L${x3} ${y3}L${x4} ${y4}z`;
   }
 
-  function selectVertex(x: number) {
+    function selectVertex(x: number) {
     const {guards, attacked} = model.position;
     if (phase === "preparation") {
       const idx = guards.indexOf(x);
@@ -348,9 +387,8 @@
     }
   }
 
-  const methods: Methods<Position, Move> = {play, initialPosition, onNewGame, isLevelFinished};
-
-
+  // svelte-ignore state_referenced_locally
+  newGame(model, methods);
 </script>
 
 {#snippet arrow(x1: number, y1: number, x2: number, y2: number)}
@@ -437,6 +475,7 @@
       tooltip={["Un seul garde peut se déplacer", "Plusieurs gardes peuvent se déplacer"]}
       setter={i => newGame(model, methods, () => rulesName = i)}
     />
+    <I.TwoPlayers bind:model={model} {methods} />
     <I.Group title="Options">
       <I.Undo bind:model={model} {methods} />
       <I.Redo bind:model={model} {methods} />
@@ -457,7 +496,7 @@
   Dans une variante, le défenseur peut déplacer plusieurs gardes à chaque tour.
 {/snippet}
 
-<Template bind:model={model} {methods} {board} {config} {rules} />
+<Template bind:model={model} {methods} {board} {config} {rules} {sizeLimit} />
 
 <style>
   .board {

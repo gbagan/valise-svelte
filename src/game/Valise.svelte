@@ -65,6 +65,12 @@
         
       />
       <ValiseObject {svg} {setHelp}
+        symbol="eternal-attack"
+        link="eternal"
+        help="Jeu: domination éternelle"
+        x={260} y={125} width={40} height={40}
+      />
+      <ValiseObject {svg} {setHelp}
         symbol="traffic"
         link="tricolor"
         help="Jeu: feu tricolore"

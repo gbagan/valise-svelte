@@ -15,7 +15,6 @@
   let dragged: number | null = $state(null);
 
   function play({ from, to }: Move) {
-    console.log(from, to);
     const position = model.position;
     const last = position[from].at(-1);
     if (from === to || last === undefined || last < (position[to].at(-1) ?? -1)) {

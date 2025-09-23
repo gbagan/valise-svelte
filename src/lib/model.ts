@@ -46,6 +46,7 @@ export interface Methods<Pos, Move> {
   updateScore?: () => { isNewRecord: boolean, showWin: boolean };
   possibleMoves?: () => Move[];
   isLosingPosition?: () => boolean;
+  computerMove?: () => Move | null;
 }
 
 function playHelper<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>, move: Move, push?: boolean): boolean {
@@ -83,7 +84,7 @@ export async function playA<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, 
 }
 
 export async function computerPlays<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>) {
-  const move = computerMove(model, methods);
+  const move = methods.computerMove ? methods.computerMove() : defaultComputerMove(model, methods);
   if (move === null) {
     return;
   }
@@ -168,7 +169,7 @@ export function reset<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>)
   // onPositionChange
 }
 
-function computerMove<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>): Move | null {
+function defaultComputerMove<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>): Move | null {
   if (methods.isLevelFinished()) {
     return null;
   }
