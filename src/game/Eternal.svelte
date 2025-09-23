@@ -406,22 +406,16 @@
     pointerPosition = {x, y};
   }
 
-  function dropGuard(to: number | null) {
-    if (draggedGuard !== null) {
-      addToNextMove(draggedGuard, to ?? draggedGuard, model.position.guards, nextMove);
-      draggedGuard = null;
-    }
-  }
-
-  function vertexPointerDown(i: number) {
-    if (phase === "game" && rulesName === "many" && model.position.guards.includes(i)) {
+  function startDrag(i: number) {
+    if (rulesName === "many" && model.position.guards.includes(i) && model.position.attacked !== null) {
       draggedGuard = i;
     }
   }
 
-  function vertexPointerUp(i: number) {
+  function dropGuard(to: number | null) {
     if (draggedGuard !== null) {
-      dropGuard(i);
+      addToNextMove(draggedGuard, to ?? draggedGuard, model.position.guards, nextMove);
+      draggedGuard = null;
     }
   }
 
@@ -504,8 +498,8 @@
           fill="transparent"
           style:transform={translateGuard(pos)}
           onclick={() => selectVertex(i)}
-          onpointerdown={() => vertexPointerDown(i)}
-          onpointerup={() => vertexPointerUp(i)}
+          onpointerdown={() => startDrag(i)}
+          onpointerup={() => dropGuard(i)}
           class={{sel: phase === "preparation" 
                   || model.position.attacked !== null && model.position.guards.includes(i)
                   || model.position.attacked === null && !model.position.guards.includes(i)

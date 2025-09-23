@@ -42,6 +42,7 @@ export function makeArenaGraph<Conf>(arena: Arena<Conf>): ArenaGraph<Conf> {
       reverseAdj[arena.encode(conf2)].push(conf);
     }
   }
+  
   const attractor = computeAttractor(arena, adj, reverseAdj);
   return {adj, reverseAdj, attractor, ...arena};
 }

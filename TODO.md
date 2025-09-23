@@ -26,3 +26,8 @@
 - [x] dessin: implémenter les meilleurs scores
 - [x] dessin: implémenter le dessin personnalisé
 - [ ] dessin: ajouter le graphe "Croix"
+- [ ] eternal: l'action "le joueur 2 commence" est bugguée
+- [ ] eternal: changer le message de victoire
+- [ ] eternal: ajouter le message d'information
+- [ ] eternal: ajouter des types de graphes?
+- [ ] eternal: graphe personnalisé
