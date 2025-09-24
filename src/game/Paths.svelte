@@ -205,9 +205,9 @@
       setter={((m: Mode) => newGame(model, methods, () => mode = m))}
     />
 
-    <I.SizesGroup
+    <I.SizesGroup bind:model={model} {methods}
       values={[[4, 6], [5, 5], [3, 8]]}
-      bind:model={model} {methods}
+      customSize={true}
     />
 
     <I.Group title="Options">

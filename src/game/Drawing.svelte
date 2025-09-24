@@ -305,7 +305,7 @@
 
   let winTitle = $derived(`Tu as réussi en ${nbRaises} levé${nbRaises > 1 ? "s" : ""}`);
 
-  const colors = [ "red", "green", "magenta", "orange", "gray", "cyan", "black" ];
+  const colors = [ "red", "green", "magenta", "orange", "gray", "cyan", "black", "blue" ];
 
   type PathDescription = {path: string, length: number, start: number};
 
@@ -336,15 +336,14 @@
     if (path !== "") {
       length += 2;
       paths.push({path, length, start});
-      start += length;
     }
     return paths;
   })
 
-  function selectCustomGraph() {
+  const selectCustomGraph = () => newGame(model, methods, () => {
     graphIndex = "custom";
     model.dialog = "customize";
-  }
+  });
 
   // svelte-ignore state_referenced_locally
   newGame(model, methods);
@@ -359,7 +358,7 @@
       x2={x2*100}
       y2={y2*100}
       class="line-to-pointer"
-      stroke={colors[nbRaises] ?? "black"}
+      stroke={colors[nbRaises] ?? "red"}
     />
   {/if}
 {/snippet}
@@ -386,7 +385,7 @@
           stroke-dashoffset={!levelFinished ? "0" : 100 * length}
           style:animation-duration="{length}s"
           style:animation-delay="{start}s"
-          stroke={colors[i] ?? "black"}
+          stroke={colors[i] ?? "red"}
           onanimationend={i < pathDescriptions.length - 1 ? null : () => counter += 1}
         />
       {/each}
@@ -453,6 +452,7 @@
           y1={y1*100}
           y2={y2*100}
           class="line2"
+          stroke="red"
         />
         <text x={50*(x1+x2)} y={50*(y1+y2)} class="edge-no">{i+1}</text>
       {/each}

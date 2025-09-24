@@ -2,7 +2,7 @@
   interface Props {
     text?: string;
     selected?: boolean;
-    tooltip?: string;
+    tooltip?: string | null;
     round?: boolean;
     large?: boolean;
     hidden?: boolean;

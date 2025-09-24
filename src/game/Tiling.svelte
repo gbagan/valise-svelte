@@ -1,16 +1,11 @@
 <script lang="ts">
-  import { coords, diffCoords, generate, generate2, gridStyle, mod, random, repeat } from '../lib/util';
-  import {type Model, type ScoreModel, type Methods, type ScoreMethods, type SizeModel,
-    initModel, newGame, updateScore, 
-    type SizeLimit,
-    playA} from '../lib/model';
+  import { coords, gridStyle, mod, repeat } from '../lib/util';
+  import {type Model, type Methods, type SizeModel, type SizeLimit,
+    initModel, newGame, playA} from '../lib/model';
   import Template from '../components/Template.svelte';
-  import Icon from '../components/icons/Icon.svelte';
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
-  import DndBoard from '../components/DndBoard.svelte';
-  import DndItem from '../components/DndItem.svelte';
-    import PointerTracker from '../components/PointerTracker.svelte';
+  import PointerTracker from '../components/PointerTracker.svelte';
 
   type Coord = [row: number, col: number];
   type Tile = Coord[];
@@ -276,7 +271,6 @@
   }
 
   .darken {
-    -webkit-filter: url(#darken);
     filter: url(#darken);
   }
 

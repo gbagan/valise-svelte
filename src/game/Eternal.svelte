@@ -551,14 +551,15 @@
 {/snippet}
 
 {#snippet rules()}
-  Domination Eternelle est un jeu à deux joueurs: un attaquant et un défenseur.<br/>
-  Au début de la partie, le défenseur choisit des sommets sur lesquels poser des gardes.<br/>
-  Ensuite, à chaque tour, l'attaquant choisit d'attaquer un sommet puis le défenseur doit déplacer un de ses gardes
-  vers le sommet attaqué à la condition que celui soit adjacent au garde.<br/>
+  <strong>Domination Eternelle</strong> est un jeu à deux joueurs: un <strong>attaquant</strong>
+   et un <strong>défenseur</strong>.<br/>
+  Au début de la partie, le défenseur choisit des sommets sur lesquels poser des <strong>gardes</strong>.<br/>
+  Ensuite, à chaque tour, l'attaquant choisit d'attaquer un sommet puis le défenseur doit <strong>déplacer</strong>
+  un de ses gardes vers le sommet attaqué à la condition que celui soit <strong>adjacent</strong> au garde.<br/>
   Si le défenseur ne peut pas déplacer de garde, il perd la partie.<br/>
   La partie peut ne pas avoir de fin. Le but est de déterminer le nombre minimum
   de gardes pour défendre infiniment toute attaque.<br/>
-  Dans une variante, le défenseur peut déplacer plusieurs gardes à chaque tour.
+  Dans une variante, le défenseur peut déplacer <strong>plusieurs gardes</strong> à chaque tour.
 {/snippet}
 
 <Template bind:model={model} {methods} {board} {config} {rules} {sizeLimit} />

@@ -7,7 +7,7 @@
     values: A[];
     selected: A;
     text?: string[] | ((v: A) => string);
-    tooltip?: string[] | ((v: A) => (string | undefined));
+    tooltip?: string[] | ((v: A) => (string | null));
     disabled?: boolean[] | ((v: A) => boolean) | boolean;
     setter: (val: A) => void;
     children?: () => any;
@@ -20,7 +20,7 @@
   {#each values as val, i}
     <Icon
       text={Array.isArray(text) ? text[i] : text ? text(val) : ""+val}
-      tooltip={Array.isArray(tooltip) ? tooltip[i] : tooltip ? tooltip(val) : undefined}
+      tooltip={Array.isArray(tooltip) ? tooltip[i] : tooltip ? tooltip(val) : null}
       selected={val === selected}
       onclick={() => setter(val)}
       disabled={Array.isArray(disabled) ? disabled[i] : typeof disabled === "function" ? disabled(val) : !!disabled}

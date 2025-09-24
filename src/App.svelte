@@ -88,30 +88,30 @@
     }
 }
 
-@keyframes gameenter {
+  @keyframes gameenter {
     from {
-        transform: scale(0.05); 
+      transform: scale(0.05); 
     }
     to {
-        transform: scale(1);
+      transform: scale(1);
     }
-}
+  }
 
-@keyframes valiseenter {
+  @keyframes valiseenter {
     from {
-        transform: translate(-50%, -50%) scale(0.1);
+      transform: translate(-50%, -50%) scale(0.1);
     }
     to {
-        transform: scale(1);
+      transform: scale(1);
     }
-}
+  }
 
 
-.valise-link {
+  .valise-link {
     position: absolute;
     left: 0;
     width: calc(192vmin / 25);
     height: calc(169vmin / 25);
     z-index: 10;
-}
+  }
 </style>

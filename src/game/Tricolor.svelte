@@ -126,10 +126,11 @@
 {/snippet}
 
 {#snippet rules()}
-  Ce jeu est une variante de "Tout noir ou tout blanc" mais avec plusieurs couleurs.<br/>
-  Lorsque tu cliques un jeton, celui-ci change de couleur ainsi que tous les jetons proches
-  jusqu'à la distance choisie dans "Portée".<br/>
-  Le but est que tous les jetons soient de couleur verte.
+  <strong>Feux tricolores</strong> est une variante de <strong>out noir ou tout blanc</strong> mais
+  avec plusieurs <strong>couleurs</strong>.<br/>
+  Lorsque tu <strong>cliques</strong> un feu, celui-ci change de couleur ainsi que tous les jetons proches
+  jusqu'à la distance choisie dans <strong>Portée</strong>.<br/>
+  Le but est que tous les jetons soient de couleur <strong>verte</strong>.
 {/snippet}
 
 <Template bind:model={model} {methods} {board} {config} {rules} />

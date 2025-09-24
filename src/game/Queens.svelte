@@ -237,10 +237,11 @@
 {/snippet}
 
 {#snippet rules()}
-  Place le plus de pièces possible sur ta grille sans qu'aucune ne soit menacée par une autre pièce.<br/>
-  Tu peux choisir de jouer avec différentes pièces comme celles du jeu d'échecs.<br/>
-  Le mode mixte permet de jouer avec plusieurs pièces différentes.<br/>
-  Tu peux jouer avec une pièce personnalisée si tu le souhaites.
+  Place le <strong>plus de pièces</strong> possible sur ta grille sans qu'aucune ne soit
+  <strong>menacée</strong> par une autre pièce.<br/>
+  Tu peux choisir de jouer avec différentes pièces comme celles du <strong>jeu d'échecs.</strong><br/>
+  Le mode <strong>mixte</strong> permet de jouer avec plusieurs pièces différentes.<br/>
+  Tu peux jouer avec une pièce <strong>personnalisée</strong> si tu le souhaites.
 {/snippet}
 
 {#snippet bestScore(position: Position)}

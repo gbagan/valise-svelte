@@ -215,13 +215,14 @@
 {/snippet}
 
 {#snippet rules()}
-  Le jeu de la grenouille est un jeu à deux joueurs.<br/>
-  A chaque tour, un joueur peut avancer la grenouille d'un nombre de cases parmi ceux
-  indiqués dans "Déplacements autorisés".<br/>
-  Le premier joueur à atteindre le nénuphar final a gagné.<br/>
+  Le jeu de la <strong>grenouille</strong> est un jeu à <strong>deux joueurs</strong>.<br/>
+  A chaque tour, un joueur peut <strong>avancer</strong> la grenouille d'un nombre de cases parmi ceux
+  indiqués dans <strong>Déplacements autorisés</strong>.<br/>
+  Le premier joueur à atteindre le <strong>nénuphar final</strong> a gagné.<br/>
   Pour éviter une situation bloquante, un joueur peut se déplacer vers le nénuphar
-  final en utilisant moins de déplacements que ce qui lui est autorisé.<br/>
-  Tu peux placer des indices sur les nénuphars avec un clic droit ou shift + clic gauche.
+  final en utilisant <strong>moins</strong> de déplacements que ce qui lui est autorisé.<br/>
+  Tu peux placer des indices sur les nénuphars avec un <strong>clic droit</strong> ou
+  <strong>shift + clic gauche</strong>.
 {/snippet}
 
 <Template bind:model={model} {methods} {board} {config} {rules} {winTitle} {sizeLimit} />

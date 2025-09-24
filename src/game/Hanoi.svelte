@@ -125,9 +125,12 @@
 {/snippet}
 
 {#snippet rules()}
-  Le but du jeu est de déplacer tous les disques sur la tour de droite avec les contraintes suivantes:<br/>
-  - tu peux déplacer seulement un disque à la fois;<br/>
-  - tu ne peux pas déplacer un disque sur un disque plus petit que lui.
+  Le but des <strong>Tours de Hanoi</strong> est de déplacer tous les <strong>disques</strong> sur la tour
+  de <strong>droite</strong> avec les contraintes suivantes:
+  <ul>
+    <li>tu peux déplacer un <strong>seul disque</strong> disque à la fois;</li>
+    <li>tu ne peux pas déplacer un disque sur un disque <strong>plus petit</strong> que lui.</li>
+  </ul>
 {/snippet}
 
 <Template bind:model={model} {methods} {board} {config} {rules} {winTitle} />

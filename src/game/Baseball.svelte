@@ -36,15 +36,17 @@
 
   const transformPeg = (position: number, nbBases: number) => {
     const mid = position / 2 | 0;
-    const x = 0.42 + 0.35 * Math.cos(mid * 2 * Math.PI / nbBases) + 0.1 * (position % 2);
-    const y = 0.46 + 0.35 * Math.sin(mid * 2 * Math.PI / nbBases);
-    return `translate(${x * 100}%, ${y * 100}%)`;
+    const angle = 2 * mid * Math.PI / nbBases;
+    const x = 0.42 + 0.35 * Math.cos(angle) + 0.1 * (position % 2);
+    const y = 0.46 + 0.35 * Math.sin(angle);
+    return `translate(${100*x}%, ${100*y}%)`;
   }
 
   const transformBase = (i: number, nbBases: number) => {
-    const x = 0.50 + 0.35 * Math.cos(2 * i * Math.PI / nbBases);
-    const y = 0.50 + 0.35 * Math.sin(2.0 * i * Math.PI / nbBases);
-    return `translate(${x * 100}%, ${y * 100}%) rotate(45deg)`;
+    const angle = 2 * i * Math.PI / nbBases;
+    const x = 0.5 + 0.35 * Math.cos(angle);
+    const y = 0.5 + 0.35 * Math.sin(angle);
+    return `translate(${100*x}%, ${100*y}%) rotate(45deg)`;
   }
 
   // svelte-ignore state_referenced_locally
@@ -78,11 +80,8 @@
               fill={colors[peg / 2 | 0]}
               onclick={() => playA(model, methods, peg)}
               style:cursor={play(peg) !== null ? "pointer" : "not-allowed"}
-              style:animation={
-                levelFinished 
-                ? `baseballHola 4s linear ${1000 + 2000 * peg / nbBases}ms infinite`
-                : "none"
-              }
+              style:animation-delay="{1000 + 2000 * peg / nbBases}ms"
+              class={{animate: levelFinished}} 
             />
           </g>
         {/if}
@@ -121,30 +120,32 @@
 <Template bind:model={model} {methods} {board} {config} {rules} />
 
 <style>
-.board {
+  .board {
     height: 80vmin;
     width: 80vmin;
     background-color: lightgreen;
-}
+  }
 
-.base {
+  .base {
     stroke-width: 1.2;
     fill: white;
     x: -10px;
     y: -10px;
     width: 20px;
     height: 20px;
-}
+  }
 
-.player {
+  .player {
     transition: transform 0.5s linear;
-}
+  }
 
-:global {
-  @keyframes baseballHola {
+  .animate {
+    animation: hola 4s linear infinite;
+  }
+
+  @keyframes hola {
     0%  { transform: translate(0, 0); }
     10% { transform: translate(0, -5%); }
     20%, 100% {transform: translate(0, 0); }
   }
-}
 </style>

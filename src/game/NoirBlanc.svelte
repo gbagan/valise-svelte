@@ -92,8 +92,8 @@
   const levelText = (i: number, unblocked: boolean) => unblocked ? levelTexts[i] : "#locked";
 
 
-  const levelTooltips: (string | undefined)[] = [
-    undefined, undefined, undefined, undefined, undefined,
+  const levelTooltips: (string | null)[] = [
+    null, null, null, null, null,
     "Dimensions personnalisées", "Grille aléatoire"
   ];
   const levelTooltip = (i: number, unblocked: boolean) => unblocked ? levelTooltips[i] : "Difficulté non débloquée";
@@ -166,14 +166,13 @@
 {/snippet}
 
 {#snippet rules()}
-  Le but du jeu est de retourner des tuiles pour que toutes soient face noire.<br/>
-  La difficulté est que lorsque tu retournes une tuile, les tuiles adjacentes sont également retournées.<br/>
-  Ce jeu possède différents niveaux débloqués au fur et à mesure ainsi que d'autres modes de jeu.
+  Le but de <strong>Tout noir, tout blanc</strong> est de <strong>retourner</strong> pour que toutes soient face noire.<br/>
+  La difficulté est que lorsque tu retournes une tuile, les tuiles <strong>adjacentes</strong> sont également retournées.<br/>
+  Ce jeu possède différents <strong>niveaux débloqués</strong> au fur et à mesure ainsi que d'autres modes de jeu.
   Selon le mode choisi, les règles pour retourner les tuiles changent.
 {/snippet}
 
 <Template bind:model={model} {methods} {board} {config} {rules} {sizeLimit} />
-
 
 <style>
   .board-container {
