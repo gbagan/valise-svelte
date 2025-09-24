@@ -225,7 +225,40 @@
           [10,15], [11,15], [14,15], [15,16], [12,16], [12,17], [13,17], [14,18], [15, 18]]
   }
 
-  const graphs = [ house, house2, hourglass, interlace, grid, konisberg, ex1, ex3, city, owl, rabbit];
+  const cross: Graph = {
+    title: "Croix",
+    vertices: [
+      { x: 0, y: 1 },
+      { x: 0, y: 2.0 },
+      { x: 0.5, y: 1.5 },
+      // 0 -- 2
+      { x: 1, y: 0 },
+      { x: 1, y: 1 },
+      { x: 1, y: 2 },
+      { x: 1, y: 3 },
+      // 3 -- 6
+      { x: 1.5, y: 0.5 },
+      { x: 1.5, y: 1.5 },
+      { x: 1.5, y: 2.5 },
+      // 7 -- 9
+      { x: 2, y: 0 },
+      { x: 2, y: 1 },
+      { x: 2, y: 2 },
+      { x: 2, y: 3 },
+      // 10 -- 13
+      { x: 2.5, y: 1.5 },
+      { x: 3.0, y: 1.0 },
+      { x: 3.0, y: 2.0 }, // 14 -- 16
+    ].map(({ x, y }) => ({ x: x * 1.3 + 0.5, y: y * 1.3 + 0.5 })),
+    edges: [
+        [0,1], [0,2], [1,2], [0,4], [1,5], [2,4], [2,5], [3,4], [4,5], [5,6], [3,7], [4,7],
+        [4,8], [5,8], [5,9], [6,9], [3,10], [4,11], [5,12], [6,13], [7,10], [7,11], [8,11],
+        [8,12], [9,12], [9,13], [10,11], [11,12], [12,13], [11,14], [12,14], [11,15], [12,16],
+        [14,15], [14,16], [15,16]
+    ]
+  }
+
+  const graphs = [ house, house2, hourglass, interlace, grid, konisberg, ex1, ex3, city, owl, rabbit, cross];
   
   type Move = number | "raise";
   type Position = Move[];
@@ -235,7 +268,7 @@
     scores: {}
   });
   let graphIndex: number | "custom" = $state(0);
-  let customGraph = $state({ title: "Graphe personnalisé", vertices: [], edges: []});
+  let customGraph: Graph = $state({ title: "Graphe personnalisé", vertices: [], edges: []});
   // pour l'animation quand le niveau est fini
   let counter = $state(0);
 
@@ -340,10 +373,16 @@
     return paths;
   })
 
-  const selectCustomGraph = () => newGame(model, methods, () => {
-    graphIndex = "custom";
-    model.dialog = "customize";
-  });
+  const selectCustomGraph = () => model.dialog = "customize";
+  
+  function acceptCustomGraph(graph: Graph) {
+    if (graph.vertices.length > 0) {
+      customGraph = graph;
+      graphIndex = "custom";
+    }
+    model.dialog = null;
+  }
+
 
   // svelte-ignore state_referenced_locally
   newGame(model, methods);
@@ -418,7 +457,7 @@
   <Config title="Dessin">
     <I.SelectGroup
       title="Niveau"
-      values={[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+      values={[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]}
       selected={graphIndex}
       text={i => "" + (i as number + 1)}
       tooltip={i => graphs[i as number].title}
@@ -461,7 +500,7 @@
 {/snippet}
 
 {#snippet custom()}
-  <GraphEditor bind:graph={customGraph} onOk={() => model.dialog = null} />
+  <GraphEditor onOk={acceptCustomGraph} />
 {/snippet}
 
 {#snippet rules()}

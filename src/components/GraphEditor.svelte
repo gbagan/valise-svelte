@@ -7,12 +7,12 @@
   type Mode = "vertex" | "addedge" | "delete";
 
   interface Props {
-    graph: Graph,
-    onOk: () => void;
+    onOk: (graph: Graph) => void;
   }
 
-  let {graph = $bindable(), onOk}: Props = $props();
+  let {onOk}: Props = $props();
 
+  let graph: Graph = $state({title: "Graph personnalisé", vertices: [], edges: []});
   let mode: Mode = $state("vertex");
   let selectedVertex: number | null = $state(null);
   let currentPosition: Position | null = $state.raw(null);
@@ -78,7 +78,7 @@
 
 </script>
 
-<Dialog title="Créé ton graphe" onOk={onOk}>
+<Dialog title="Créé ton graphe" onOk={() => onOk(graph)}>
   <div class="container">
     <div class="board">
       <!-- svelte-ignore a11y_click_events_have_key_events -->

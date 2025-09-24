@@ -72,7 +72,7 @@
 </script>
 
 {#snippet row(i: number)}
-  <rect class="row row-10" y={10+19*i}/>
+  <rect class="row {length === 5? "row-5" : "row-10"}" y={10+19*i}/>
 {/snippet}
 
 {#snippet square(i: number, j: number)}
