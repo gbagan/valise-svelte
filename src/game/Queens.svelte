@@ -3,10 +3,10 @@
         type Methods, type Model, type ScoreMethods, type ScoreModel, type SizeLimit, type SizeModel
       } from "../lib/model";
   import { diffCoords, generate, gridStyle, range, repeat } from "../lib/util";
+  import PointerTracker from "../components/PointerTracker.svelte";
   import Template from '../components/Template.svelte';
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
-  import Icon from "../components/icons/Icon.svelte";
 
   type Piece = "R" | "B" | "K" | "N" | "Q" | "custom" | null;
   type Position = Piece[];
@@ -133,7 +133,7 @@
 {#snippet pieceSelector()}
   <div class="pieceselector">
     {#each allowedPieces as piece}
-      <Icon
+      <I.Icon
         text="#piece-{piece}"
         selected={piece === selectedPiece}
         onclick={() => selectedPiece = piece}
@@ -151,10 +151,22 @@
   {/each}
 {/snippet}
 
+{#snippet pointer(x: number, y: number)}
+  <use
+    class="piece"
+    href="#piece-{selectedPiece}"
+    x={-20}
+    y={-20}
+    width="40"
+    height="40"
+    style:transform="translate({100*x}%, {100*y}%)"
+  />
+{/snippet}
+
 {#snippet board2()}
   <div class="board">
     <div class="ui-board board" style={gridStyle(model.rows, model.columns, 5)}>
-      <svg viewBox="0 0 {50*model.columns} {50*model.rows}">
+      <PointerTracker {pointer} viewBox="0 0 {50*model.columns} {50*model.rows}">
         {#each model.position as piece, i}
           {@const x = 50 * (i % model.columns)}  
           {@const y = 50 * (i / model.columns | 0)}  
@@ -181,7 +193,7 @@
           {/if}
         {/each}
         {@render lines(model.rows, model.columns)}
-      </svg>
+      </PointerTracker>
     </div>
   </div>
 {/snippet}
@@ -201,7 +213,7 @@
     />
     <I.Group title="Pièces disponibles">
       {#each piecesList as piece}
-        <Icon
+        <I.Icon
           text="#piece-{piece}"
           selected={allowedPieces.includes(piece)}
           tooltip={tooltip(piece)}
@@ -210,7 +222,7 @@
     {/each}
     </I.Group>
     <I.Group title="Options">
-      <Icon
+      <I.Icon
         text="#customize"
         tooltip="Mode mixte"
         selected={multiPieces}

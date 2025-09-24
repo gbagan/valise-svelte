@@ -3,8 +3,10 @@
   import {type Model, type Methods, type SizeLimit, type SizeModel, 
     initModel, newGame, playA} from '../lib/model';
   import Template from '../components/Template.svelte';
+  import PointerTracker from '../components/PointerTracker.svelte';
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
+
 
   type Position = number[];
   type Move = number;
@@ -19,7 +21,15 @@
 
   let exit: number | null = $state(null);
   let mode: Mode = $state(1);
-  
+  let pathElement: SVGPathElement = $state()!;
+
+  let levelFinished = $derived(
+    exit !== null 
+    && model.position.length > 0
+    && model.position.length == model.columns * model.rows
+        + (exit === model.position[0] ? 1 : 0)
+  );
+
   // renvoie un chemin horizontal ou vertical entre u et v si celui ci existe (u exclus du chemin)
   function pathBetween(columns: number, u: number, v: number): number[] | null {
     const [row, col] = diffCoords(columns, u, v);
@@ -67,11 +77,7 @@
     }
   }
 
-  const isLevelFinished = () =>
-    exit !== null 
-    && model.position.length > 0
-    && model.position.length == model.columns * model.rows
-        + (exit === model.position[0] ? 1 : 0);
+  const isLevelFinished = () => levelFinished;
 
   const initialPosition = () => exit === null ? [] : [exit];
   
@@ -136,27 +142,57 @@
   />
 {/snippet}
 
+{#snippet pointer(x: number, y: number)}
+  {#if model.position.length === 0}
+    <use
+      href="#meeplehat"
+      class="pointer"
+      x="-40"
+      y="-40"
+      width="80"
+      height="80"
+      style:transform="translate({100*x}%, {100*y}%)"
+    />
+  {:else if exit === null}
+    <use
+      href="#paths-door"
+      class="pointer"
+      x="-50"
+      y="-50.0"
+      width="100"
+      height="100"
+      style:transform="translate({100*x}%, {100*y}%)"
+    />
+  {/if}
+{/snippet}
+
 {#snippet board()}
   <div class="board-container">
     <div class="ui-board" style={gridStyle(model.rows, model.columns, 5)}>
-      <svg viewBox="0 0 {100*model.columns} {100*model.rows}">
+      <PointerTracker {pointer} viewBox="0 0 {100*model.columns} {100*model.rows}">
         {#each grid as trapped, index}
-            {@const row = index / model.columns | 0}
-            {@const col = index % model.columns}
-            {@render square(
-              col * 100,
-              row * 100,
-              model.help && (row + col) % 2 === 0,
-              trapped && index !== model.position.at(-1),
-              index === exit,
-              () => selectSquare(index)
-            )}
+          {@const row = index / model.columns | 0}
+          {@const col = index % model.columns}
+          {@render square(
+            col * 100,
+            row * 100,
+            model.help && (row + col) % 2 === 0,
+            trapped && index !== model.position.at(-1) && !levelFinished,
+            index === exit,
+            () => selectSquare(index)
+          )}
         {/each}
-        <path d={pathDescription} class="path" />
+        <path
+          d={pathDescription}
+          class={["path", {animate: levelFinished}]}
+          stroke-dasharray={!levelFinished ? "0" : 100 * model.position.length}
+          stroke-dashoffset={!levelFinished ? "0" : 100 * model.position.length}
+          bind:this={pathElement}
+        />
         {#if model.position.length > 0}
           {@render hero(model.position.at(-1)!)}
         {/if}
-      </svg>
+      </PointerTracker>
    </div>
   </div>
 {/snippet}
@@ -230,6 +266,10 @@
     stroke-width: 8;
     stroke: blue;
     fill: none;
+
+    &.animate {
+      animation: drawline 4s linear forwards infinite;
+    }
   }
 
   .trap{
@@ -250,5 +290,13 @@
   .hero {
     transition: all 500ms linear;
     pointer-events: none;
+  }
+
+
+
+  @keyframes drawline {
+    70%, 80% {
+      stroke-dashoffset: 0;
+    }
   }
 </style>

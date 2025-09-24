@@ -275,11 +275,6 @@
     height: 75vmin
   }
 
-  .message {
-    color: blue;
-    font-size: 1.3em;
-  }
-
   .darken {
     -webkit-filter: url(#darken);
     filter: url(#darken);

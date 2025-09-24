@@ -13,11 +13,11 @@
 - [ ] nim: ajouter les icones manquantes
 - [x] frog: ajouter les icones manquantes
 - [x] changer le message de victoire pour nim et frog
-- [ ] queens: ajouter le curseur
+- [x] queens: ajouter le curseur
 - [ ] queens: quand on quitte le mode mixte, vérifier qu'il ne reste qu'une pièce choisie
 - [x] solitaire: sur le cercle 5, le pion à droite ne peut pas être déplacé 
 - [ ] solitaire: ajouter les règles
-- [ ] chemins: ajouter les curseurs
+- [x] chemins: ajouter les curseurs
 - [ ] sans mot: implémenter d'autres preuves
 - [x] roue des couleurs: gérer les rotations négatives
 - [ ] roue des couleurs: ajouter un indicateur pour savoir si la rotation est valide
@@ -34,3 +34,4 @@
 - [ ] eternal: ajouter l'icone manquante
 - [ ] eternal: un style quand une pièce est draggable
 - [ ] tiling: ajouter la rotation par la touche espace
+- [ ] tiling; pièce personnalisée
