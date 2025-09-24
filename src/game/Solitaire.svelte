@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { dCoords, generate, generate2, gridStyle, random, repeat } from '../lib/util';
+  import { diffCoords, generate, generate2, gridStyle, random, repeat } from '../lib/util';
   import {type Model, type ScoreModel, type Methods, type ScoreMethods, type SizeModel,
     initModel, newGame, updateScore, 
     type SizeLimit} from '../lib/model';
@@ -31,7 +31,7 @@
 
   // retourne la position du trou situé entre les deux positions d'un coup si celui est valide
   function betweenMove({ from, to }: Move): number | null {
-    const [row, col] = dCoords(model.columns, from, to);
+    const [row, col] = diffCoords(model.columns, from, to);
     return row * row + col * col == 4 ? (from + to) / 2 | 0 : null;
   }
   

@@ -31,3 +31,6 @@
 - [ ] eternal: ajouter le message d'information
 - [ ] eternal: ajouter des types de graphes?
 - [ ] eternal: graphe personnalisé
+- [ ] eternal: ajouter l'icone manquante
+- [ ] eternal: un style quand une pièce est draggable
+- [ ] tiling: ajouter la rotation par la touche espace

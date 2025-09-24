@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { dCoords, gridStyle, repeat } from '../lib/util';
+  import { diffCoords, gridStyle, repeat } from '../lib/util';
   import {type Model, type ScoreModel, type Methods, type SizeLimit, type SizeModel,
     initModel, newGame, 
     playA} from '../lib/model';
@@ -25,7 +25,7 @@
   // indique si index1 est voisine de index2 selon le mode de jeu en cours
   // c'est à dire que si l'on active index1, index2 va changer de couleur
   function neighbor(index1: number, index2: number): boolean {
-    let [row, col] = dCoords(model.columns, index1, index2);
+    let [row, col] = diffCoords(model.columns, index1, index2);
     return row * row + col * col === 1
       || mode % 3 == 0 && index1 === index2
       || mode >= 2 && index1 !== index2 && row * col == 0

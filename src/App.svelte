@@ -15,6 +15,7 @@
   import Solitaire from './game/Solitaire.svelte';
   import Wheel from './game/Wheel.svelte';
   import Tricolor from './game/Tricolor.svelte';
+  import Tiling from './game/Tiling.svelte';
   import { onMount } from 'svelte';
 
   let location = $state(window.location.hash.slice(1) || "main");
@@ -64,6 +65,8 @@
     <SansMot />
   {:else if location === "solitaire"}
     <Solitaire />
+  {:else if location === "tiling"}
+    <Tiling />
   {:else if location === "tricolor"}
     <Tricolor />
   {/if}

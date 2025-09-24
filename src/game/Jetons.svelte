@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { dCoords, gridStyle, repeat } from '../lib/util';
+  import { diffCoords, gridStyle, repeat } from '../lib/util';
   import {type Model, type ScoreModel, type Methods, type ScoreMethods, type SizeModel,
     initModel, newGame, updateScore } from '../lib/model';
   import Template from '../components/Template.svelte';
@@ -23,7 +23,7 @@
 
   function play({ from, to }: Move) {
     const position = model.position;
-    const [row, col] = dCoords(model.columns, from, to);
+    const [row, col] = diffCoords(model.columns, from, to);
     const pfrom = position[from];
     const pto = position[to];
     if (pfrom > 0 && pfrom <= pto && row * row + col * col === 1) {

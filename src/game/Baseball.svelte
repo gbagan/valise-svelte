@@ -110,9 +110,11 @@
 {/snippet}
 
 {#snippet rules()}
-  Le but du jeu est d'amener chaque jeton dans sa base (celle qui a la même couleur que le jeton).<br/>
-  Pour cela, tu peux déplacer un jeton vers une base adjacente si celle-ci possède un emplacement libre.<br/>
-  Pour déplacer un jeton, il te suffit de cliquer dessus.
+  Le but de <strong>Baseball multicolore</strong> est d'amener chaque <strong>jeton</strong> dans sa
+  <strong>base</strong> (celle qui a la même couleur que le jeton).<br/>
+  Pour cela, tu peux déplacer un jeton vers une base <strong>adjacente</strong>
+  si celle-ci possède un emplacement <strong>libre</strong>.<br/>
+  Pour déplacer un jeton, il te suffit de <strong>cliquer</strong> dessus.
 {/snippet}
 
 

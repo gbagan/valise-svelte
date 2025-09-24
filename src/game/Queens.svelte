@@ -2,7 +2,7 @@
   import { initModel, newGame, playA, updateScore,
         type Methods, type Model, type ScoreMethods, type ScoreModel, type SizeLimit, type SizeModel
       } from "../lib/model";
-  import { dCoords, generate, gridStyle, range, repeat } from "../lib/util";
+  import { diffCoords, generate, gridStyle, range, repeat } from "../lib/util";
   import Template from '../components/Template.svelte';
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
@@ -41,7 +41,7 @@
   // teste si la pièce de type "piece" à la position index1 peut attaquer la pièce à la position index2
   // suppose que la pièce est différent de Empty
   function canCapture(piece: Piece, index1: number, index2: number): boolean {
-    const [row, col] = dCoords(model.columns, index1, index2);
+    const [row, col] = diffCoords(model.columns, index1, index2);
     if (piece !== "custom") {
       return index1 !== index2 && legalMoves(piece, row, col);
     } else {

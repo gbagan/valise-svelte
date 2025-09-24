@@ -144,9 +144,13 @@ export const generate2 = <A>(n: number,  m: number, f: (i: number, j: number) =>
   generate(n * m, i => f(i / m | 0, i % m));
 
 
+export function coords(cols: number, x: number): [number, number] {
+  const row = x / cols | 0;
+  const col = x % cols;
+  return [row, col];
+}
 
-
-export function dCoords(cols: number, x: number, y: number): [number, number] {
+export function diffCoords(cols: number, x: number, y: number): [number, number] {
   const row1 = x / cols | 0;
   const col1 = x % cols;
   const row2 = y / cols | 0;

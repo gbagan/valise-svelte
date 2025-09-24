@@ -113,9 +113,16 @@
     }
 }
 
-.rules {
+  .rules {
     width: 46rem;
     font-size: 1.1rem;
-}
+  
+    :global {
+      & strong {
+        color: blue;
+        font-weight: bold;
+      }
+    }
+  }
 
 </style>

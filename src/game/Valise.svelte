@@ -26,6 +26,12 @@
     <g class="valise-open">
       <use href="#openvalise"/>
       <ValiseObject {svg} {setHelp}
+        symbol="tile"
+        link="tiling"
+        help="Jeu: carrelage"
+        x={280} y={400} width={120} height={60}
+      />
+      <ValiseObject {svg} {setHelp}
         symbol="chocolate"
         link="chocolat"
         help="Jeu: chocolat"
@@ -44,6 +50,13 @@
         help="Jeu: les 8 reines"
         x={461} y={380} width={24} height={48}
         style="transform:rotate(40deg);"  
+      />
+      <ValiseObject {svg} {setHelp}
+        symbol="paw"
+        link="labete"
+        help="Jeu: la bête"
+        x={300} y={180} width={40} height={40}
+        style="transform:rotate(30deg);opacity:0.5;"
       />
       <ValiseObject {svg} {setHelp}
         symbol="stack"

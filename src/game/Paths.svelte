@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { allDistinct, dCoords, gridStyle, random, range, repeat } from '../lib/util';
+  import { allDistinct, diffCoords, gridStyle, random, range, repeat } from '../lib/util';
   import {type Model, type Methods, type SizeLimit, type SizeModel, 
     initModel, newGame, playA} from '../lib/model';
   import Template from '../components/Template.svelte';
@@ -22,7 +22,7 @@
   
   // renvoie un chemin horizontal ou vertical entre u et v si celui ci existe (u exclus du chemin)
   function pathBetween(columns: number, u: number, v: number): number[] | null {
-    const [row, col] = dCoords(columns, u, v);
+    const [row, col] = diffCoords(columns, u, v);
     if (row == 0) {
       return u < v ? range(u+1, v+1) : range(u-1, v-1, -1);
     } else if (col == 0) {
