@@ -236,7 +236,9 @@
   });
   let graphIndex: number | "custom" = $state(0);
   let customGraph = $state({ title: "Graphe personnalisé", vertices: [], edges: []});
-  
+  // pour l'animation quand le niveau est fini
+  let counter = $state(0);
+
   let graph: Graph = $derived.by(() => {
     if (graphIndex === "custom") {
       return customGraph;
@@ -303,35 +305,40 @@
 
   let winTitle = $derived(`Tu as réussi en ${nbRaises} levé${nbRaises > 1 ? "s" : ""}`);
 
-  let pathDescription = $derived.by(() => {
-    let p = "";
-    let raised = true;
-    for (const move of model.position) {
-      if (move === "raise") {
-        raised = true;
-      } else {
-        const {x, y} = graph.vertices[move];
-        p += `${raised ? 'M' : 'L'} ${100*x} ${100*y}`;
-        raised = false;
-      }
-    }
-    return p;
-  })
+  const colors = [ "red", "green", "magenta", "orange", "gray", "cyan", "black" ];
 
-  let pathLength = $derived.by(() => {
-    let len = 0;
+  type PathDescription = {path: string, length: number, start: number};
+
+  let pathDescriptions: PathDescription[] = $derived.by(() => {
+    let paths = [];
+    let path = "";
+    let length = 0;
+    let start = 0;
     let pred: [x: number, y: number] | null = null;
     for (const move of model.position) {
-      if (move !== "raise") {
+      if (move === "raise") {
+        length += 0.5;
+        paths.push({path, length, start});
+        path = "";
+        start += length;
+        length = 0;
+        pred = null;
+      } else {
         const {x, y} = graph.vertices[move];
+        path += `${path === "" ? 'M' : 'L'} ${100*x} ${100*y}`;
         if (pred) {
           let [x2, y2] = pred;
-          len += Math.sqrt((x2 - x) ** 2 + (y2 - y) ** 2)
+          length += Math.sqrt((x2 - x) ** 2 + (y2 - y) ** 2);
         }
-        pred = [x, y]
+        pred = [x, y];
       }
     }
-    return len;
+    if (path !== "") {
+      length += 2;
+      paths.push({path, length, start});
+      start += length;
+    }
+    return paths;
   })
 
   function selectCustomGraph() {
@@ -346,7 +353,14 @@
 {#snippet currentLine(x2: number, y2: number)}
   {#if !levelFinished && typeof model.position.at(-1) === "number"}
     {@const {x, y} =  graph.vertices[model.position.at(-1) as number] }
-    <line x1={x*100} y1={y*100} x2={x2*100} y2={y2*100} class="line-to-pointer" />
+    <line
+      x1={x*100}
+      y1={y*100}
+      x2={x2*100}
+      y2={y2*100}
+      class="line-to-pointer"
+      stroke={colors[nbRaises] ?? "black"}
+    />
   {/if}
 {/snippet}
 
@@ -364,12 +378,18 @@
           class="line1"
         />
       {/each}
-      <path
-        d={pathDescription}
-        class={["line2", {animate: levelFinished}]}
-        stroke-dasharray={!levelFinished ? "0" : 100 * pathLength}
-        stroke-dashoffset={!levelFinished ? "0" : 100 * pathLength}
-      />
+      {#each pathDescriptions as {path, length, start}, i (`${i},${counter}`)}
+        <path
+          d={path}
+          class={["line2", {animate: levelFinished}]}
+          stroke-dasharray={!levelFinished ? "0" : 100 * length}
+          stroke-dashoffset={!levelFinished ? "0" : 100 * length}
+          style:animation-duration="{length}s"
+          style:animation-delay="{start}s"
+          stroke={colors[i] ?? "black"}
+          onanimationend={i < pathDescriptions.length - 1 ? null : () => counter += 1}
+        />
+      {/each}
       {#if !levelFinished}
         {#each graph.vertices as {x, y}, i}
           <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -468,16 +488,15 @@
   }
 
   .line2 {
-    stroke: red;
     stroke-width: 1.5;
     fill: transparent;
+    stroke-linejoin: round;
     &.animate {
-      animation: drawline 6s linear forwards infinite;
+      animation: drawline 6s linear forwards;
     }
   }
 
   .line-to-pointer {
-    stroke: red;
     stroke-width: 1.5;
     pointer-events: none;
     opacity: 0.6;
@@ -518,7 +537,7 @@
   }
 
   @keyframes drawline {
-    75%, 85% {
+    to {
       stroke-dashoffset: 0;
     }
   }

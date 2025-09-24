@@ -26,6 +26,8 @@
 - [x] dessin: implémenter les meilleurs scores
 - [x] dessin: implémenter le dessin personnalisé
 - [ ] dessin: ajouter le graphe "Croix"
+- [x] animation quand le niveau est fini
+- [x] couleurs différentes pour indiquer à quel levé un tracé a été fait
 - [ ] eternal: l'action "le joueur 2 commence" est bugguée
 - [ ] eternal: changer le message de victoire
 - [ ] eternal: ajouter le message d'information
