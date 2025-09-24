@@ -98,7 +98,6 @@
       selected={nbBases}
       setter={i => newGame(model, methods, () => nbBases = i)}
     />
-
     <I.Group title="Options">
       <I.Undo bind:model={model} {methods} />
       <I.Redo bind:model={model} {methods} />

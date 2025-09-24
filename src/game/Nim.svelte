@@ -27,7 +27,7 @@
   }
 
   const initialPosition = () =>
-    generate(nbPiles, () => [random(0, 5), random(5, 10)]) as Position;
+    generate(nbPiles, () => length === 5 ? [0, 4] : [random(0, 5), random(5, 10)]) as Position;
 
   const isLevelFinished = () => 
     model.position.every(([p1, p2]) =>
@@ -80,7 +80,7 @@
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <rect
     class="square"
-    style:transform="translate({5 + 10 * j}px, {15 + 19 * i}px) rotate(45deg)"
+    style:transform="translate({(length === 5 ? 30 : 5) + 10 * j}px, {15 + 19 * i}px) rotate(45deg)"
     style:cursor={canPlay({pile:i, pos: j}) ? "pointer" : "not-allowed"}
     onclick={() => playA(model, methods, {pile: i, pos: j})}
   />
@@ -93,7 +93,7 @@
     height="8"
     class="player"
     fill={player === 0 ? "blue" : "red"}
-    style:transform="translate({1 + 10 * j}px, {11 + 19 * i}px)"
+    style:transform="translate({ (length === 5 ? 26 : 1) + 10 * j}px, {11 + 19 * i}px)"
   />
 {/snippet}
 
@@ -118,6 +118,20 @@
 
 {#snippet config()}
   <Config title="Bloque moi si tu peux">
+    <I.SelectGroup 
+      title="Taille des rangées"
+      values={[ 1, 2, 3, 4, 5 ]}
+      selected={nbPiles}
+      disabled={model.locked}
+      setter={i => newGame(model, methods, () => nbPiles = i)}
+    />
+    <I.SelectGroup 
+      title="Taille des rangées"
+      values={[ 10, 5 ]}
+      selected={length}
+      disabled={model.locked}
+      setter={i => newGame(model, methods, () => length = i)}
+    />
     <I.TwoPlayers bind:model={model} {methods} />
     <I.Group title="Options">
       <I.Undo bind:model={model} {methods} />
@@ -129,58 +143,58 @@
 {/snippet}
 
 {#snippet rules()}
-  Le but du jeu est d'acculer chacun des jetons de l'adversaire au bord du plateau de telle
-  façon qu'il ne puisse plus en déplacer.<br/>
-  À chaque tour, tu peux déplacer un de tes jetons vers la gauche ou vers la droite d'autant
-  de cases que tu veux mais tu ne peux pas sauter par-dessus un jeton adverse.<br/>
-  Tu es obligé de déplacer un jeton d'au moins une case, tu ne peux pas passer ton tour.<br/>
+  Le but de <strong>Bloque moi</strong> si tu peux est d'acculer chacun des jetons de l'adversaire au bord du plateau de telle
+  façon qu'il ne puisse <strong>plus en déplacer</strong>.<br/>
+  À chaque tour, tu peux déplacer un de tes jetons vers la <strong>gauche</strong>
+  ou vers la <strong>droite</strong> d'autant de cases que tu veux mais tu
+  ne peux pas <strong>sauter</strong> par-dessus un jeton adverse.<br/>
+  Tu es obligé de déplacer un jeton d'au moins une case, tu ne peux pas <strong>passer ton tour</strong>.<br/>
   Tu gagnes la partie si ton adversaire n'a aucun mouvement possible.
 {/snippet}
 
 <Template bind:model={model} {methods} {board} {config} {rules} {winTitle} />
 
 <style>
-.board {
+  .board {
     height: 80vmin;
     width: 80vmin;
     position: relative;
     background-color: lightblue;
-}
+  }
 
-.square {
+  .square {
     x: -2.5px;
     y: -2.5px;
     width: 5px;
     height: 5px;
     fill: grey;
-}
+  }
 
-.row {
+  .row {
     height: 10px;
     fill: snow;
-}
+  }
 
-.row-5 {
+  .row-5 {
     x: 25px;
     width: 50px;
-}
+  }
 
-.row-10 {
+  .row-10 {
     width: 100px;
-}
+  }
 
-.player {
+  .player {
     cursor: not-allowed;
     transition: all 0.5s linear;
-}
+  }
 
-.turn-message {
+  .turn-message {
     position: absolute;
     left: 0;
     top: 0;
     color: blue;
     font-size: 1.5em;
     font-weight: bold;
-}
+  }
 </style>
-

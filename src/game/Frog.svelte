@@ -228,49 +228,49 @@
 <Template bind:model={model} {methods} {board} {config} {rules} {winTitle} {sizeLimit} />
 
 <style>
-.board {
+  .board {
     width: 100%;
     height: 100%;
-}
+  }
 
-.lily {
+  .lily {
     fill: url(#lilyg);
 
     &.reachable {
-        transition: opacity 0.3s linear 0.5s;
-        fill: url(#lilyh);
+      transition: opacity 0.3s linear 0.5s;
+      fill: url(#lilyh);
     }
 
     &.reachable.hidden {
-        transition: opacity 0.3s linear;
-        opacity: 0;
+      transition: opacity 0.3s linear;
+      opacity: 0;
     }
-}
+  }
 
-.index {
+  .index {
     fill: blue;
     font-size: 20;
     text-anchor: middle;
     pointer-events: none;
-}
+  }
 
-.frog-container {
+  .frog-container {
     transition: transform linear 0.6s;
-}
+  }
 
-.frog {
+  .frog {
     fill: #bcd35f;
     pointer-events: none;
     &.marked {
-        opacity: 0.6;
-        fill: #bc835f;
+      opacity: 0.6;
+      fill: #bc835f;
     }
     &.goal {
-        animation: frog-jump 4s infinite;
+      animation: frog-jump 4s infinite;
     }
-}
+  }
 
-@keyframes frog-jump {
+  @keyframes frog-jump {
     0% { transform: translate(0, 0); }
     70% { transform: translate(0, 0); }
     75% { transform: translate(0, -30px); }
@@ -279,13 +279,13 @@
     90% { transform: translate(0, -0); }
     95% { transform: translate(0, -30px); }
     100% { transform: translate(0, 0); }
-}
+  }
 
-.turn-message {
+  .turn-message {
     position: absolute;
     bottom: 0.5em;
     left: 0.5em;
     color: blue;
     font-size: 1.3em;
-}
+  }
 </style>

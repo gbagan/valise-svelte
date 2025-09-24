@@ -10,7 +10,7 @@
 - [ ] valise: le tooltip doit être affiché quand on survole le <a> et non l'image entière
 - [x] désactiver SelectGroup et MultiSelectGroup quand locked=true
 - [ ] Konami code ?
-- [ ] nim: ajouter les icones manquantes
+- [x] nim: ajouter les icones manquantes
 - [x] frog: ajouter les icones manquantes
 - [x] changer le message de victoire pour nim et frog
 - [x] queens: ajouter le curseur
