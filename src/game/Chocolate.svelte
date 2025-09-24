@@ -210,9 +210,11 @@
 {/snippet}
 
 {#snippet rules()}
-  Chocolat est un jeu à deux joueurs.<br/>
-  A chaque tour, un joueur coupe la barre de chocolat en deux et conserve celle qui contient le carré empoisonné.<br/>
-  Lorsqu'il ne reste que le carré empoisonné, le joueur qui doit jouer a perdu.
+  <strong>Chocolat</strong> est un jeu à <strong>deux joueurs</strong>.<br/>
+  A chaque tour, un joueur <strong>coupe</strong> la barre de chocolat en deux,
+  <strong>verticalement</strong> ou <strong>horizontalement</strong> et conserve celle
+  qui contient le <strong>carré empoisonné</strong>.<br/>
+  Lorsqu'il ne reste que le carré empoisonné, le joueur qui doit jouer a <strong>perdu</strong>.
 {/snippet}
 
 <Template bind:model={model} {methods} {board} {config} {rules} {winTitle} {sizeLimit} />

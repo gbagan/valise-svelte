@@ -7,7 +7,6 @@
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
 
-
   type Position = number[];
   type Move = number;
   type Mode = 1 | 2;
@@ -21,7 +20,6 @@
 
   let exit: number | null = $state(null);
   let mode: Mode = $state(1);
-  let pathElement: SVGPathElement = $state()!;
 
   let levelFinished = $derived(
     exit !== null 
@@ -187,7 +185,6 @@
           class={["path", {animate: levelFinished}]}
           stroke-dasharray={!levelFinished ? "0" : 100 * model.position.length}
           stroke-dashoffset={!levelFinished ? "0" : 100 * model.position.length}
-          bind:this={pathElement}
         />
         {#if model.position.length > 0}
           {@render hero(model.position.at(-1)!)}
@@ -225,25 +222,26 @@
 
 {#snippet rules()}
   <p>
-    Après moultes péripéties dans le temple maudit de Berge, le professeur Hamilton Jones
+    Après moultes péripéties dans le temple maudit de Berge, le professeur <strong>Hamilton Jones</strong>
     se retrouve dans la dernière salle.<br/>
     Pour sortir de celle-ci, il doit s'enfuir par une porte au-dessous de lui.<br/>
     Celle-ci ne peut être ouverte qu'en marchant sur chacune des dalles dans la salle.
   </p>
   <p>
     Malheureusement, ces dalles sont piégées, le piège se déclenchant peu de temps après avoir marché dessus.<br/>
-    Donc, Hamilton ne peut pas remarcher sur une dalle sur laquelle il a déjà été.<br/>
-    N'ayant plus l'aisance de sa jeunesse, Hamilton ne peut se déplacer que d'une dalle
-    à la fois et ne peut le faire en diagonale.
+    Donc, Hamilton ne <strong>ne peut pas remarcher</strong> sur une dalle sur laquelle il a déjà été.<br/>
+    N'ayant plus l'aisance de sa jeunesse, Hamilton ne peut se déplacer que d'une <strong>dalle à la fois</strong>
+    et ne peut le faire en <strong>diagonale</strong>.
   </p>
   <p>
     Trouve un parcours pour résoudre l'énigme. Ca semble facile ?
     Mais, cela est-il possible pour toutes les tailles de grille ?
   </p>
   <p>
-      Tu remarqueras qu'il n'y a pas toujours de solution.<br/>
-      Dans le deuxième mode de jeu, tu peux choisir la position de départ d'Hamilton ainsi que celle de la porte.<br/>
-    Trouve des critères sur les positions d\'Hamilton et de la porte pour qu'une solution soit possible
+      Tu remarqueras qu'il n'y a <strong>pas</strong> toujours de solution.<br/>
+      Dans le deuxième mode de jeu, tu peux choisir la <strong>position de départ</strong> d'Hamilton ainsi que celle de la
+      <strong>porte</strong>.<br/>
+    Trouve des critères sur les positions d'Hamilton et de la porte pour qu'une solution soit possible
   </p>
 {/snippet}
 

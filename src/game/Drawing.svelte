@@ -303,11 +303,41 @@
 
   let winTitle = $derived(`Tu as réussi en ${nbRaises} levé${nbRaises > 1 ? "s" : ""}`);
 
+  let pathDescription = $derived.by(() => {
+    let p = "";
+    let raised = true;
+    for (const move of model.position) {
+      if (move === "raise") {
+        raised = true;
+      } else {
+        const {x, y} = graph.vertices[move];
+        p += `${raised ? 'M' : 'L'} ${100*x} ${100*y}`;
+        raised = false;
+      }
+    }
+    return p;
+  })
+
+  let pathLength = $derived.by(() => {
+    let len = 0;
+    let pred: [x: number, y: number] | null = null;
+    for (const move of model.position) {
+      if (move !== "raise") {
+        const {x, y} = graph.vertices[move];
+        if (pred) {
+          let [x2, y2] = pred;
+          len += Math.sqrt((x2 - x) ** 2 + (y2 - y) ** 2)
+        }
+        pred = [x, y]
+      }
+    }
+    return len;
+  })
+
   function selectCustomGraph() {
     graphIndex = "custom";
     model.dialog = "customize";
   }
-
 
   // svelte-ignore state_referenced_locally
   newGame(model, methods);
@@ -334,16 +364,12 @@
           class="line1"
         />
       {/each}
-      {#each positionEdges as [u, v]}
-        {@const {x1, x2, y1, y2} = getCoordsOfEdge(graph, u, v)}
-        <line
-          x1={x1*100}
-          x2={x2*100}
-          y1={y1*100}
-          y2={y2*100}
-          class="line2"
-        />
-      {/each}
+      <path
+        d={pathDescription}
+        class={["line2", {animate: levelFinished}]}
+        stroke-dasharray={!levelFinished ? "0" : 100 * pathLength}
+        stroke-dashoffset={!levelFinished ? "0" : 100 * pathLength}
+      />
       {#if !levelFinished}
         {#each graph.vertices as {x, y}, i}
           <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -444,6 +470,10 @@
   .line2 {
     stroke: red;
     stroke-width: 1.5;
+    fill: transparent;
+    &.animate {
+      animation: drawline 6s linear forwards infinite;
+    }
   }
 
   .line-to-pointer {
@@ -485,5 +515,11 @@
     font-size: 6px;
     text-anchor: middle;
     dominant-baseline: middle;
+  }
+
+  @keyframes drawline {
+    75%, 85% {
+      stroke-dashoffset: 0;
+    }
   }
 </style>
