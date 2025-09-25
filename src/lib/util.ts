@@ -162,3 +162,10 @@ export function gridStyle(rows: number, columns: number, limit: number): string 
   const m = Math.max(limit, rows, columns);
   return `height:${100*rows/m}%;width:${100*columns/m}%;`
 }
+
+export function pointerPosition(e: PointerEvent): {x: number, y: number} {
+  const rect = (e.currentTarget as Element).getBoundingClientRect();
+  const x = (e.clientX - rect.left) / rect.width;
+  const y = (e.clientY - rect.top) / rect.height;
+  return {x, y};
+}

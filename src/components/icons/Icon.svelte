@@ -28,7 +28,7 @@
     <span class="icon-text">{text}</span>
   {/if}
 
-  {#if tooltip !== undefined}
+  {#if tooltip}
     <span class="tooltip">{tooltip}</span>
   {/if}
 </button>

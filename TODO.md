@@ -39,3 +39,6 @@
 - [x] tilinng: ajouter SizeLimit
 - [ ] tiling: ajouter la rotation par la touche espace
 - [ ] tiling; pièce personnalisée
+- [ ] la bête: implémenter l'aide
+- [ ] la bête: pièce personnalisée
+- [ ] la bête: meilleurs scores

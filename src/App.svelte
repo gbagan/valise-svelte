@@ -7,6 +7,7 @@
   import Frog from './game/Frog.svelte';
   import Hanoi from './game/Hanoi.svelte';
   import Jetons from './game/Jetons.svelte';
+  import Labete from './game/Labete.svelte';
   import NoirBlanc from './game/NoirBlanc.svelte';
   import Nim from './game/Nim.svelte';
   import Paths from './game/Paths.svelte';
@@ -51,6 +52,8 @@
     <Hanoi />
   {:else if location === "jetons"}
     <Jetons />
+  {:else if location === "labete"}
+    <Labete />
   {:else if location === "noirblanc"}
     <NoirBlanc />
   {:else if location === "nim"}
@@ -105,7 +108,6 @@
       transform: scale(1);
     }
   }
-
 
   .valise-link {
     position: absolute;
