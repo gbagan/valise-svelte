@@ -25,15 +25,17 @@
 - [x] roue des couleurs: refaire la roue extérieure
 - [x] dessin: implémenter les meilleurs scores
 - [x] dessin: implémenter le dessin personnalisé
-- [ ] dessin: ajouter le graphe "Croix"
+- [x] dessin: ajouter le graphe "Croix"
 - [x] animation quand le niveau est fini
 - [x] couleurs différentes pour indiquer à quel levé un tracé a été fait
 - [ ] eternal: l'action "le joueur 2 commence" est bugguée
+- [x] eternal: bug quand on choisit biclique ou grille
 - [ ] eternal: changer le message de victoire
 - [ ] eternal: ajouter le message d'information
 - [ ] eternal: ajouter des types de graphes?
 - [ ] eternal: graphe personnalisé
 - [ ] eternal: ajouter l'icone manquante
 - [ ] eternal: un style quand une pièce est draggable
+- [x] tilinng: ajouter SizeLimit
 - [ ] tiling: ajouter la rotation par la touche espace
 - [ ] tiling; pièce personnalisée

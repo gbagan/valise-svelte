@@ -98,6 +98,8 @@
 
   // view
 
+  const sizeLimit: SizeLimit = {minRows: 3, minCols: 3, maxRows: 10, maxCols: 10};
+
   interface SquareProps {
     isDark: boolean;
     hasBlock: boolean;
@@ -262,7 +264,7 @@
   </ul>
 {/snippet}
 
-<Template bind:model={model} {methods} {board} {config} {rules} />
+<Template bind:model={model} {methods} {board} {config} {rules} {sizeLimit} />
 
 <style>
   .container {

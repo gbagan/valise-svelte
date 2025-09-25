@@ -165,7 +165,7 @@
   }
 
   // generate a biclique graph
-  const biclique = (m: number, n: number) => ({
+  const biclique = (m: number, n: number) => (console.log(n, m), {
     title: "Biclique",
     vertices: generate(n + m, i => ({
       x: i < n ? 0.2 : 0.8,
@@ -419,6 +419,24 @@
     }
   }
 
+  const setGraphKind = (kind: GraphKind) => newGame(model, methods, () => {
+    graphKind = kind;
+    switch (kind) {
+      case "path":
+      case "cycle":
+        model.columns = 0;
+        model.rows = 6;
+        break;
+      case "grid":
+        model.columns = 3;
+        model.rows = 3;
+        break;
+      case "biclique":
+        model.columns = 2;
+        model.rows = 5;
+    }
+  })
+
   // svelte-ignore state_referenced_locally
   newGame(model, methods);
 </script>
@@ -529,7 +547,7 @@
       text={["#graph-path", "#graph-cycle", "#graph-biclique", "#graph-grid"]}
       disabled={model.locked}
       tooltip={["Chemin", "Cycle", "Biclique", "Grille"]}
-      setter={i => newGame(model, methods, () => graphKind = i)}
+      setter={i => newGame(model, methods, () => setGraphKind(i))}
     />
     <I.SelectGroup
       title="Règles"
