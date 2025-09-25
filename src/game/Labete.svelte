@@ -1,14 +1,10 @@
 <script lang="ts">
-  import { coords, countBy, generate2, gridStyle, mod, pointerPosition, repeat } from '../lib/util';
-  import {type Model, type ScoreModel, type Methods, type SizeLimit, type SizeModel,
-    initModel, newGame, 
-    playA,
-    type ScoreMethods,
-    updateScore} from '../lib/model';
+  import { coords, countBy, generate2, gridStyle, mod, getPointerPosition, repeat } from '../lib/util';
+  import {type Model, type ScoreModel, type Methods, type SizeLimit, type ScoreMethods, type SizeModel,
+    initModel, newGame, playA, updateScore} from '../lib/model';
   import Template from '../components/Template.svelte';
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
-    import { onDestroy, onMount } from 'svelte';
 
   type Mode = "standard" | "cylinder" | "torus";
   type Beast = [number, number][];
@@ -213,9 +209,9 @@
   <div class="container">
     <div class="ui-board" style={gridStyle(model.rows, model.columns, 5)}>
       <svg
-        onpointerdown={e => { if(e.shiftKey) startingPosition = pointerPosition(e) }} 
+        onpointerdown={e => { if(e.shiftKey) startingPosition = getPointerPosition(e) }} 
         viewBox="0 0 {50*model.columns} {50*model.rows}"
-        onpointermove={e => currentPosition = pointerPosition(e)}
+        onpointermove={e => currentPosition = getPointerPosition(e)}
         onpointerleave={() => startingPosition = currentPosition = null}       
       >
         {#each squareColors as color, i}

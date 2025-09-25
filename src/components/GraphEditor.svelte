@@ -1,6 +1,7 @@
 <script lang="ts">
   import { addEdge, addVertex, getCoordsOfEdge, removeEdge, removeVertex,
   type Graph, type Position } from "../lib/graph";
+    import { getPointerPosition } from "../lib/util";
   import Dialog from "./Dialog.svelte";
   import Icon from "./icons/Icon.svelte";
 
@@ -19,18 +20,13 @@
 
   const onclick = (e: MouseEvent) => {
     if (mode === "vertex") {
-      const rect = (e.currentTarget as Element).getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width;
-      const y = (e.clientY - rect.top) / rect.height;
-      addVertex(graph, {x, y});
+      addVertex(graph, getPointerPosition(e));
     }
   }
 
   const onpointermove = (e: PointerEvent) => {
     if (selectedVertex === null) return;
-    const rect = (e.currentTarget as Element).getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width;
-    const y = (e.clientY - rect.top) / rect.height;
+    const {x, y} = getPointerPosition(e);
     if (mode === "vertex" && selectedVertex !== null) {
       graph.vertices[selectedVertex] = {x, y};
     } else if (mode === "addedge") {

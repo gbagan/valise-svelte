@@ -1,6 +1,6 @@
 <script lang="ts">
   import { initModel, newGame, playA, type Methods, type Model, type SizeModel } from "../lib/model";
-  import { allDistinct, countBy, generate, generate2, minBy, randomPick, range, sublists } from "../lib/util";
+  import { allDistinct, countBy, generate, generate2, getPointerPosition, minBy, randomPick, range, sublists } from "../lib/util";
   import { answer, makeArenaGraph, type Arena, type ArenaGraph } from "../lib/arena";
   import { getCoordsOfEdge, type Edge, type Graph } from "../lib/graph";
   import Template from "../components/Template.svelte";
@@ -400,10 +400,7 @@
 
   function setPointer(e: PointerEvent) {
     if (draggedGuard === null) return;
-    const rect = (e.currentTarget as Element).getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width;
-    const y = (e.clientY - rect.top) / rect.height;
-    pointerPosition = {x, y};
+    pointerPosition = getPointerPosition(e);
   }
 
   function startDrag(i: number) {

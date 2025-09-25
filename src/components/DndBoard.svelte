@@ -1,4 +1,6 @@
 <script lang="ts" generics="Drag">
+  import { getPointerPosition } from '../lib/util';
+
   interface Props {
     viewBox: string;
     class?: string;
@@ -13,10 +15,7 @@
 
   const onpointermove = (e: PointerEvent) => {
     if (dragged === null) return;
-    const rect = (e.currentTarget as Element).getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width;
-    const y = (e.clientY - rect.top) / rect.height;
-    position = {x, y};
+    position = getPointerPosition(e);
   }
 
 </script>

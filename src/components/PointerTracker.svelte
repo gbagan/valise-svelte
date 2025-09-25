@@ -1,4 +1,6 @@
 <script lang="ts" generics="Drag">
+  import { getPointerPosition } from '../lib/util';
+
   interface Props {
     viewBox: string;
     class?: string;
@@ -10,20 +12,11 @@
   let { viewBox, class: className, style, children, pointer }: Props = $props();
   
   let position: {x: number, y: number} | null = $state(null);
-
-  const onpointermove = (e: PointerEvent) => {
-    const rect = (e.currentTarget as Element).getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width;
-    const y = (e.clientY - rect.top) / rect.height;
-    position = {x, y};
-  }
-
 </script>
 
 <svg
   {viewBox} class={className} {style}
-  onpointerdown={onpointermove}
-  onpointermove={onpointermove}
+  onpointermove={e => position = getPointerPosition(e)}
   onpointerleave={() => position = null}
 >
   {@render children()}

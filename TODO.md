@@ -42,3 +42,5 @@
 - [ ] la bête: implémenter l'aide
 - [ ] la bête: pièce personnalisée
 - [ ] la bête: meilleurs scores
+
+- [] Nim en largeur 5, est-ce le bon jeu?

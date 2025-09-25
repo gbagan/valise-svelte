@@ -163,7 +163,7 @@ export function gridStyle(rows: number, columns: number, limit: number): string 
   return `height:${100*rows/m}%;width:${100*columns/m}%;`
 }
 
-export function pointerPosition(e: PointerEvent): {x: number, y: number} {
+export function getPointerPosition(e: MouseEvent): {x: number, y: number} {
   const rect = (e.currentTarget as Element).getBoundingClientRect();
   const x = (e.clientX - rect.left) / rect.width;
   const y = (e.clientY - rect.top) / rect.height;
