@@ -202,8 +202,7 @@
       y="-20"
       width="40"
       height="40"
-      opacity="0.7"
-      pointer-events="none"
+      class="pointer"
       style:transform="translate({100*x}%, {100*y}%)"
     />
   {/if}
@@ -281,6 +280,23 @@
   </Config>
 {/snippet}
 
+{#snippet bestScore(position: Position)}
+  <div class="bestscore-container">
+    <div class="ui-board" style={gridStyle(model.rows, model.columns, 5)}>
+      <svg viewBox="0 0 {50*model.columns} {50*model.rows}">
+        {#each position as hasTrap, i}
+          {@const [row, col] = coords(model.columns, i)}
+          <use href="#grass" x={50*col} y={50*row} width="50" height="50" fill={colors[0]} />  
+          <rect x={50*col} y={50*row} width="50" height="50" class="square-borders" />
+          {#if hasTrap}
+            <use href="#trap" x={50*col+5} y={50*row+5} width="40" height="40" />
+          {/if}
+        {/each}
+      </svg>
+    </div>
+  </div>
+{/snippet}
+
 {#snippet rules()}
   Place le moins de <strong>pièges</strong> possible pour empêcher la <strong>bête</strong> d'abîmer ta belle pelouse !<br/>
   Tu peux choisir de jouer avec des bêtes de différentes formes comme celles prédéfinies dans
@@ -295,7 +311,7 @@
 {/snippet}
 
 <svelte:window on:keydown={handleKeydown} />
-<Template bind:model={model} {methods} {board} {config} {rules} {sizeLimit} {winTitle} />
+<Template bind:model={model} {methods} {board} {config} {rules} {sizeLimit} {winTitle} {bestScore} />
 
 <style>
   .container {
@@ -333,8 +349,9 @@
     fill: transparent;
   }
 
-  .cursor {
+  .pointer {
     opacity: 0.7;
+    pointer-events: none;
 
     &.overtrap {
       opacity: 0.3;
@@ -347,12 +364,12 @@
     opacity: 0.4;
   }
 
-  .labete-custombeast-grid-container {
+  .custombeast-grid-container {
     width: 50vmin;
     height: 50vmin;
   }
 
-  .labete-bestscore-grid-container {
+  .bestscore-container {
     width: 60vmin;
     height: 60vmin;
   }
