@@ -15,7 +15,8 @@
 - [x] frog: ajouter les icones manquantes
 - [x] changer le message de victoire pour nim et frog
 - [x] queens: ajouter le curseur
-- [ ] queens: quand on quitte le mode mixte, vérifier qu'il ne reste qu'une pièce choisie
+- [x] queens: quand on quitte le mode mixte, vérifier qu'il ne reste qu'une pièce choisie
+- [ ] queens: pièce personnalisée
 - [x] solitaire: sur le cercle 5, le pion à droite ne peut pas être déplacé 
 - [ ] solitaire: ajouter les règles
 - [x] chemins: ajouter les curseurs

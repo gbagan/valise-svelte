@@ -113,6 +113,13 @@
     }
   }
 
+  function toggleMultiPieces() {
+    multiPieces = !multiPieces;
+    if (!multiPieces) {
+      allowedPieces = allowedPieces.slice(0, 1);
+    }
+  }
+
   function changeAllowedPieces(piece: Piece) {
     newGame(model, methods, () => {
       if (multiPieces) {
@@ -228,7 +235,7 @@
         text="#customize"
         tooltip="Mode mixte"
         selected={multiPieces}
-        onclick={() => multiPieces = !multiPieces}
+        onclick={toggleMultiPieces}
       />
       <I.Help bind:model={model} />
       <I.Reset bind:model={model} {methods} />
