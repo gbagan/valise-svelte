@@ -8,17 +8,21 @@
     hidden?: boolean;
     disabled?: boolean;
     style?: string;
-    onclick: () => void;
+    onclick?: ((e: MouseEvent) => void) | null;
+    onpointerdown?: ((e: PointerEvent) => void) | null;
+    onpointerup?: ((e: PointerEvent) => void) | null;
+    onpointerleave?: ((e: PointerEvent) => void) | null;
   }
   
-  const {text, selected, tooltip, round, large, hidden, disabled, style, onclick}: Props = $props();
+  const { text, selected, tooltip, round, large, hidden, disabled, style,
+    onclick, onpointerdown, onpointerup, onpointerleave }: Props = $props();
 </script>
 
 <button
   class={["icon", {selected, round, large, hidden}]}
-  disabled={disabled}
-  onclick={onclick}
-  oncontextmenu={ev => ev.preventDefault()} 
+  {disabled}
+  {onclick} {onpointerdown} {onpointerup} {onpointerleave}
+  oncontextmenu={e => e.preventDefault()} 
 >
   {#if text && text.startsWith("#")}
     <svg style:width="100%" style:height="100%" style={style}>

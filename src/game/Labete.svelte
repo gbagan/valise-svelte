@@ -83,7 +83,7 @@
     }
   }) as Beast
 
-  // Fonction auxiliaire pour nonTrappedBeastOnGrid.
+  // Fonction auxiliaire pour nonTrappedBeast.
   // Il n'est pas nécessaire d'avoir une vraie fonction aléatoire
   function pseudoRandomPick<A>(arr: A[]): A {
     return arr[28921 % arr.length]
@@ -103,7 +103,7 @@
   // Renvoie un emplacement possible pour la bête sur le plateau sous forme d'un tableau de booléens
   // indicé par les positions du plateau.
   // Renvoie un tableau ne contenant que la valeur false si aucun emplacement pour la bête n'est possible
-  let nonTrappedBeastOnGrid = $derived.by(() => {
+  let nonTrappedBeast = $derived.by(() => {
     const res = repeat(model.rows * model.columns, false);
     if (nonTrappedBeasts.length > 0) {
       const beast = pseudoRandomPick(nonTrappedBeasts);
@@ -111,6 +111,7 @@
         res[row * model.columns + col] = true;
       }
     }
+    return res;
   });
 
   const play = (i: Move) => model.position.with(i, !model.position[i]);
@@ -235,6 +236,13 @@
             <use href="#trap" x={50*col+5} y={50*row+5} width="40" height="40" pointer-events="none" />
           {/if}
         {/each}
+        {#each nonTrappedBeast as hasBeast, i}
+          {@const [row, col] = coords(model.columns, i)}
+          <use
+            href="#paw" x={50*col+5} y={50*row+5} width="40" height="40"
+            class={["beast", {visible: model.help && hasBeast}]}
+          />
+        {/each}
         {@render zone()}
         {@render pointerTrap()}
       </svg>
@@ -265,6 +273,7 @@
       customSize={true}
     />
     <I.Group title="Options">
+      <I.Help bind:model={model} interaction="press" />
       <I.Reset bind:model={model} {methods} />
       <I.Rules bind:model={model} />
     </I.Group>
@@ -310,6 +319,7 @@
   .beast {
     opacity: 0;
     transition: opacity 0.3s ease-in;
+    pointer-events: none;
 
     &.visible {
       opacity: 0.6;

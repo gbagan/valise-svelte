@@ -37,10 +37,10 @@
 - [ ] eternal: graphe personnalisé
 - [ ] eternal: ajouter l'icone manquante
 - [ ] eternal: un style quand une pièce est draggable
-- [x] tilinng: ajouter SizeLimit
+- [x] tiling: ajouter SizeLimit
 - [ ] tiling: ajouter la rotation par la touche espace
 - [ ] tiling; pièce personnalisée
-- [ ] la bête: implémenter l'aide
+- [x] la bête: implémenter l'aide
 - [ ] la bête: pièce personnalisée
 - [ ] la bête: meilleurs scores
 
