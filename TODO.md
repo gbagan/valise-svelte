@@ -28,8 +28,8 @@
 - [x] dessin: implémenter les meilleurs scores
 - [x] dessin: implémenter le dessin personnalisé
 - [x] dessin: ajouter le graphe "Croix"
-- [x] animation quand le niveau est fini
-- [x] couleurs différentes pour indiquer à quel levé un tracé a été fait
+- [x] dessin: animation quand le niveau est fini
+- [x] dessin: couleurs différentes pour indiquer à quel levé un tracé a été fait
 - [ ] eternal: l'action "le joueur 2 commence" est bugguée
 - [x] eternal: bug quand on choisit biclique ou grille
 - [ ] eternal: changer le message de victoire
@@ -42,7 +42,7 @@
 - [x] tiling: ajouter la rotation par la touche espace
 - [ ] tiling; pièce personnalisée
 - [x] la bête: implémenter l'aide
-- [ ] la bête: pièce personnalisée
+- [x] la bête: pièce personnalisée
 - [x] la bête: meilleurs scores
 
 - [ ] Nim en largeur 5, est-ce le bon jeu?

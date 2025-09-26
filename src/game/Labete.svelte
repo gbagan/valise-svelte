@@ -5,6 +5,7 @@
   import Template from '../components/Template.svelte';
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
+    import Dialog from '../components/Dialog.svelte';
 
   type Mode = "standard" | "cylinder" | "torus";
   type Beast = [number, number][];
@@ -36,14 +37,15 @@
   let startingPosition: {x: number, y: number} | null = $state(null);
   let startingSquare: number | null = $state(null);
   let squareColors: number[] = $state([]);
-  
+  let customBeast: Beast2 = $state([[]]);
+
   let beast: Beast2 = $derived.by(() => {
     switch (beastType) {
       case "type1": return beastTypes[0];
       case "type2": return beastTypes[1];
       case "type3": return beastTypes[2];
       case "type4": return beastTypes[3];
-      default: return [];
+      default: return customBeast;
     }
   });
 
@@ -114,6 +116,15 @@
     return res;
   });
 
+
+  let customBeastGrid = $derived.by(() => {
+    const res = repeat(25, false);
+    for (const [row, col] of customBeast[0]) {
+      res[row * 5 + col + 12] = true;
+    }
+    return res;
+  });
+
   const play = (i: Move) => model.position.with(i, !model.position[i]);
   const isLevelFinished = () => nonTrappedBeasts.length === 0;
   const initialPosition = () => repeat(model.rows * model.columns, false);
@@ -138,6 +149,18 @@
       model.dialog = "customize";
       model.rows = Math.max(model.rows, 5);
       model.columns = Math.max(model.columns, 5);
+    }
+  }
+
+  function flipCustomBeast(i: number) {
+    let [row, col] = coords(5, i);
+    row -= 2;
+    col -= 2;
+    let idx = customBeast[0].findIndex(([r, c]) => r === row && c === col);
+    if (idx === -1) {
+        customBeast[0].push([row, col])
+    } else {
+        customBeast[0].slice(idx, 1);
     }
   }
 
@@ -297,6 +320,34 @@
   </div>
 {/snippet}
 
+{#snippet custom()}
+  <Dialog
+    title="Personnalise ta bête"
+    onOk={() => model.dialog = null}
+  >
+    <div class="custombeast-container">
+      <svg viewBox="0 0 250 250">
+        {#each customBeastGrid as beast, i}
+          {@const [row, col] = coords(5, i)}
+          <use href="#grass" x={50*col} y={50*row} width="50" height="50" fill={colors[0]} />  
+          <!-- svelte-ignore a11y_click_events_have_key_events -->
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
+          <rect
+            x={50*col} y={50*row} width="50" height="50"
+            class="square-borders"
+            onclick={() => flipCustomBeast(i)}
+          />
+          <use
+            href="#paw" x={50*col+5} y={50*row+5} width="40" height="40"
+            class={["beast", {visible: beast}]}
+          />
+        {/each}
+      </svg>
+    </div>
+  </Dialog>
+{/snippet}
+
+
 {#snippet rules()}
   Place le moins de <strong>pièges</strong> possible pour empêcher la <strong>bête</strong> d'abîmer ta belle pelouse !<br/>
   Tu peux choisir de jouer avec des bêtes de différentes formes comme celles prédéfinies dans
@@ -311,7 +362,7 @@
 {/snippet}
 
 <svelte:window on:keydown={handleKeydown} />
-<Template bind:model={model} {methods} {board} {config} {rules} {sizeLimit} {winTitle} {bestScore} />
+<Template bind:model={model} {methods} {board} {config} {rules} {sizeLimit} {winTitle} {bestScore} {custom} />
 
 <style>
   .container {
@@ -364,7 +415,7 @@
     opacity: 0.4;
   }
 
-  .custombeast-grid-container {
+  .custombeast-container {
     width: 50vmin;
     height: 50vmin;
   }
