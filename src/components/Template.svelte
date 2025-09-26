@@ -115,7 +115,8 @@
 
   .rules {
     width: 46rem;
-    font-size: 1.1rem;
+    font-size: 1.25rem;
+    line-height: 1.75rem;
   
     :global {
       & strong {

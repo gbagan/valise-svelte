@@ -38,10 +38,10 @@
 - [ ] eternal: ajouter l'icone manquante
 - [ ] eternal: un style quand une pièce est draggable
 - [x] tiling: ajouter SizeLimit
-- [ ] tiling: ajouter la rotation par la touche espace
+- [x] tiling: ajouter la rotation par la touche espace
 - [ ] tiling; pièce personnalisée
 - [x] la bête: implémenter l'aide
 - [ ] la bête: pièce personnalisée
 - [ ] la bête: meilleurs scores
 
-- [] Nim en largeur 5, est-ce le bon jeu?
+- [ ] Nim en largeur 5, est-ce le bon jeu?

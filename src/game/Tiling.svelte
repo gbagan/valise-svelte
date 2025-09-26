@@ -128,6 +128,12 @@
     }
   });
 
+  function handleKeydown(e: KeyboardEvent) {
+    if (e.key === " ") {
+      rotation += 1;
+    }
+  }
+
   // svelte-ignore state_referenced_locally
   newGame(model, methods);
 </script>
@@ -255,6 +261,8 @@
   Est-il possible de faire le <strong>carrelage</strong> de toute ta cuisine,
   sachant qu'elle peut avoir un ou plusieurs <strong>éviers</strong> ?<br/>
   Tu peux tester avec différentes formes de <strong>tuile</strong> et différents emplacements d'éviers.<br/>
+  Pour tourner la pièce, tu peux utiliser le <strong>clic droit</strong> ou appuyer sur la touche
+  <strong>Espace</strong>.<br/>
   Deux questions sont particulièrement intéressantes: <br/>
   <ul>
     <li>Pour quelles dimensions de la grille et pour quels positions d'éviers
@@ -264,6 +272,7 @@
   </ul>
 {/snippet}
 
+<svelte:window on:keydown={handleKeydown} />
 <Template bind:model={model} {methods} {board} {config} {rules} {sizeLimit} />
 
 <style>
