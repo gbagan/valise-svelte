@@ -10,7 +10,7 @@
 
   const {model=$bindable(), methods}: Props = $props();
 
-  let bestScore: [number, Pos] | undefined = $derived(model.scores[methods.scoreHash()]);
+  let bestScore: [number, Pos] | undefined = $derived(model.scores[methods.scoreHash() ?? "$custom"]);
 
   let title = $derived(`Meilleur score (${bestScore ? "" + bestScore[0] : "∅"})`);
 </script>

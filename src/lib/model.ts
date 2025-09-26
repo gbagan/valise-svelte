@@ -125,7 +125,9 @@ export function newGame<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move
   model.help = false;
   model.turn = 1;
   model.newGameAction = null;
-  //  # set (_scores ∘ at "custom") Nothing
+  if(isScoreModel(model)) {
+    delete model.scores["$custom"];
+  }
 }
 
 
@@ -243,7 +245,7 @@ export function isScoreModel<Pos>(model: Model<Pos>): model is Model<Pos> & Scor
 
 export interface ScoreMethods {
   score: () => number;
-  scoreHash: () => string;
+  scoreHash: () => string | null;
   objective: "minimize" | "maximize";
 }
 
@@ -263,7 +265,7 @@ export function updateScore<Pos, Move>(
     return { isNewRecord: false, showWin: false }
   } else {
     const score = methods.score();
-    const hash = methods.scoreHash();
+    const hash = methods.scoreHash() ?? "$custom";
     const cmp = (a: number, b: number) => methods.objective === "minimize" ? a < b : a > b;
     const oldScore = model.scores[hash];
     const isNewRecord = !oldScore || cmp(score, oldScore[0]);

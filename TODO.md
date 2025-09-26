@@ -6,7 +6,8 @@
 - [ ] Safari: jetons: l'ombre sur les cases n'apparait pas
 - [ ] problème d'affichage du joueur quand l'IA commence
 - [x] bug de undo/redo pour les jeux à deux joueurs
-- [ ] gérer le cas des parties personnalisées: le score ne doit pas être sauvegardé
+- [x] gérer le cas des parties personnalisées: le score ne doit pas être sauvegardé
+- [ ] le joueur peux commencer seulement si la partie n'a pas débuté
 - [ ] valise: le tooltip doit être affiché quand on survole le <a> et non l'image entière
 - [x] désactiver SelectGroup et MultiSelectGroup quand locked=true
 - [ ] Konami code ?

@@ -328,7 +328,7 @@
 
   const objective = "minimize";
   const score = () => nbRaises;
-  const scoreHash = () => "" + graphIndex;
+  const scoreHash = () => graphIndex === "custom" ? null : "" + graphIndex;
 
   const methods: Methods<Position, Move> & ScoreMethods = {
     play, isLevelFinished, initialPosition,

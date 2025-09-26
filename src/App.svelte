@@ -17,17 +17,15 @@
   import Wheel from './game/Wheel.svelte';
   import Tricolor from './game/Tricolor.svelte';
   import Tiling from './game/Tiling.svelte';
-  import { onMount } from 'svelte';
 
   let location = $state(window.location.hash.slice(1) || "main");
 
-  onMount(() =>
-    addEventListener("hashchange", () => { 
-      location = window.location.hash.slice(1) || "main";
-    })
-  )
+  function handleHashChange() {
+    location = window.location.hash.slice(1) || "main";
+  }
 </script>
 
+<svelte:window on:hashchange={handleHashChange} />
 <div class="container {location === "main" ? "valise" : "game"}">
   {#if location !== "main"}
     <a class="valise-link" href="#main" aria-label="valise">

@@ -8,7 +8,7 @@
   type Position = [number, number][];
   type Move = {pile: number, pos: number};
 
-  let model: Model<Position> = $state({...initModel([]), mode: 'expert'});
+  let model: Model<Position> = $state({...initModel([]), mode: "random"});
   let length = $state(10);
   let nbPiles = $state(4);
 

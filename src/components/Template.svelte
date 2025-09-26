@@ -54,7 +54,7 @@
     {@render custom?.()}
   {:else if model.dialog == "score" && isScoreModel(model) && isScoreMethods(methods)}
     <Dialog title="Meilleur score" onOk={() => model.dialog = null}>
-      {@const position = model.scores[methods.scoreHash()][1] }
+      {@const position = model.scores[methods.scoreHash() ?? "$custom"][1] }
       {@render bestScore?.(position)}
     </Dialog>
   {:else if model.newGameAction}

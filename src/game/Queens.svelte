@@ -92,7 +92,9 @@
 
   const objective = "maximize";
   const score = () => isValidPosition ? model.position.filter(p => p !== null).length : 0;
-  const scoreHash = () => `${model.rows},${model.columns},${allowedPieces[0]}`;
+  const scoreHash = () => multiPieces || allowedPieces.includes("custom")
+    ? null
+    : `${model.rows},${model.columns},${allowedPieces[0]}`;
 
   const methods: Methods<Position, Move> & ScoreMethods = {
     play, isLevelFinished, initialPosition, onNewGame,

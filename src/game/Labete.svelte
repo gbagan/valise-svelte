@@ -123,7 +123,7 @@
   const objective = "minimize";
   const score = () => countBy(model.position, x => x);
   // todo
-  const scoreHash = () => `${model.columns},${model.rows},${mode},${beastType}`;
+  const scoreHash = () => beastType === "custom" ? null : `${model.columns},${model.rows},${mode},${beastType}`;
 
   const methods: Methods<Position, Move> & ScoreMethods = {
     play, isLevelFinished, initialPosition, onNewGame,
@@ -159,6 +159,9 @@
     startingSquare = null;
     startingPosition = null;
   }
+
+  const sizeLimit: SizeLimit = { minRows: 2, minCols: 2, maxRows: 9, maxCols: 9 };
+  let winTitle = $derived(`Record: ${score()} pièges`);
 
   const colors = [ "#5aa02c", "blue", "red", "yellow", "magenta", "cyan", "orange", "darkgreen", "grey" ];
 
@@ -283,7 +286,7 @@
 {/snippet}
 
 <svelte:window on:keydown={handleKeydown} />
-<Template bind:model={model} {methods} {board} {config} {rules} />
+<Template bind:model={model} {methods} {board} {config} {rules} {sizeLimit} {winTitle} />
 
 <style>
   .container {

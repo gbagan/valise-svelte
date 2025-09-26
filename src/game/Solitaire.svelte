@@ -133,7 +133,7 @@
   const objective = "minimize";
   const score = () => model.position.filter(x => x).length;
   // todo à vérifier
-  const scoreHash = () => `${boardType},${model.rows},${model.columns}`;
+  const scoreHash = () => boardType === "random" ? null : `${boardType},${model.rows},${model.columns}`;
 
   const methods: Methods<Position, Move> & ScoreMethods = {
     play, isLevelFinished, initialPosition, onNewGame,
