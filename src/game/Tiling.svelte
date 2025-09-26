@@ -6,6 +6,7 @@
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
   import PointerTracker from '../components/PointerTracker.svelte';
+    import Dialog from '../components/Dialog.svelte';
 
   type Coord = [row: number, col: number];
   type Tile = Coord[];
@@ -37,22 +38,31 @@
     ...initModel([]),
     rows: 5,
     columns: 5,
-    customSize: true,
+    customSize: false,
   });
 
   let rotation = $state(0);
   let tileType: TileType = $state("type1");
   let nbSinks = $state(0);
   let hoverSquare: number | null = $state(null);
+  let customTile: [number, number][] = $state([]);
 
   let tile: Tile = $derived.by(() => {
     switch (tileType) {
       case "type1": return [ [0, 0], [0, 1] ];
       case "type2": return [ [0, 0], [0, 1], [0, -1] ];
       case "type3": return [ [0, 0], [0, 1], [1, 0] ];
-      default: return [];
+      default: return customTile;
     }
   });
+
+  let customTileGrid = $derived.by(() => {
+    const res = repeat(25, false);
+    for (const [row, col] of customTile) {
+      res[row * 5 + col + 12] = true;
+    }
+    return res;
+  });  
 
   // renvoie la liste des positions où devra être posée une tuile,  -1 est une position invalide
   function tilePositions(index: number): number[] {
@@ -100,17 +110,6 @@
 
   const sizeLimit: SizeLimit = {minRows: 3, minCols: 3, maxRows: 10, maxCols: 10};
 
-  interface SquareProps {
-    isDark: boolean;
-    hasBlock: boolean;
-    hasSink: boolean;
-    row: number;
-    col: number;
-    onclick?: (e: MouseEvent) => void;
-    onpointerenter?: (e: PointerEvent) => void;
-    onpointerleave?: (e: PointerEvent) => void;
-  }
-
   const border = (i: number, d: number) => model.position[i] !== model.position[i+d];
 
   function selectSquare(index: number) {
@@ -118,6 +117,18 @@
       model.position[index] = -1;
     } else {
       playA(model, methods, index);
+    }
+  }
+
+  function flipCustomTile(i: number) {
+    let [row, col] = coords(5, i);
+    row -= 2;
+    col -= 2;
+    let idx = customTile.findIndex(([r, c]) => r === row && c === col);
+    if (idx === -1) {
+        customTile.push([row, col])
+    } else {
+        customTile.slice(idx, 1);
     }
   }
 
@@ -132,6 +143,17 @@
     if (e.key === " ") {
       rotation += 1;
     }
+  }
+
+  interface SquareProps {
+    isDark?: boolean;
+    hasBlock?: boolean;
+    hasSink?: boolean;
+    row: number;
+    col: number;
+    onclick?: (e: MouseEvent) => void;
+    onpointerenter?: (e: PointerEvent) => void;
+    onpointerleave?: (e: PointerEvent) => void;
   }
 
   // svelte-ignore state_referenced_locally
@@ -257,6 +279,27 @@
   </Config>
 {/snippet}
 
+{#snippet custom()}
+  <Dialog
+    title="Personnalise ta tuile"
+    onOk={() => model.dialog = null}
+  >
+    <div class="customtile-container">
+      <svg viewBox="0 0 250 250">
+        {#each customTileGrid as block, i}
+          {@const [row, col] = coords(5, i)}
+          {@render square({
+            hasBlock: block,
+            row,
+            col,
+            onclick: () => flipCustomTile(i),
+          })}
+        {/each}
+      </svg>
+    </div>
+  </Dialog>
+{/snippet}
+
 {#snippet rules()}
   Est-il possible de faire le <strong>carrelage</strong> de toute ta cuisine,
   sachant qu'elle peut avoir un ou plusieurs <strong>éviers</strong> ?<br/>
@@ -273,7 +316,7 @@
 {/snippet}
 
 <svelte:window on:keydown={handleKeydown} />
-<Template bind:model={model} {methods} {board} {config} {rules} {sizeLimit} />
+<Template bind:model={model} {methods} {board} {config} {rules} {custom} {sizeLimit} />
 
 <style>
   .container {
@@ -290,12 +333,7 @@
     transition: transform 0.4s;
   }
 
-  .success-container {
-    width: 60vmin;
-    height: 60vmin;
-  }
-
-  .customtile-grid-container {
+  .customtile-container {
     width: 50vmin;
     height: 50vmin;
   }

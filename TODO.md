@@ -40,7 +40,7 @@
 - [ ] eternal: un style quand une pièce est draggable
 - [x] tiling: ajouter SizeLimit
 - [x] tiling: ajouter la rotation par la touche espace
-- [ ] tiling; pièce personnalisée
+- [x] tiling; pièce personnalisée
 - [x] la bête: implémenter l'aide
 - [x] la bête: pièce personnalisée
 - [x] la bête: meilleurs scores
