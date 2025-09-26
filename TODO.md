@@ -16,11 +16,10 @@
 - [x] changer le message de victoire pour nim et frog
 - [x] queens: ajouter le curseur
 - [x] queens: quand on quitte le mode mixte, vérifier qu'il ne reste qu'une pièce choisie
-- [ ] queens: pièce personnalisée
+- [x] queens: pièce personnalisée
 - [x] solitaire: sur le cercle 5, le pion à droite ne peut pas être déplacé 
 - [ ] solitaire: ajouter les règles
 - [x] chemins: ajouter les curseurs
-- [ ] sans mot: implémenter d'autres preuves
 - [x] roue des couleurs: gérer les rotations négatives
 - [ ] roue des couleurs: ajouter un indicateur pour savoir si la rotation est valide
 - [ ] roue des couleurs: ce sont les bonnes règles?
@@ -45,4 +44,5 @@
 - [x] la bête: pièce personnalisée
 - [x] la bête: meilleurs scores
 
+- [ ] sans mot: implémenter d'autres preuves
 - [ ] Nim en largeur 5, est-ce le bon jeu?

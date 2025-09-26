@@ -2,17 +2,19 @@
   import { initModel, newGame, playA, updateScore,
         type Methods, type Model, type ScoreMethods, type ScoreModel, type SizeLimit, type SizeModel
       } from "../lib/model";
-  import { diffCoords, generate, gridStyle, range, repeat } from "../lib/util";
+  import { coords, diffCoords, generate, gridStyle, range, repeat } from "../lib/util";
   import PointerTracker from "../components/PointerTracker.svelte";
   import Template from '../components/Template.svelte';
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
+    import Dialog from "../components/Dialog.svelte";
 
   type Piece = "R" | "B" | "K" | "N" | "Q" | "custom" | null;
   type Position = Piece[];
   type Move = number;
 
   const piecesList: Piece[] = ["R", "B", "K", "N", "Q"];
+  const angles = [ 45, 90, 135, 0, 0, 180, -45, -90, -135 ]
   
   let model: Model<Position> & ScoreModel<Position> & SizeModel = $state({
     ...initModel([]),
@@ -26,6 +28,8 @@
   let selectedSquare: number | null = $state(null);
   let allowedPieces: Piece[] = $state(["R"]);
   let multiPieces = $state(false);
+  let customLocalMoves = $state(repeat(25, false));
+  let customDirections = $state(repeat(9, false));
 
   function legalMoves(piece: Piece, x: number, y: number) {
     switch(piece) {
@@ -45,14 +49,17 @@
     if (piece !== "custom") {
       return index1 !== index2 && legalMoves(piece, row, col);
     } else {
-      return false;
+      return (row * row - col * col) * row * col === 0 
+        && customDirections[3 * Math.sign(row)  + Math.sign(col) + 4]
+        || row * row + col * col <= 8
+        && customLocalMoves[5 * row + col + 12]
     }
   }
 
   // renvoie l'ensemble des positions pouvant être attaquées par une pièce
   // à la position index sous forme de tableau de booléens
   const attackedBy = (piece: Piece, index: number) =>
-    generate(model.rows * model.columns, i => canCapture(piece, index, i));
+    generate(model.rows * model.columns, i => canCapture(piece, i, index));
 
   // ensemble des cases pouvant être attaquées par une pièce sur le plateau
   let capturable = $derived.by(() => {
@@ -132,6 +139,12 @@
       }
     })
   }
+
+  const customize = () => newGame(model, methods, () => {
+    allowedPieces = ["custom"];
+    model.dialog = "customize";
+    multiPieces = false;
+  });
 
   const sizeLimit: SizeLimit = { minRows:3, minCols: 3, maxRows: 9, maxCols: 9 };
 
@@ -233,6 +246,12 @@
     <I.Group title="Options">
       <I.Icon
         text="#customize"
+        selected={allowedPieces[0] == "custom"}
+        tooltip="Crée ta propre pièce"
+        onclick={customize}
+      />
+      <I.Icon
+        text="#piece-mix"
         tooltip="Mode mixte"
         selected={multiPieces}
         onclick={toggleMultiPieces}
@@ -278,7 +297,47 @@
   </div>
 {/snippet}
 
-<Template bind:model={model} {methods} {board} {config} {rules} {bestScore} {sizeLimit} />
+{#snippet custom()}
+  <Dialog title="Personnalise ta pièce" onOk={() => model.dialog = null}>
+    <div class="custompiece-container">
+      <div class="ui-board custompiece-grid">
+        <svg viewBox="0 0 250 250">
+          {#each customLocalMoves as attacked, i}
+            {@const [row, col] = coords(5, i)}
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
+            <rect
+              x={50*col} y={50*row}
+              class={["square", {attacked}]}
+              onclick={() => { if (i !== 12) customLocalMoves[i] = !customLocalMoves[i] }}
+            />
+          {/each}
+          <use
+            class="piece"
+            href="#piece-custom"
+            x="105"
+            y="105"
+            width="40"
+            height="40"
+          />
+          {@render lines(5, 5)}
+        </svg>
+      </div>
+      <div class="custompiece-directions">
+        {#each customDirections as selected, i}
+          <I.Icon
+            text={i === 4 ? "" : "#arrow"}
+            {selected}
+            style="transform:rotate({angles[i]}deg)"
+            onclick={() => { if (i !== 4) customDirections[i] = !customDirections[i] }}
+          />
+        {/each}
+      </div>
+    </div>
+  </Dialog>
+{/snippet}
+
+<Template bind:model={model} {methods} {board} {config} {rules} {bestScore} {custom} {sizeLimit} />
 
 <style>
   .board-container {
@@ -336,17 +395,20 @@
     height: 60vmin;
   }
 
-.queens-custompiece-grid {
+  .custompiece-grid {
     width: 50vmin;
     height: 50vmin;
-}
+  }
 
-.queens-custompiece-directions {
-    width : 13em;
-    margin-left: 0.5em;
-}
+  .custompiece-container {
+    display: flex;
+    align-items: start;
+    justify-content: center;
+    gap: 1rem;
+  }
 
-.queens-custompiece-directions > div {
-    margin: 0.3em;
-}
+  .custompiece-directions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
 </style>
