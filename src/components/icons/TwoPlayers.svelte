@@ -9,6 +9,11 @@
   }
   
   const {model=$bindable(), methods }: Props = $props();
+
+  const onclickHandler = () => {
+    model.computerStarts = true;
+    computerPlays(model, methods);
+  };
 </script>
 
 <SelectGroup
@@ -23,7 +28,7 @@
   <Icon
     text="2P⇨"
     tooltip="L'IA commence"
-    disabled={model.locked}
-    onclick={() => computerPlays(model, methods)}
+    disabled={model.locked || model.computerStarts || model.mode === "duel" || model.history.length > 0}
+    onclick={onclickHandler}
   />
 </SelectGroup>

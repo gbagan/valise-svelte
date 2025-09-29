@@ -4,10 +4,10 @@
 - [ ] Safari: roue des couleurs: les contours des parties survolés de
        la roue extérieure lors d'un drag and drop n'appaissent pas en vert 
 - [ ] Safari: jetons: l'ombre sur les cases n'apparait pas
-- [ ] problème d'affichage du joueur quand l'IA commence
+- [x] problème d'affichage du joueur gagnant quand l'IA commence
 - [x] bug de undo/redo pour les jeux à deux joueurs
 - [x] gérer le cas des parties personnalisées: le score ne doit pas être sauvegardé
-- [ ] le joueur peux commencer seulement si la partie n'a pas débuté
+- [x] le joueur peux commencer seulement si la partie n'a pas débuté
 - [ ] valise: le tooltip doit être affiché quand on survole le <a> et non l'image entière
 - [x] désactiver SelectGroup et MultiSelectGroup quand locked=true
 - [ ] Konami code ?

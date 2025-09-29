@@ -8,6 +8,7 @@ export interface Model<Pos> {
   history: Pos[];
   redoHistory: Pos[];
   turn: Turn;
+  computerStarts: boolean;
   mode: Mode;
   help: boolean;
   showWin: boolean;
@@ -22,6 +23,7 @@ export function initModel<Pos>(position: Pos): Model<Pos> {
     history: [],
     redoHistory: [],
     turn: 1,
+    computerStarts: false,
     mode: "solo",
     help: false,
     showWin: false,
@@ -124,6 +126,7 @@ export function newGame<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move
   model.redoHistory = [];
   model.help = false;
   model.turn = 1;
+  model.computerStarts = false;
   model.newGameAction = null;
   if(isScoreModel(model)) {
     delete model.scores["$custom"];
@@ -283,7 +286,7 @@ export function updateScore<Pos, Move>(
 export function turnMessage<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>) {
   if (methods.isLevelFinished()) {
     return "Partie finie"
-  } else if (model.turn === 1) {
+  } else if ((model.turn === 1) !== model.computerStarts) {
     return "Tour du premier joueur"
   } else if (model.mode === "duel") {
     return "Tour du second joueur"
@@ -295,6 +298,6 @@ export function turnMessage<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, 
 export const winTitleFor2Player = <Pos>(model: Model<Pos>) =>
   model.mode === "duel"
   ? `Le ${model.turn === 2 ? "premier" : "second"} joueur gagne`
-  : model.turn === 2
+  : (model.turn === 2) !== model.computerStarts
   ? "Tu as gagné"
   : "L'IA gagne";
