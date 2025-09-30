@@ -87,9 +87,7 @@
 
   // Fonction auxiliaire pour nonTrappedBeast.
   // Il n'est pas nécessaire d'avoir une vraie fonction aléatoire
-  function pseudoRandomPick<A>(arr: A[]): A {
-    return arr[28921 % arr.length]
-  }
+  const pseudoRandomPick = <A>(arr: A[]) => arr[28921 % arr.length]
 
   // Renvoie toutes les emplacement possibles évitants les pièges pour la bête
   let nonTrappedBeasts = $derived.by(() => {
@@ -197,6 +195,13 @@
     }
   }
 
+  const handlePointerdown = (e: PointerEvent, i: number) => {
+    if (e.shiftKey) {
+      (e.currentTarget as Element)?.releasePointerCapture(e.pointerId);
+      startingSquare = i;
+    }
+  }
+
   // svelte-ignore state_referenced_locally
   newGame(model, methods);
 </script>
@@ -247,7 +252,7 @@
           <!-- svelte-ignore a11y_no_static_element_interactions -->
           <rect x={50*col} y={50*row} width="50" height="50"
             class="square-borders"
-            onpointerdown={e => { if (e.shiftKey) startingSquare = i  }}
+            onpointerdown={e => handlePointerdown(e, i)}
             onpointerup={() => finishZone(i)}
             onclick={e => { if (!e.shiftKey) playA(model, methods, i) }}
           />

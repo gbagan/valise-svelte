@@ -403,8 +403,9 @@
     pointerPosition = getPointerPosition(e);
   }
 
-  function startDrag(i: number) {
+  function startDrag(e: PointerEvent, i: number) {
     if (rulesName === "many" && model.position.guards.includes(i) && model.position.attacked !== null) {
+      (e.currentTarget as Element)?.releasePointerCapture(e.pointerId);
       draggedGuard = i;
     }
   }
@@ -513,7 +514,7 @@
           fill="transparent"
           style:transform={translateGuard(pos)}
           onclick={() => selectVertex(i)}
-          onpointerdown={() => startDrag(i)}
+          onpointerdown={e => startDrag(e, i)}
           onpointerup={() => dropGuard(i)}
           class={{sel: phase === "preparation" 
                   || model.position.attacked !== null && model.position.guards.includes(i)

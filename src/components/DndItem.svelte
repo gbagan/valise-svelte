@@ -27,6 +27,7 @@
   );
 
   function onpointerdown(e: PointerEvent) {
+    (e.currentTarget as Element)?.releasePointerCapture(e.pointerId);
     dragged = id;
   }
 
