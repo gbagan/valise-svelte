@@ -1,5 +1,5 @@
 - [x] PWA
-- [ ] Vérifier que ça marche bien sur tablette
+- [x] Vérifier que ça marche bien sur tablette
 - [ ] Safari: queens: bug d'affichage des cases grises
 - [ ] Safari: roue des couleurs: les contours des parties survolés de
        la roue extérieure lors d'un drag and drop n'appaissent pas en vert 
@@ -34,7 +34,7 @@
 - [ ] eternal: changer le message de victoire
 - [ ] eternal: ajouter le message d'information
 - [ ] eternal: ajouter des types de graphes?
-- [ ] eternal: graphe personnalisé
+- [x] eternal: graphe personnalisé
 - [ ] eternal: ajouter l'icone manquante
 - [ ] eternal: un style quand une pièce est draggable
 - [x] tiling: ajouter SizeLimit

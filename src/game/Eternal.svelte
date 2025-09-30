@@ -6,6 +6,7 @@
   import Template from "../components/Template.svelte";
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
+    import GraphEditor from "../components/GraphEditor.svelte";
 
   type Conf = number[];
   type AdjGraph = number[][];
@@ -229,6 +230,7 @@
   let rulesName: Rules = $state("one");
   let draggedGuard: number | null = $state(null);
   let pointerPosition: {x: number, y: number} | null = $state(null);
+  let customGraph: Graph = $state({ title: "Graphe personnalisé", vertices: [], edges: []});
 
   // derived
 
@@ -238,7 +240,7 @@
       case "cycle": return cycle(model.rows);
       case "biclique": return biclique(model.rows, model.columns);
       case "grid": return grid(model.rows, model.columns);
-      default: return path(model.rows);
+      default: return customGraph;
     }
   })
 
@@ -435,6 +437,16 @@
     }
   })
 
+  const selectCustomGraph = () => model.dialog = "customize";
+
+  function acceptCustomGraph(graph: Graph) {
+    if (graph.vertices.length > 0) {
+      customGraph = graph;
+      graphKind = "custom";
+    }
+    model.dialog = null;
+  }
+
   // svelte-ignore state_referenced_locally
   newGame(model, methods);
 </script>
@@ -546,7 +558,15 @@
       disabled={model.locked}
       tooltip={["Chemin", "Cycle", "Biclique", "Grille"]}
       setter={i => newGame(model, methods, () => setGraphKind(i))}
-    />
+    >
+      <I.Icon
+        text="#customize"
+        tooltip="Créé ton propre graphe"
+        selected={graphKind === "custom"}
+        disabled={model.locked}
+        onclick={selectCustomGraph}
+      />
+    </I.SelectGroup>
     <I.SelectGroup
       title="Règles"
       values={["one", "many"] as Rules[]}
@@ -566,6 +586,10 @@
   </Config>
 {/snippet}
 
+{#snippet custom()}
+  <GraphEditor onOk={acceptCustomGraph} />
+{/snippet}
+
 {#snippet rules()}
   <strong>Domination Eternelle</strong> est un jeu à deux joueurs: un <strong>attaquant</strong>
    et un <strong>défenseur</strong>.<br/>
@@ -578,7 +602,7 @@
   Dans une variante, le défenseur peut déplacer <strong>plusieurs gardes</strong> à chaque tour.
 {/snippet}
 
-<Template bind:model={model} {methods} {board} {config} {rules} {sizeLimit} />
+<Template bind:model={model} {methods} {board} {config} {custom} {rules} {sizeLimit} />
 
 <style>
   .board {
