@@ -31,8 +31,8 @@
 - [x] dessin: couleurs différentes pour indiquer à quel levé un tracé a été fait
 - [ ] eternal: l'action "le joueur 2 commence" est bugguée
 - [x] eternal: bug quand on choisit biclique ou grille
-- [ ] eternal: changer le message de victoire
-- [ ] eternal: ajouter le message d'information
+- [x] eternal: changer le message de victoire
+- [x] eternal: ajouter le message d'information
 - [ ] eternal: ajouter des types de graphes?
 - [x] eternal: graphe personnalisé
 - [ ] eternal: ajouter l'icone manquante

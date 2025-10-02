@@ -261,6 +261,11 @@
     }
   });
 
+  let levelFinished = $derived.by(() => {
+    const attacked = model.position.attacked 
+    return attacked !== null && model.position.guards.every(guard => !hasEdge(adjGraph, guard, attacked));
+  });
+
   function validate() {
     if (phase === "preparation") {
       phase = "game";
@@ -312,10 +317,7 @@
     // draggedGuard
   }
 
-  function isLevelFinished() {
-    const attacked = model.position.attacked 
-    return attacked !== null && model.position.guards.every(guard => !hasEdge(adjGraph, guard, attacked));
-  }
+  const isLevelFinished = () => levelFinished;
 
 
   function onPositionChange() {
@@ -323,7 +325,7 @@
   }
 
   function randomMove() : Move | null {
-    if (isLevelFinished()) {
+    if (levelFinished) {
       return null;
     }
     const {guards, attacked} = model.position;
@@ -340,7 +342,7 @@
   }
 
   function computerMove(): Move | null {
-    if (isLevelFinished()) {
+    if (levelFinished) {
       return null;
     } else if (!arena || model.mode === "random") {
       return randomMove();
@@ -447,6 +449,8 @@
     model.dialog = null;
   }
 
+  const winTitle = "L'attaquant gagne"
+
   // svelte-ignore state_referenced_locally
   newGame(model, methods);
 </script>
@@ -539,6 +543,17 @@
         {@render cursor(pointerPosition.x, pointerPosition.y)}
       {/if}
     </svg>
+    <span class="info">
+      {#if levelFinished}
+        Le sommet attaqué ne peut être défendu
+      {:else if phase === "preparation"}
+        Choisis la position initiale des gardes
+      {:else if model.position.attacked !== null}
+        Déplace un garde vers le sommet attaqué
+      {:else}
+        Choisis un sommet à attaquer
+      {/if}
+    </span>
     <button
       class="ui-button ui-button-primary validate"
       disabled={nbGuards === 0 || phase === "game" 
@@ -602,7 +617,7 @@
   Dans une variante, le défenseur peut déplacer <strong>plusieurs gardes</strong> à chaque tour.
 {/snippet}
 
-<Template bind:model={model} {methods} {board} {config} {custom} {rules} {sizeLimit} />
+<Template bind:model={model} {methods} {board} {config} {custom} {rules} {sizeLimit} {winTitle} />
 
 <style>
   .board {
