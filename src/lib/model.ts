@@ -114,14 +114,6 @@ export function newGame<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move
     return;
   }
 
-  (action || model.newGameAction || (() => {}))();
-
-  if (methods.onNewGame) {
-    methods.onNewGame();
-  }
-  do {
-    model.position = methods.initialPosition();
-  } while (methods.isLevelFinished())
   model.history = [];
   model.redoHistory = [];
   model.help = false;
@@ -131,6 +123,15 @@ export function newGame<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move
   if(isScoreModel(model)) {
     delete model.scores["$custom"];
   }
+
+  (action || model.newGameAction || (() => {}))();
+
+  if (methods.onNewGame) {
+    methods.onNewGame();
+  }
+  do {
+    model.position = methods.initialPosition();
+  } while (methods.isLevelFinished())
 }
 
 

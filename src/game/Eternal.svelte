@@ -269,6 +269,7 @@
   function validate() {
     if (phase === "preparation") {
       phase = "game";
+      model.computerStarts = false;
     } else {
       playA(model, methods, nextMove);
     }
@@ -314,7 +315,9 @@
   function onNewGame() {
     nextMove = [];
     phase = "preparation";
-    // draggedGuard
+    // draggedGuard;
+    // hack pour empécher l'IA de commencer tant qu'on ait en phase de préparation
+    model.computerStarts = true;
   }
 
   const isLevelFinished = () => levelFinished;

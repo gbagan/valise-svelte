@@ -29,7 +29,7 @@
 - [x] dessin: ajouter le graphe "Croix"
 - [x] dessin: animation quand le niveau est fini
 - [x] dessin: couleurs différentes pour indiquer à quel levé un tracé a été fait
-- [ ] eternal: l'action "le joueur 2 commence" est bugguée
+- [x] eternal: l'action "le joueur 2 commence" est bugguée
 - [x] eternal: bug quand on choisit biclique ou grille
 - [x] eternal: changer le message de victoire
 - [x] eternal: ajouter le message d'information
