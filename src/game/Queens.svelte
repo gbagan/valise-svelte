@@ -375,10 +375,13 @@
     width: 50px;
     height: 50px;
     &.attacked {
-      filter: brightness(0.9);
+      fill: #e6e6e6
     }
     &.capturable {
       fill: rgb(224, 123, 162);
+    }
+    &.capturable.attacked {
+      fill: rgb(200, 90, 140);
     }
   }
 

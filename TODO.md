@@ -1,6 +1,6 @@
 - [x] PWA
 - [x] Vérifier que ça marche bien sur tablette
-- [ ] Safari: queens: bug d'affichage des cases grises
+- [x] Safari: queens: bug d'affichage des cases grises
 - [ ] Safari: roue des couleurs: les contours des parties survolés de
        la roue extérieure lors d'un drag and drop n'appaissent pas en vert 
 - [ ] Safari: jetons: l'ombre sur les cases n'apparait pas
@@ -10,7 +10,6 @@
 - [x] le joueur peux commencer seulement si la partie n'a pas débuté
 - [ ] valise: le tooltip doit être affiché quand on survole le <a> et non l'image entière
 - [x] désactiver SelectGroup et MultiSelectGroup quand locked=true
-- [ ] Konami code ?
 - [x] nim: ajouter les icones manquantes
 - [x] frog: ajouter les icones manquantes
 - [x] changer le message de victoire pour nim et frog
@@ -33,7 +32,6 @@
 - [x] eternal: bug quand on choisit biclique ou grille
 - [x] eternal: changer le message de victoire
 - [x] eternal: ajouter le message d'information
-- [ ] eternal: ajouter des types de graphes?
 - [x] eternal: graphe personnalisé
 - [ ] eternal: ajouter l'icone manquante
 - [ ] eternal: un style quand une pièce est draggable
@@ -44,5 +42,7 @@
 - [x] la bête: pièce personnalisée
 - [x] la bête: meilleurs scores
 
+- [ ] Konami code ?
 - [ ] sans mot: implémenter d'autres preuves
 - [ ] Nim en largeur 5, est-ce le bon jeu?
+- [ ] eternal: ajouter des types de graphes?
