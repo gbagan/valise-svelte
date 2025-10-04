@@ -6,6 +6,7 @@
   import Config from '../components/Config.svelte';
   import DndBoard from '../components/DndBoard.svelte';
   import DndItem from '../components/DndItem.svelte';
+  import { tick } from 'svelte';
 
   type Position = (number | null)[];
   type Location = { kind: "panel", id: number } | { kind: "wheel", id: number } | {kind: "board"};
@@ -77,9 +78,9 @@
       rotation += 1;
       await delay(600);
     }
-    model.showWin = true;
-    await delay(1000);
     model.showWin = false;
+    await tick();
+    model.showWin = true;
     model.locked = false;
   }
 

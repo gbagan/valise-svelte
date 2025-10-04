@@ -1,3 +1,4 @@
+import { tick } from "svelte";
 import {clone, delay, randomPick} from "./util";
 
 export type Turn = 1 | 2;
@@ -76,9 +77,9 @@ export async function playA<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, 
     // save to storage
   }
   if (showWin) {
-    model.showWin = true;
-    await delay(1000);
     model.showWin = false;
+    await tick();
+    model.showWin = true;
   } else if (model.mode === "expert" || model.mode === "random") {
     model.locked = true;
     await delay(1000);
@@ -94,9 +95,9 @@ export async function computerPlays<Pos, Move>(model: Model<Pos>, methods: Metho
   }
   playHelper(model, methods, move);
   if (methods.isLevelFinished()) {
-    model.showWin = true;
-    await delay(1000);
     model.showWin = false;
+    await tick();
+    model.showWin = true;
   }
 }
 

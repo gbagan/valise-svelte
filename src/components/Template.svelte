@@ -1,4 +1,5 @@
 <script lang="ts" generics="Pos, Move">
+  import { Confetti } from 'svelte-confetti';
   import { setGridSize, type Model, type Methods, type SizeLimit, newGame, isScoreModel, isScoreMethods, isSizeModel } from '../lib/model';
   import Dialog from './Dialog.svelte';
   import IncDecGrid from './IncDecGrid.svelte';
@@ -20,11 +21,22 @@
 </script>
 
 {#snippet winPanel(title: string, visible: boolean)}
-  <div class="win-container">
-    <div class={["win", {visible}]}>
-      {title}
+  {#if visible}
+    <div class="win-container">
+      <div class="confetti-container">
+        <Confetti
+          cone
+          y={[1.25, 2.5]}
+          x={[-3, 3]}
+          amount={200}
+          delay={[0, 1500]}
+          duration={5000}
+          fallDistance="100vh"
+        />
+      </div>
+      <div class="win">{title}</div>
     </div>
-  </div>
+  {/if}
 {/snippet}
 
 <div class="main-container">
@@ -69,7 +81,7 @@
 </div>
 
 <style>
-.main-container {
+  .main-container {
     position: fixed;
     display: flex;
     width: 100%;
@@ -77,24 +89,24 @@
     justify-content: space-around;
     align-items: center;
     background: linear-gradient(to right, #cfd9df, #e2ebf0);
-}
+  }
 
-@media screen and (orientation: portrait) {
+  @media screen and (orientation: portrait) {
     .main-container {
-        flex-direction: column;
+      flex-direction: column;
     }
-}
+  }
 
-.win-container {
+  .win-container {
     position: absolute;
     display: flex;
     align-items: center;
     justify-content: center; 
     pointer-events: none;
     z-index: 500;
-}
+  }
 
-.win {
+  .win {
     background: white;
     white-space: nowrap;
     border-radius: 1rem;
@@ -104,25 +116,45 @@
     color: red;
     display: block;
     opacity: 0;
-    z-index: 500;
-    transition: opacity 0.5s ease-in;
+    animation: win-animation 2.5s ease-in-out forwards;
+  }
 
-    &.visible {
-        opacity: 1;
-        transition: none;
-    }
-}
+  .confetti-container {
+    position: fixed;
+    top: 50vh;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    display: flex;
+    justify-content: center;
+    z-index: 400;
+  }
 
   .rules {
     width: 46rem;
     font-size: 1.25rem;
     line-height: 1.75rem;
   
-    :global {
-      & strong {
-        color: blue;
-        font-weight: bold;
-      }
+    & :global(strong) {
+      color: blue;
+      font-weight: bold;
+    }
+  }
+
+
+  @keyframes win-animation {
+    0% {
+      opacity: 0;
+    }
+    25% {
+      opacity: 1;
+    }
+    75% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
     }
   }
 
