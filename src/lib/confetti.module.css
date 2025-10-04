@@ -1,0 +1,68 @@
+/* y-axis */
+@keyframes ya {
+	to {
+		translate: 0 var(--sh);
+	}
+}
+
+/* x-axis */
+@keyframes xa {
+	to {
+		translate: var(--xlp) 0;
+	}
+}
+
+/* rotation */
+@keyframes r {
+	50% {
+		rotate: var(--hr) 180deg;
+	}
+	100% {
+		rotate: var(--r) 360deg;
+	}
+}
+
+/* Container */
+.c {
+	width: 0;
+	height: 0;
+
+	overflow: visible;
+
+	position: relative;
+
+	z-index: 1200;
+}
+
+/* Particle */
+.p {
+	animation: xa var(--dc) forwards cubic-bezier(var(--x1), var(--x2), var(--x3), var(--x4));
+	animation-name: xa;
+}
+
+.p > div {
+	position: absolute;
+	top: 0;
+	left: 0;
+
+	animation: ya var(--dc) forwards cubic-bezier(var(--y1), var(--y2), var(--y3), var(--y4));
+	animation-name: ya;
+
+	width: var(--w);
+	height: var(--h);
+}
+
+.p > div::before {
+	display: block;
+
+	height: 100%;
+	width: 100%;
+
+	content: '';
+	background-color: var(--bgc);
+
+	animation: r var(--rd) infinite linear;
+	animation-name: r;
+
+	border-radius: var(--br);
+}

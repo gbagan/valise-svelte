@@ -6,7 +6,7 @@
   import Template from "../components/Template.svelte";
   import * as I from '../components/Icons';
   import Config from '../components/Config.svelte';
-    import GraphEditor from "../components/GraphEditor.svelte";
+  import GraphEditor from "../components/GraphEditor.svelte";
 
   type Conf = number[];
   type AdjGraph = number[][];

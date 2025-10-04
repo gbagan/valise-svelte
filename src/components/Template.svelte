@@ -1,8 +1,8 @@
 <script lang="ts" generics="Pos, Move">
-  import { Confetti } from 'svelte-confetti';
   import { setGridSize, type Model, type Methods, type SizeLimit, newGame, isScoreModel, isScoreMethods, isSizeModel } from '../lib/model';
   import Dialog from './Dialog.svelte';
   import IncDecGrid from './IncDecGrid.svelte';
+  import { confetti } from '../lib/confetti';
 
   interface Props {
     model: Model<Pos>;
@@ -24,15 +24,7 @@
   {#if visible}
     <div class="win-container">
       <div class="confetti-container">
-        <Confetti
-          cone
-          y={[1.25, 2.5]}
-          x={[-3, 3]}
-          amount={200}
-          delay={[0, 1500]}
-          duration={5000}
-          fallDistance="100vh"
-        />
+        <div use:confetti={{stageHeight: "100vh", stageWidth: "100vw"}}></div>
       </div>
       <div class="win">{title}</div>
     </div>
@@ -121,7 +113,7 @@
 
   .confetti-container {
     position: fixed;
-    top: 50vh;
+    top: 15vh;
     left: 0;
     width: 100%;
     height: 100%;

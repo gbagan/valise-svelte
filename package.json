@@ -17,8 +17,5 @@
     "typescript": "^5.9.3",
     "vite": "^7.1.9",
     "vite-plugin-pwa": "^1.0.3"
-  },
-  "dependencies": {
-    "svelte-confetti": "^2.3.2"
   }
 }
