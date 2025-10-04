@@ -43,7 +43,7 @@
 
   let rotation = $state(0);
   let tileType: TileType = $state("type1");
-  let nbSinks = $state(0);
+  let sinkCount = $state(0);
   let hoverSquare: number | null = $state(null);
   let customTile: [number, number][] = $state([]);
 
@@ -113,7 +113,7 @@
   const border = (i: number, d: number) => model.position[i] !== model.position[i+d];
 
   function selectSquare(index: number) {
-    if (sinks.length < nbSinks) {
+    if (sinks.length < sinkCount) {
       model.position[index] = -1;
     } else {
       playA(model, methods, index);
@@ -180,7 +180,7 @@
 {/snippet}
 
 {#snippet pointer(x: number, y: number)}
-  {#if sinks.length < nbSinks}
+  {#if sinks.length < sinkCount}
     <use
       href="#sink"
       x="-25"
@@ -268,8 +268,8 @@
     <I.SelectGroup
       title="Nombre d'éviers"
       values={[0, 1, 2]}
-      selected={nbSinks}
-      setter={i => newGame(model, methods, () => nbSinks = i)}
+      selected={sinkCount}
+      setter={i => newGame(model, methods, () => sinkCount = i)}
     />
     <I.Group title="Options">
       <I.Help bind:model={model} />

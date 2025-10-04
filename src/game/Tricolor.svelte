@@ -10,7 +10,7 @@
 
   let model: Model<Position> = $state(initModel([]));
   let size = $state(5);
-  let nbColors = $state(2);
+  let colorCount = $state(2);
   let range = $state(1);
   let hoverCell: number | null = $state(null);
   let shuffle = $state(false);
@@ -23,12 +23,12 @@
   }
   
   const play = (move: Move) => model.position.map((color, i) => 
-    inRange(move, i) ? (color + 1) % nbColors : color
+    inRange(move, i) ? (color + 1) % colorCount : color
   );
 
   const initialPosition = () =>
     shuffle 
-    ? generate(size, () => random(0, nbColors))
+    ? generate(size, () => random(0, colorCount))
     : repeat(size, 1);
 
   const isLevelFinished = () => levelFinished;
@@ -63,9 +63,9 @@
 {/snippet}
 
 {#snippet colorCycle()}
-  {#each colors.slice(0, nbColors) as color, i}
+  {#each colors.slice(0, colorCount) as color, i}
     <circle
-      cx={95 + 15 * (i - nbColors)}
+      cx={95 + 15 * (i - colorCount)}
       cy="95"
       r="3"
       fill={color}
@@ -73,7 +73,7 @@
     <path
       d="M0 2H4V0l3 3l-3 3v-2h-4Z"
       fill="black"
-      style:transform="translate({99 + 15 * (i - nbColors)}px, 92px)"
+      style:transform="translate({99 + 15 * (i - colorCount)}px, 92px)"
     />
   {/each}
   <circle cx="95" cy="95" r="3" fill="green" />
@@ -101,8 +101,8 @@
     <I.SelectGroup
       title="Nombre de couleurs"
       values={[2, 3, 4, 5]}
-      selected={nbColors}
-      setter={i => newGame(model, methods, () => nbColors = i)}
+      selected={colorCount}
+      setter={i => newGame(model, methods, () => colorCount = i)}
     />
     <I.SelectGroup
       title="Portée"

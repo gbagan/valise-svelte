@@ -244,11 +244,11 @@
     }
   })
 
-  let nbGuards = $derived(model.position.guards.length);
+  let guardCount = $derived(model.position.guards.length);
   let adjGraph: AdjGraph = $derived(edgesToGraph(graph.vertices.length, graph.edges));
 
   let arena: EdsArena | null = $derived(
-    model.mode === "duel"  ? null : makeEDS(adjGraph, rulesName, nbGuards)
+    model.mode === "duel"  ? null : makeEDS(adjGraph, rulesName, guardCount)
   );
 
   let sizeLimit = $derived.by(() => {
@@ -559,7 +559,7 @@
     </span>
     <button
       class="ui-button ui-button-primary validate"
-      disabled={nbGuards === 0 || phase === "game" 
+      disabled={guardCount === 0 || phase === "game" 
                 && (rulesName === "one")}
       onclick={() => validate()}
     >Valider</button>

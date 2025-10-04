@@ -9,7 +9,7 @@
   type Move = number;
 
   let model: Model<Position> = $state(initModel(range(0, 10)));
-  let nbBases = $state(5);
+  let baseCount = $state(5);
   let missingPeg = $state(1);
 
   let levelFinished = $derived(model.position.every((i, j) => i >> 1 == j >> 1));
@@ -19,7 +19,7 @@
     const j = missingPeg;
     const x = position[i];
     const y = position[j];
-    if ([1, nbBases-1, -1, -nbBases+1].includes((x >> 1) - (y >> 1))) {
+    if ([1, baseCount-1, -1, -baseCount+1].includes((x >> 1) - (y >> 1))) {
       return position.with(i, y).with(j, x);
     } else {
       return null;
@@ -27,23 +27,23 @@
   }
 
   const isLevelFinished = () => levelFinished;
-  const initialPosition = () => shuffle(range(0, 2*nbBases))
-  const onNewGame = () => missingPeg = random(0, 2 * nbBases);
+  const initialPosition = () => shuffle(range(0, 2*baseCount))
+  const onNewGame = () => missingPeg = random(0, 2 * baseCount);
 
   const methods: Methods<Position, Move> = { play, isLevelFinished, initialPosition, onNewGame };
 
   const colors = [ "blue", "red", "green", "magenta", "orange", "black", "cyan", "gray" ];
 
-  const transformPeg = (position: number, nbBases: number) => {
+  const transformPeg = (position: number) => {
     const mid = position / 2 | 0;
-    const angle = 2 * mid * Math.PI / nbBases;
+    const angle = 2 * mid * Math.PI / baseCount;
     const x = 0.42 + 0.35 * Math.cos(angle) + 0.1 * (position % 2);
     const y = 0.46 + 0.35 * Math.sin(angle);
     return `translate(${100*x}%, ${100*y}%)`;
   }
 
-  const transformBase = (i: number, nbBases: number) => {
-    const angle = 2 * i * Math.PI / nbBases;
+  const transformBase = (i: number) => {
+    const angle = 2 * i * Math.PI / baseCount;
     const x = 0.5 + 0.35 * Math.cos(angle);
     const y = 0.5 + 0.35 * Math.sin(angle);
     return `translate(${100*x}%, ${100*y}%) rotate(45deg)`;
@@ -57,11 +57,11 @@
 {#snippet board()}
   <div class="ui-board board">
     <svg viewBox="0 0 100 100">
-      {#each take(colors, nbBases) as color, i}
+      {#each take(colors, baseCount) as color, i}
         <rect
           class="base"
           stroke={color}
-          style:transform={transformBase(i, nbBases)}          
+          style:transform={transformBase(i)}          
         />
       {/each}
 
@@ -69,7 +69,7 @@
         {#if peg !== missingPeg}
           <g
             class="player"
-            style:transform={transformPeg(pos, nbBases)}
+            style:transform={transformPeg(pos)}
           >
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -80,7 +80,7 @@
               fill={colors[peg / 2 | 0]}
               onclick={() => playA(model, methods, peg)}
               style:cursor={play(peg) !== null ? "pointer" : "not-allowed"}
-              style:animation-delay="{1000 + 2000 * peg / nbBases}ms"
+              style:animation-delay="{1000 + 2000 * peg / baseCount}ms"
               class={{animate: levelFinished}} 
             />
           </g>
@@ -95,8 +95,8 @@
     <I.SelectGroup
       title="Nombre de bases"
       values={[4, 5, 6, 7, 8]}
-      selected={nbBases}
-      setter={i => newGame(model, methods, () => nbBases = i)}
+      selected={baseCount}
+      setter={i => newGame(model, methods, () => baseCount = i)}
     />
     <I.Group title="Options">
       <I.Undo bind:model={model} {methods} />

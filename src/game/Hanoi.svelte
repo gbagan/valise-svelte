@@ -11,7 +11,7 @@
   type Move = {from: number, to: number};
 
   let model: Model<Position> = $state(initModel([]));
-  let nbDisks = $state(4);
+  let diskCount = $state(4);
   let dragged: number | null = $state(null);
 
   function play({ from, to }: Move) {
@@ -24,16 +24,16 @@
     return position.with(from, init).with(to, position[to].concat([last]));
   }
 
-  const initialPosition = () => [range(0, nbDisks), [], []];
+  const initialPosition = () => [range(0, diskCount), [], []];
   const isLevelFinished = () => model.position[0].length === 0 && model.position[1].length === 0;
 
   const methods: Methods<Position, Move> = {play, initialPosition, isLevelFinished};
 
   const colors = [ "blue", "red", "green", "magenta", "orange", "gray", "cyan" ];
 
-  let nbMoves = $derived(model.history.length);
+  let stepCount = $derived(model.history.length);
 
-  let winTitle = $derived(`Tu as gagné en ${nbMoves} coups`);
+  let winTitle = $derived(`Tu as gagné en ${stepCount} étapes`);
 
   // svelte-ignore state_referenced_locally
   newGame(model, methods)
@@ -103,7 +103,7 @@
         {/each}
       {/each}
     </DndBoard>
-    <div class="moves">{nbMoves} coup{nbMoves > 1 ? "s" : ""}</div>
+    <div class="moves">{stepCount} coup{stepCount > 1 ? "s" : ""}</div>
   </div>
 {/snippet}
 
@@ -112,8 +112,8 @@
     <I.SelectGroup
       title="Nombre de disques"
       values={[4, 5, 6, 7, 8]}
-      selected={nbDisks}
-      setter={n => newGame(model, methods, () => nbDisks = n)}
+      selected={diskCount}
+      setter={n => newGame(model, methods, () => diskCount = n)}
     />
     <I.Group title="Options">
       <I.Undo bind:model={model} {methods} />

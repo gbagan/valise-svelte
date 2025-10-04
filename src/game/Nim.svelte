@@ -10,7 +10,7 @@
 
   let model: Model<Position> = $state({...initModel([]), mode: "random"});
   let length = $state(10);
-  let nbPiles = $state(4);
+  let pileCount = $state(4);
 
   const canPlay = (move: Move) => {
     const [p1, p2] = model.position[move.pile];
@@ -27,7 +27,7 @@
   }
 
   const initialPosition = () =>
-    generate(nbPiles, () => length === 5 ? [0, 4] : [random(0, 5), random(5, 10)]) as Position;
+    generate(pileCount, () => length === 5 ? [0, 4] : [random(0, 5), random(5, 10)]) as Position;
 
   const isLevelFinished = () => 
     model.position.every(([p1, p2]) =>
@@ -36,7 +36,7 @@
 
   function possibleMoves(): Move[] {
     const moves = [];
-    for (let i = 0; i < nbPiles; i++) {
+    for (let i = 0; i < pileCount; i++) {
       for (let j = 0; j < length; j++) {
         moves.push({pile: i, pos: j});
       }
@@ -100,7 +100,7 @@
 {#snippet board()}
   <div class="ui-board board">
     <svg viewBox="0 0 100 100">
-      {#each range(0, nbPiles) as i}
+      {#each range(0, pileCount) as i}
         {@render row(i)}
         {#each range(0, length) as j}
           {@render square(i, j)}
@@ -121,9 +121,9 @@
     <I.SelectGroup 
       title="Taille des rangées"
       values={[ 1, 2, 3, 4, 5 ]}
-      selected={nbPiles}
+      selected={pileCount}
       disabled={model.locked}
-      setter={i => newGame(model, methods, () => nbPiles = i)}
+      setter={i => newGame(model, methods, () => pileCount = i)}
     />
     <I.SelectGroup 
       title="Taille des rangées"

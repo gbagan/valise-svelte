@@ -302,7 +302,7 @@
 
   let positionEdges: Edge[] = $derived(edgesOf(model.position))
 
-  let nbRaises = $derived(model.position.filter(x => x === "raise").length);
+  let raiseCount = $derived(model.position.filter(x => x === "raise").length);
   let levelFinished = $derived(positionEdges.length === graph.edges.length);
 
   function containsEdge(edges: Edge[], u: number, v: number) {
@@ -327,7 +327,7 @@
   const isLevelFinished = () => levelFinished;
 
   const objective = "minimize";
-  const score = () => nbRaises;
+  const score = () => raiseCount;
   const scoreHash = () => graphIndex === "custom" ? null : "" + graphIndex;
 
   const methods: Methods<Position, Move> & ScoreMethods = {
@@ -336,7 +336,7 @@
   };
   methods.updateScore = () => updateScore(model, methods, true, "onNewRecord");
 
-  let winTitle = $derived(`Tu as réussi en ${nbRaises} levé${nbRaises > 1 ? "s" : ""}`);
+  let winTitle = $derived(`Tu as réussi en ${raiseCount} levé${raiseCount > 1 ? "s" : ""}`);
 
   const colors = [ "red", "green", "magenta", "orange", "gray", "cyan", "black", "blue" ];
 
@@ -397,7 +397,7 @@
       x2={x2*100}
       y2={y2*100}
       class="line-to-pointer"
-      stroke={colors[nbRaises] ?? "red"}
+      stroke={colors[raiseCount] ?? "red"}
     />
   {/if}
 {/snippet}
@@ -443,7 +443,7 @@
       {/if}
     </PointerTracker>
     <span class="title">{graph.title}</span>
-    <span class="raise-info">{nbRaises} levé{nbRaises > 0 ? "s" : ""} de crayon</span>
+    <span class="raise-info">{raiseCount} levé{raiseCount > 0 ? "s" : ""} de crayon</span>
     <button
       class="ui-button ui-button-primary raise"
       disabled={levelFinished || typeof model.position.at(-1) !== "number"}
