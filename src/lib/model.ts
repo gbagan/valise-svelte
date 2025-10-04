@@ -111,7 +111,7 @@ export function defaultUpdateScore<Pos, Move>(methods: Methods<Pos, Move>): { is
 
 export function newGame<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>, action?: () => void) {
   if (!model.newGameAction && action && model.history.length > 0 && !methods.isLevelFinished()) {
-    model.newGameAction = action || (() => {})
+    model.newGameAction = action;
     return;
   }
 
@@ -120,7 +120,6 @@ export function newGame<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move
   model.help = false;
   model.turn = 1;
   model.computerStarts = false;
-  model.newGameAction = null;
   if(isScoreModel(model)) {
     delete model.scores["$custom"];
   }
@@ -132,7 +131,9 @@ export function newGame<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move
   }
   do {
     model.position = methods.initialPosition();
-  } while (methods.isLevelFinished())
+  } while (methods.isLevelFinished());
+  
+  model.newGameAction = null;
 }
 
 
