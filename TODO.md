@@ -4,6 +4,7 @@
 - [ ] Safari: roue des couleurs: les contours des parties survolés de
        la roue extérieure lors d'un drag and drop n'appaissent pas en vert 
 - [ ] Safari: jetons: l'ombre sur les cases n'apparait pas
+- [x] Bug dans les jeux à deux joueurs quand la partie est finie et qu'on revient en arrière
 - [x] problème d'affichage du joueur gagnant quand l'IA commence
 - [x] bug de undo/redo pour les jeux à deux joueurs
 - [x] gérer le cas des parties personnalisées: le score ne doit pas être sauvegardé

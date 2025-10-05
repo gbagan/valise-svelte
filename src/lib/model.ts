@@ -140,6 +140,8 @@ export function newGame<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move
 function changeTurn<Pos>(model: Model<Pos>) {
   if (model.mode === "duel") {
     model.turn = model.turn === 1 ? 2 : 1;
+  } else {
+    model.turn = model.computerStarts ? 2 : 1;
   }
 }
 

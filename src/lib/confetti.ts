@@ -69,14 +69,14 @@ type ConfettiOptions = {
 	 * @default 800px
 	 */
 
-	stageHeight?: string;
+	stageHeight?: string | number;
 
 	/**
 	 * Width of the stage in pixels. Confetti will only fall within this width.
 	 *
 	 * @default 1600px
 	 */
-	stageWidth?: string;
+	stageWidth?: string | number;
 
 	/**
 	 * Whether or not destroy all confetti nodes after the `duration` period has passed. By default it destroys all nodes, to preserve memory.
@@ -112,6 +112,9 @@ export function confetti(container: HTMLElement, options: ConfettiOptions = {}) 
 		stageWidth = DEFAULT_STAGE_WIDTH,
 	} = options;
 
+    stageHeight = typeof stageHeight === 'number' ? stageHeight + 'px' : stageHeight;
+    stageWidth = typeof stageWidth === 'number' ? stageWidth + 'px' : stageWidth;
+
 	append_styles(styles);
 	container.classList.add(c_container);
 	// stage-height
@@ -137,7 +140,7 @@ export function confetti(container: HTMLElement, options: ConfettiOptions = {}) 
 		set_css_var(
 			// x landing point
 			'--xlp',
-			map_range_s(abs(rotate(degree, 90) - 180), 0, 180, `-${stageWidth} / 2`, `${stageWidth} / 2`)
+            `calc(${abs(rotate(degree, 90) - 180) / 180 - 0.5} * ${stageWidth})`
 		);
 		set_css_var(
 			// duration chaos
@@ -348,11 +351,6 @@ const round = (num: number, precision: number = 2) =>
 
 const map_range = (value: number, x1: number, y1: number, x2: number, y2: number) =>
 	((value - x1) * (y2 - x2)) / (y1 - x1) + x2;
-
-const map_range_s = (value: number, x1: number, y1: number, x2: string, y2: string) => 
-	`calc(${x2} + ${(value - x1) / (y1 - x1)} * (${y2} - ${x2}))`;
-
-
 
 const rotate = (degree: number, amount: number) =>
 	degree + amount > 360 ? degree + amount - 360 : degree + amount;
