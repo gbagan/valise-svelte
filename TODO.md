@@ -37,6 +37,7 @@
 - [x] eternal: graphe personnalisé
 - [ ] eternal: ajouter l'icone manquante
 - [ ] eternal: un style quand une pièce est draggable
+- [ ] afficher le bouton valider grisé tant que le défenseur n'a pas déplacé un garde vers le sommet attaqué
 - [x] tiling: ajouter SizeLimit
 - [x] tiling: ajouter la rotation par la touche espace
 - [x] tiling; pièce personnalisée

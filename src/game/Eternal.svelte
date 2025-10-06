@@ -224,7 +224,6 @@
     mode: "duel",
   });
 
-  let nextMove: number[] = $state([]);
   let phase: Phase = $state("preparation");
   let graphKind: GraphKind = $state("path");
   let rulesName: Rules = $state("one");
@@ -233,6 +232,8 @@
   let customGraph: Graph = $state({ title: "Graphe personnalisé", vertices: [], edges: []});
 
   // derived
+
+  let nextMove = $derived(model.position.guards);
 
   let graph: Graph = $derived.by(() => {
     switch (graphKind) {
@@ -275,12 +276,12 @@
     }
   }
 
-  function addToNextMove(from: number, to: number, srcs: number[], dests: number[]) {
+  function addToNextMove(from: number, to: number, srcs: number[], dests: number[]): number[] {
     if (from === to || hasEdge(adjGraph, from, to)) {
       const idx = srcs.indexOf(from);
-      if (idx !== -1) {
-        dests[idx] = to;
-      }
+      return idx !== -1 ? dests.with(idx, to) : dests;
+    } else {
+      return dests;
     }
   }
 
@@ -323,10 +324,6 @@
   const isLevelFinished = () => levelFinished;
 
 
-  function onPositionChange() {
-    nextMove = model.position.guards.slice();
-  }
-
   function randomMove() : Move | null {
     if (levelFinished) {
       return null;
@@ -335,9 +332,7 @@
     if (attacked !== null) {
       // cannot be empty
       const candidates = guards.filter(g => hasEdge(adjGraph, g, attacked));
-      const move = guards.slice();
-      addToNextMove(randomPick(candidates)!, attacked, move, move);
-      return move;
+      return addToNextMove(randomPick(candidates)!, attacked, guards, guards)
     } else {
       const candidates = range(0, graph.vertices.length).filter(x => !guards.includes(x));
       return randomPick(candidates);
@@ -365,7 +360,7 @@
   }
 
   const methods: Methods<Position, Move> = {
-    play, initialPosition, onNewGame, isLevelFinished, computerMove, onPositionChange
+    play, initialPosition, onNewGame, isLevelFinished, computerMove
   };
 
   type Coords = {x: number, y: number};
@@ -399,9 +394,7 @@
     } else if (attacked === null) {
       playA(model, methods, x);
     } else if (rulesName === "one") {
-      const move = guards.slice();
-      addToNextMove(x, attacked, move, move);
-      playA(model, methods, move) // todo
+      playA(model, methods, addToNextMove(x, attacked, guards, guards)); // todo
     }
   }
 
@@ -419,7 +412,7 @@
 
   function dropGuard(to: number | null) {
     if (draggedGuard !== null) {
-      addToNextMove(draggedGuard, to ?? draggedGuard, model.position.guards, nextMove);
+      nextMove = addToNextMove(draggedGuard, to ?? draggedGuard, model.position.guards, nextMove);
       draggedGuard = null;
     }
   }
@@ -561,7 +554,7 @@
       class="ui-button ui-button-primary validate"
       disabled={guardCount === 0 || phase === "game" 
                 && (rulesName === "one")}
-      onclick={() => validate()}
+      onclick={validate}
     >Valider</button>
   </div>
 {/snippet}

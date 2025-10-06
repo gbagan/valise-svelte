@@ -46,7 +46,6 @@ export interface Methods<Pos, Move> {
   isLevelFinished: () => boolean,
   initialPosition: () => Pos,
   onNewGame?: () => void,
-  onPositionChange?: () => void;
   updateScore?: () => { isNewRecord: boolean, showWin: boolean };
   possibleMoves?: () => Move[];
   isLosingPosition?: () => boolean;
@@ -63,7 +62,6 @@ function playHelper<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>, m
   }
   model.position = position;
   model.turn = model.turn == 1 ? 2 : 1;
-  methods.onPositionChange?.();
   return true;
 }
 
@@ -153,7 +151,6 @@ export function undo<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>) 
   model.redoHistory.push(model.position);
   model.position = position;
   changeTurn(model);
-  methods.onPositionChange?.();
 }
 
 export function redo<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>) {
@@ -164,7 +161,6 @@ export function redo<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>) 
   model.history.push(model.position);
   model.position = position;
   changeTurn(model);
-  methods.onPositionChange?.();
 }
 
 export function reset<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>) {
@@ -176,7 +172,6 @@ export function reset<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>)
   model.redoHistory = [];
   model.turn === 1;
   model.position = position;
-  methods.onPositionChange?.();
 }
 
 function defaultComputerMove<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>): Move | null {
@@ -195,7 +190,6 @@ function defaultComputerMove<Pos, Move>(model: Model<Pos>, methods: Methods<Pos,
       }
       model.position = position;
       model.turn = model.turn == 1 ? 2 : 1;
-      // onPositionChange
       if (found) {
         bestMove = move;
         break;
