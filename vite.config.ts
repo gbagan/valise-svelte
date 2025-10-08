@@ -1,3 +1,11 @@
+import { sveltekit } from '@sveltejs/kit/vite';
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+	plugins: [sveltekit()]
+});
+
+/*
 import { defineConfig } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { VitePWA } from 'vite-plugin-pwa';
@@ -20,8 +28,9 @@ export default defineConfig({
         theme_color: '#0000ff'
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,webm,webp}']
+        globPatterns: ['** /*.{js,css,html,ico,png,webm,webp}']
       }
     }),
   ],
 })
+*/
