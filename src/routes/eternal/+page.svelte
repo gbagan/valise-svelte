@@ -166,7 +166,7 @@
   }
 
   // generate a biclique graph
-  const biclique = (m: number, n: number) => (console.log(n, m), {
+  const biclique = (m: number, n: number) => ({
     title: "Biclique",
     vertices: generate(n + m, i => ({
       x: i < n ? 0.2 : 0.8,

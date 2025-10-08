@@ -130,7 +130,7 @@ export function newGame<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move
   do {
     model.position = methods.initialPosition();
   } while (methods.isLevelFinished());
-  
+
   model.newGameAction = null;
 }
 
