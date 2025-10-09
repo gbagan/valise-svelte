@@ -8,11 +8,9 @@
   type Position = number[];
   type Move = number;
 
-  let model: Model<Position> = $state(initModel(range(0, 10)));
+  let model: Model<Position> = $state(initModel([]));
   let baseCount = $state(5);
   let missingPeg = $state(1);
-
-  let levelFinished = $derived(model.position.every((i, j) => i >> 1 == j >> 1));
 
   function play(i: number): Position | null {
     const position = model.position;
@@ -26,11 +24,14 @@
     }
   }
 
-  const isLevelFinished = () => levelFinished;
+  const isLevelFinished = () => model.position.every((i, j) => i >> 1 == j >> 1);
   const initialPosition = () => shuffle(range(0, 2*baseCount))
   const onNewGame = () => missingPeg = random(0, 2 * baseCount);
 
   const methods: Methods<Position, Move> = { play, isLevelFinished, initialPosition, onNewGame };
+
+  let levelFinished = $derived(isLevelFinished());
+
 
   const colors = [ "blue", "red", "green", "magenta", "orange", "black", "cyan", "gray" ];
 

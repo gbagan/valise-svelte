@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { resolve } from '$app/paths';
+
   interface Props {
     symbol: string;
     drag?: boolean;
@@ -61,7 +63,7 @@
     >
       <use href="#{symbol}" class="symbol" />
       {#if link}
-        <a href="/{link}" aria-label={link}>
+        <a href={resolve(`/${link}` as any)} aria-label={link}>
           <rect
             x={rectX ?? "0"}
             y={rectY ?? "0"}

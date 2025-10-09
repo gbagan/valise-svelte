@@ -12,7 +12,7 @@
 
 <div class={["layout", isHome ? "valise" : "game"]}>
   {#if !isHome}
-    <a class="valise-link" href="/" aria-label="valise">
+    <a class="valise-link" href={resolve('/')} aria-label="valise">
       <svg style="width: 100%; height: 100%">
         <use href="#valise"/>
       </svg>

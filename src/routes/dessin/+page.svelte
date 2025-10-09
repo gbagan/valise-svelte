@@ -303,7 +303,6 @@
   let positionEdges: Edge[] = $derived(edgesOf(model.position))
 
   let raiseCount = $derived(model.position.filter(x => x === "raise").length);
-  let levelFinished = $derived(positionEdges.length === graph.edges.length);
 
   function containsEdge(edges: Edge[], u: number, v: number) {
     if (u > v) {
@@ -324,7 +323,7 @@
   }
 
   const initialPosition = () => [] as Position;
-  const isLevelFinished = () => levelFinished;
+  const isLevelFinished = () => positionEdges.length === graph.edges.length;
 
   const objective = "minimize";
   const score = () => raiseCount;
@@ -336,6 +335,10 @@
   };
   methods.updateScore = () => updateScore(model, methods, true, "onNewRecord");
 
+  // svelte-ignore state_referenced_locally
+  newGame(model, methods);
+
+  let levelFinished = $derived.by(isLevelFinished);
   let winTitle = $derived(`Tu as réussi en ${raiseCount} levé${raiseCount > 1 ? "s" : ""}`);
 
   const colors = [ "red", "green", "magenta", "orange", "gray", "cyan", "black", "blue" ];
@@ -382,10 +385,6 @@
     }
     model.dialog = null;
   }
-
-
-  // svelte-ignore state_referenced_locally
-  newGame(model, methods);
 </script>
 
 {#snippet currentLine(x2: number, y2: number)}

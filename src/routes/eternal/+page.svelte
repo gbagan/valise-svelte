@@ -252,21 +252,6 @@
     model.mode === "duel"  ? null : makeEDS(adjGraph, rulesName, guardCount)
   );
 
-  let sizeLimit = $derived.by(() => {
-    switch (graphKind) {
-      case "grid": return {minRows: 2, minCols: 2, maxRows: 5, maxCols: 5};
-      //case "sun": return {minRows: 3, minC  ols: 0, maxRows: 6, maxCols: 0};
-      case "biclique": return {minRows: 1, minCols: 1, maxRows: 6, maxCols: 0};
-      case "custom": return {minRows: 0, minCols: 0, maxRows: 0, maxCols: 0};
-      default: return {minRows: 3, minCols: 0, maxRows: 11, maxCols: 0};
-    }
-  });
-
-  let levelFinished = $derived.by(() => {
-    const attacked = model.position.attacked 
-    return attacked !== null && model.position.guards.every(guard => !hasEdge(adjGraph, guard, attacked));
-  });
-
   function validate() {
     if (phase === "preparation") {
       phase = "game";
@@ -321,8 +306,22 @@
     model.computerStarts = true;
   }
 
-  const isLevelFinished = () => levelFinished;
+  const isLevelFinished = () => {
+    const attacked = model.position.attacked 
+    return attacked !== null && model.position.guards.every(guard => !hasEdge(adjGraph, guard, attacked));
+  }
 
+  let sizeLimit = $derived.by(() => {
+    switch (graphKind) {
+      case "grid": return {minRows: 2, minCols: 2, maxRows: 5, maxCols: 5};
+      //case "sun": return {minRows: 3, minC  ols: 0, maxRows: 6, maxCols: 0};
+      case "biclique": return {minRows: 1, minCols: 1, maxRows: 6, maxCols: 0};
+      case "custom": return {minRows: 0, minCols: 0, maxRows: 0, maxCols: 0};
+      default: return {minRows: 3, minCols: 0, maxRows: 11, maxCols: 0};
+    }
+  });
+
+  let levelFinished = $derived.by(isLevelFinished);
 
   function randomMove() : Move | null {
     if (levelFinished) {
@@ -362,6 +361,9 @@
   const methods: Methods<Position, Move> = {
     play, initialPosition, onNewGame, isLevelFinished, computerMove
   };
+
+  // svelte-ignore state_referenced_locally
+  newGame(model, methods);
 
   type Coords = {x: number, y: number};
   const translateGuard = ({ x, y }: Coords) => `translate(${100*x}%,${100*y}%)`;
@@ -445,10 +447,7 @@
     model.dialog = null;
   }
 
-  const winTitle = "L'attaquant gagne"
-
-  // svelte-ignore state_referenced_locally
-  newGame(model, methods);
+  const winTitle = "L'attaquant gagne";
 </script>
 
 {#snippet arrow(x1: number, y1: number, x2: number, y2: number)}

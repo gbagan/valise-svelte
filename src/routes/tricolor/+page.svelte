@@ -15,8 +15,6 @@
   let hoverCell: number | null = $state(null);
   let shuffle = $state(false);
 
-  let levelFinished = $derived(model.position.every(i => i === 0));
-
   function inRange(i: number, j: number) {
     const diff = Math.abs(i - j);
     return Math.min(diff, size - diff) <= range;
@@ -31,10 +29,15 @@
     ? generate(size, () => random(0, colorCount))
     : repeat(size, 1);
 
-  const isLevelFinished = () => levelFinished;
+  const isLevelFinished = () => model.position.every(i => i === 0);
 
   const methods: Methods<Position, Move> = { play, isLevelFinished, initialPosition };
   
+  // svelte-ignore state_referenced_locally
+  newGame(model, methods);
+
+  let levelFinished = $derived.by(isLevelFinished);
+
   const colors = [ "green", "yellow", "red", "magenta", "blue" ];
 
   function translateCell(i: number) {
@@ -42,9 +45,6 @@
     const y = 45 + 35 * Math.sin(2 *  i * Math.PI / size);
     return `translate(${x}px, ${y}px)`;
   }
-
-  // svelte-ignore state_referenced_locally
-  newGame(model, methods);
 </script>
 
 {#snippet cell(i: number, color: number)}
@@ -126,7 +126,7 @@
 {/snippet}
 
 {#snippet rules()}
-  <strong>Feux tricolores</strong> est une variante de <strong>out noir ou tout blanc</strong> mais
+  <strong>Feux tricolores</strong> est une variante de <strong>Tout noir ou tout blanc</strong> mais
   avec plusieurs <strong>couleurs</strong>.<br/>
   Lorsque tu <strong>cliques</strong> un feu, celui-ci change de couleur ainsi que tous les jetons proches
   jusqu'à la distance choisie dans <strong>Portée</strong>.<br/>

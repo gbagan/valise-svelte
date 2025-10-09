@@ -1,5 +1,5 @@
 <script lang="ts" generics="Pos,Move">
-  import { type Model, type ScoreModel, type Methods, type ScoreMethods } from '../../lib/model';
+  import { type Model, type ScoreModel, type Methods, type ScoreMethods } from '$lib/model';
   import Icon from "./Icon.svelte";
   import IconGroup from './IconGroup.svelte';
 
