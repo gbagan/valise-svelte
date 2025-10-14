@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { initModel, newGame, playA, updateScore,
+  import { initModel, loadRecords, newGame, playA, updateScore,
         type Methods, type Model, type ScoreMethods, type ScoreModel, type SizeLimit, type SizeModel
       } from "$lib/model";
   import { coords, diffCoords, generate, gridStyle, range, repeat } from "$lib/util";
@@ -8,6 +8,7 @@
   import * as I from "$lib/components/Icons";
   import Config from "$lib/components/Config.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
+  import { onMount } from "svelte";
 
   type Piece = "R" | "B" | "K" | "N" | "Q" | "custom" | null;
   type Position = Piece[];
@@ -150,6 +151,9 @@
 
   // svelte-ignore state_referenced_locally
   newGame(model, methods);
+  onMount(() => {
+    loadRecords(model);
+  });
 </script>
 
 {#snippet pieceSelector()}

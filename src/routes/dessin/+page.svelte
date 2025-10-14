@@ -1,12 +1,13 @@
 <script lang="ts">
   import { getCoordsOfEdge, type Edge, type Graph } from "$lib/graph";
-  import { initModel, newGame, playA, updateScore,
+  import { initModel, loadRecords, newGame, playA, updateScore,
           type Methods, type Model, type ScoreMethods, type ScoreModel } from "$lib/model";
   import GraphEditor from "$lib/components/GraphEditor.svelte";
   import * as I from '$lib/components/Icons';
   import Config from '$lib/components/Config.svelte';
   import Template from "$lib/components/Template.svelte";
   import PointerTracker from "$lib/components/PointerTracker.svelte";
+  import { onMount } from "svelte";
 
   const house: Graph = {
     title: "Maison",
@@ -337,6 +338,10 @@
 
   // svelte-ignore state_referenced_locally
   newGame(model, methods);
+  onMount(() => {
+    loadRecords(model);
+  });
+
 
   let levelFinished = $derived.by(isLevelFinished);
   let winTitle = $derived(`Tu as réussi en ${raiseCount} levé${raiseCount > 1 ? "s" : ""}`);

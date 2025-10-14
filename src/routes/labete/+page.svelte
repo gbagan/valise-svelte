@@ -1,11 +1,13 @@
 <script lang="ts">
   import { coords, countBy, generate2, gridStyle, mod, getPointerPosition, repeat } from '$lib/util';
   import {type Model, type ScoreModel, type Methods, type SizeLimit, type ScoreMethods, type SizeModel,
-    initModel, newGame, playA, updateScore} from '$lib/model';
+    initModel, newGame, playA, updateScore,
+    loadRecords} from '$lib/model';
   import Template from '$lib/components/Template.svelte';
   import * as I from '$lib/components/Icons';
   import Config from '$lib/components/Config.svelte';
   import Dialog from '$lib/components/Dialog.svelte';
+  import { onMount } from 'svelte';
 
   type Mode = "standard" | "cylinder" | "torus";
   type Beast = [number, number][];
@@ -15,9 +17,7 @@
   const type1: Beast = [ [0, 0], [0, 1] ];
   const type2: Beast = [ [0, 0], [0, 1], [0, -1] ];
   const type3: Beast = [ [0, 0], [0, 1], [1, 1] ];
-
   const beastTypes: Beast2[] = [ [ type1 ], [ type2 ], [ type3 ], [ type2, type3 ] ];
-
 
   type Position = boolean[];
   type Move = number;
@@ -204,6 +204,9 @@
 
   // svelte-ignore state_referenced_locally
   newGame(model, methods);
+  onMount(() => {
+    loadRecords(model);
+  });
 </script>
 
 {#snippet zone()}

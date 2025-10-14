@@ -1,12 +1,13 @@
 <script lang="ts">
   import { diffCoords, gridStyle, repeat } from '$lib/util';
   import {type Model, type ScoreModel, type Methods, type ScoreMethods, type SizeModel,
-    initModel, newGame, updateScore } from '$lib/model';
+    initModel, newGame, updateScore, loadRecords} from '$lib/model';
   import Template from '$lib/components/Template.svelte';
   import * as I from '$lib/components/Icons';
   import Config from '$lib/components/Config.svelte';
   import DndBoard from '$lib/components/DndBoard.svelte';
   import DndItem from '$lib/components/DndItem.svelte';
+  import { onMount } from 'svelte';
 
   type Position = number[];
   type Move = {from: number, to: number};
@@ -64,7 +65,10 @@
   });
 
   // svelte-ignore state_referenced_locally
-    newGame(model, methods);
+  newGame(model, methods);
+  onMount(() => {
+    loadRecords(model);
+  });
 </script>
 
 {#snippet peg([i, val]: [number, number], dragged: boolean, droppable: boolean,

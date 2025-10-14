@@ -1,5 +1,8 @@
 import { tick } from "svelte";
 import {clone, delay, randomPick} from "./util";
+import { page } from "$app/state";
+
+const VERSION = 1;
 
 export type Turn = 1 | 2;
 export type Mode = "solo" | "random" | "expert" | "duel"
@@ -72,6 +75,13 @@ export async function playA<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, 
 
   const {isNewRecord, showWin} = methods.updateScore ? methods.updateScore() : defaultUpdateScore(methods);
   if (isNewRecord) {
+    if (isScoreModel(model)) {
+      const scores = {...model.scores};
+      delete scores["$custom"];
+      // save to storage
+      localStorage.setItem(page.url.pathname, JSON.stringify([VERSION, scores]));
+    }
+    
     // save to storage
   }
   if (showWin) {
@@ -134,6 +144,21 @@ export function newGame<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move
   model.newGameAction = null;
 }
 
+export function loadRecords<Pos>(model: Model<Pos> & ScoreModel<Pos>) {
+  const scores = localStorage.getItem(page.url.pathname);
+  let data;
+  if (!scores) {
+    return;
+  }
+  try {
+    data = JSON.parse(scores);
+  } catch {
+    return
+  }
+  if (typeof Array.isArray(data) && data.length === 2 && data[0] === VERSION) {
+    model.scores = data[1];
+  }
+}
 
 function changeTurn<Pos>(model: Model<Pos>) {
   if (model.mode === "duel") {

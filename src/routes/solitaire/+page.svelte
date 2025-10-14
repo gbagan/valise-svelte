@@ -1,14 +1,14 @@
 <script lang="ts">
   import { diffCoords, generate, generate2, gridStyle, random, repeat } from '$lib/util';
-  import {type Model, type ScoreModel, type Methods, type ScoreMethods, type SizeModel,
-    initModel, newGame, updateScore, 
-    type SizeLimit} from '$lib/model';
+  import {type Model, type ScoreModel, type Methods, type ScoreMethods, type SizeModel, type SizeLimit,
+    initModel, newGame, updateScore, loadRecords} from '$lib/model';
   import Template from '$lib/components/Template.svelte';
   import Icon from '$lib/components/icons/Icon.svelte';
   import * as I from '$lib/components/Icons';
   import Config from '$lib/components/Config.svelte';
   import DndBoard from '$lib/components/DndBoard.svelte';
   import DndItem from '$lib/components/DndItem.svelte';
+  import { onMount } from 'svelte';
 
   type Board = "french" | "english" | "circle" | "grid3" | "random";
 
@@ -186,7 +186,10 @@
   }
 
   // svelte-ignore state_referenced_locally
-  newGame(model, methods)
+  newGame(model, methods);
+  onMount(() => {
+    loadRecords(model);
+  });
 
 </script>
 

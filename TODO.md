@@ -4,6 +4,7 @@
 - [ ] Safari: roue des couleurs: les contours des parties survolés de
        la roue extérieure lors d'un drag and drop n'appaissent pas en vert 
 - [ ] Safari: jetons: l'ombre sur les cases n'apparait pas
+- [x] Sauvegarde des meilleurs scores
 - [x] Bug dans les jeux à deux joueurs quand la partie est finie et qu'on revient en arrière
 - [x] problème d'affichage du joueur gagnant quand l'IA commence
 - [x] bug de undo/redo pour les jeux à deux joueurs
@@ -15,6 +16,7 @@
 - [x] nim: ajouter les icones manquantes
 - [x] frog: ajouter les icones manquantes
 - [x] changer le message de victoire pour nim et frog
+- [ ] noirblanc: sauvegarder le niveau
 - [x] queens: ajouter le curseur
 - [x] queens: quand on quitte le mode mixte, vérifier qu'il ne reste qu'une pièce choisie
 - [x] queens: pièce personnalisée

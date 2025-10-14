@@ -19,7 +19,7 @@ const config = {
 			bundleStrategy: 'single'
 		},
 		paths: {
-      		base: process.env.BASE_PATH  || "",
+      		base: process.env.BASE_PATH  ?? "",
 		},
 	}
 };
