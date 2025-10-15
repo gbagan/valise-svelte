@@ -1,7 +1,6 @@
 <script lang="ts">
   import { getCoordsOfEdge, type Edge, type Graph } from "$lib/graph";
-  import { initModel, loadRecords, newGame, playA, updateScore,
-          type Methods, type Model, type ScoreMethods, type ScoreModel } from "$lib/model";
+  import { Model, WithScore } from "$lib/model.svelte";
   import GraphEditor from "$lib/components/GraphEditor.svelte";
   import * as I from '$lib/components/Icons';
   import Config from '$lib/components/Config.svelte';
@@ -264,10 +263,33 @@
   type Move = number | "raise";
   type Position = Move[];
 
-  let model: Model<Position> & ScoreModel<Position> = $state({
-    ...initModel([]),
-    scores: {}
-  });
+  class DessinModel extends WithScore(Model<Position, Move>) {
+    constructor() {
+      super([]);
+    }
+
+    play(x: Move): Position | null {
+      const last = model.position.at(-1);
+      if (x === "raise") {
+        return typeof last === "number" ? [...model.position, x] : null;
+      } if (typeof last === "number" && (containsEdge(positionEdges, x, last) || !containsEdge(graph.edges, x, last))) {
+        return null;
+      } else {
+        return [...model.position, x];
+      }
+    }
+
+    initialPosition = () => [];
+    isLevelFinished = () => positionEdges.length === graph.edges.length;
+
+    objective = () => "minimize" as "minimize";
+    score = () => raiseCount;
+    scoreHash = () => graphIndex === "custom" ? null : "" + graphIndex;
+
+    updateScore = () => this.updateScore2(true, "onNewRecord");
+  }
+
+  let model = $state(new DessinModel());
   let graphIndex: number | "custom" = $state(0);
   let customGraph: Graph = $state({ title: "Graphe personnalisé", vertices: [], edges: []});
   // pour l'animation quand le niveau est fini
@@ -312,38 +334,13 @@
     return edges.findIndex(e => e[0] === u && e[1] === v) !== -1;
   }
 
-  function play(x: Move): Position | null {
-    const last = model.position.at(-1);
-    if (x === "raise") {
-      return typeof last === "number" ? [...model.position, x] : null;
-    } if (typeof last === "number" && (containsEdge(positionEdges, x, last) || !containsEdge(graph.edges, x, last))) {
-      return null;
-    } else {
-      return [...model.position, x];
-    }
-  }
-
-  const initialPosition = () => [] as Position;
-  const isLevelFinished = () => positionEdges.length === graph.edges.length;
-
-  const objective = "minimize";
-  const score = () => raiseCount;
-  const scoreHash = () => graphIndex === "custom" ? null : "" + graphIndex;
-
-  const methods: Methods<Position, Move> & ScoreMethods = {
-    play, isLevelFinished, initialPosition,
-    objective, score, scoreHash
-  };
-  methods.updateScore = () => updateScore(model, methods, true, "onNewRecord");
-
   // svelte-ignore state_referenced_locally
-  newGame(model, methods);
+  model.newGame();
   onMount(() => {
-    loadRecords(model);
+    model.loadRecords();
   });
 
-
-  let levelFinished = $derived.by(isLevelFinished);
+  let levelFinished = $derived(model.isLevelFinished());
   let winTitle = $derived(`Tu as réussi en ${raiseCount} levé${raiseCount > 1 ? "s" : ""}`);
 
   const colors = [ "red", "green", "magenta", "orange", "gray", "cyan", "black", "blue" ];
@@ -408,7 +405,7 @@
 
 {#snippet board()}
   <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div class="ui-board board" oncontextmenu={e => { e.preventDefault(); playA(model, methods, "raise")}}>
+  <div class="ui-board board" oncontextmenu={e => { e.preventDefault(); model.playA("raise")}}>
     <PointerTracker viewBox="0 0 100 100" pointer={currentLine}>
       {#each graph.edges as [u, v]}
         {@const {x1, x2, y1, y2} = getCoordsOfEdge(graph, u, v)}
@@ -441,7 +438,7 @@
             r="3"
             stroke={i === model.position.at(-1) ? "red" : "blue"}
             fill="blue"
-            onclick={() => playA(model, methods, i)}
+            onclick={() => model.playA(i)}
           />
         {/each}
       {/if}
@@ -451,7 +448,7 @@
     <button
       class="ui-button ui-button-primary raise"
       disabled={levelFinished || typeof model.position.at(-1) !== "number"}
-      onclick={() => playA(model, methods, "raise")}
+      onclick={() => model.playA("raise")}
     > Lever le crayon
     </button>
   </div>
@@ -465,7 +462,7 @@
       selected={graphIndex}
       text={i => "" + (i as number + 1)}
       tooltip={i => graphs[i as number].title}
-      setter={i => newGame(model, methods, () => graphIndex = i)}
+      setter={i => model.newGame(() => graphIndex = i)}
     >
       <I.Icon
         text="#customize"
@@ -475,12 +472,12 @@
       />
     </I.SelectGroup>
     <I.Group title="Options">
-      <I.Undo bind:model={model} {methods} />
-      <I.Redo bind:model={model} {methods} />
-      <I.Reset bind:model={model} {methods} />
+      <I.Undo bind:model={model} />
+      <I.Redo bind:model={model} />
+      <I.Reset bind:model={model} />
       <I.Rules bind:model={model} />
     </I.Group>
-    <I.BestScore bind:model={model} {methods} />
+    <I.BestScore bind:model={model} />
   </Config>
 {/snippet}
 
@@ -512,7 +509,7 @@
   Pour lever le crayon, tu peux cliquer sur le bouton prévu pour ou utiliser le clic droit.
 {/snippet}
 
-<Template bind:model={model} {methods} {board} {config} {rules} {bestScore} {custom} {winTitle} />
+<Template bind:model={model} {board} {config} {rules} {bestScore} {custom} {winTitle} />
 
 <style>
   .board {

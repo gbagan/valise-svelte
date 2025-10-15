@@ -1,16 +1,15 @@
 <script lang="ts" generics="Pos,Move">
-  import { type Model, type ScoreModel, type Methods, type ScoreMethods } from '$lib/model';
+  import { type Model, type ScoreModel } from '$lib/model.svelte';
   import Icon from "./Icon.svelte";
   import IconGroup from './IconGroup.svelte';
 
   interface Props {
-    model: Model<Pos> & ScoreModel<Pos>;
-    methods: Methods<Pos, Move> & ScoreMethods;
+    model: Model<Pos, Move> & ScoreModel<Pos>;
   }
 
-  const {model=$bindable(), methods}: Props = $props();
+  const {model=$bindable()}: Props = $props();
 
-  let bestScore: [number, Pos] | undefined = $derived(model.scores[methods.scoreHash() ?? "$custom"]);
+  let bestScore: [number, Pos] | undefined = $derived(model.scores[model.scoreHash() ?? "$custom"]);
 
   let title = $derived(`Meilleur score (${bestScore ? "" + bestScore[0] : "∅"})`);
 </script>

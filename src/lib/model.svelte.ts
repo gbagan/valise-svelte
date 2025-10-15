@@ -1,5 +1,6 @@
 import { tick } from "svelte";
 import {clone, delay, randomPick} from "./util";
+import { page } from "$app/state";
 
 const VERSION = 1;
 
@@ -73,11 +74,7 @@ export abstract class Model<Pos, Move> {
 
     const {isNewRecord, showWin} = this.updateScore();
     if (isNewRecord) {
-      // if (isScoreModel(model)) {
-      //  const scores = {...model.scores};
-      //  delete scores["$custom"];
-      // save to storage
-      // localStorage.setItem(page.url.pathname, JSON.stringify([VERSION, scores]));
+      this.saveRecord();
     }
     
     if (showWin) {
@@ -132,6 +129,8 @@ export abstract class Model<Pos, Move> {
 
     this.newGameAction = null;
   }
+
+  saveRecord() {}
 
   private changeTurn() {
     if (this.mode === "duel") {
@@ -195,23 +194,6 @@ export abstract class Model<Pos, Move> {
 }
 
 /*
-export function loadRecords<Pos>(model: Model<Pos> & ScoreModel<Pos>) {
-  const scores = localStorage.getItem(page.url.pathname);
-  let data;
-  if (!scores) {
-    return;
-  }
-  try {
-    data = JSON.parse(scores);
-  } catch {
-    return
-  }
-  if (typeof Array.isArray(data) && data.length === 2 && data[0] === VERSION) {
-    model.scores = data[1];
-  }
-}
-*/
-/*
 function defaultComputerMove<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>): Move | null {
   if (methods.isLevelFinished()) {
     return null;
@@ -242,6 +224,9 @@ function defaultComputerMove<Pos, Move>(model: Model<Pos>, methods: Methods<Pos,
 }
 */
 
+type Constructor<T = {}> = abstract new (...args: any[]) => T;
+
+
 export interface SizeModel {
   rows: number;
   columns: number;
@@ -255,14 +240,14 @@ export function isSizeModel<Pos, Move>(model: Model<Pos, Move>): model is Model<
     && (model as any).customSize !== undefined
 }
 
-export function SizeMixin<Pos, Move>(Base: new (position: Pos) => Model<Pos, Move>) {
+export function WithSize<Pos, Move, TBase extends Constructor<Model<Pos, Move>>>(Base: TBase) {
   abstract class C extends Base implements SizeModel {
     rows: number;
     columns: number;
     customSize: boolean;
 
-    constructor(position: Pos) {
-      super(position);
+    constructor(...args: any) {
+      super(...args);
       this.rows = $state(0);
       this.columns = $state(0);
       this.customSize = $state(false);
@@ -301,12 +286,12 @@ export function isScoreModel<Pos, Move>(model: Model<Pos, Move>): model is Model
   return !!(model as any).scores
 }
 
-export function ScoreMixin<Pos, Move>(Base: new (position: Pos) => Model<Pos, Move>) {
+export function WithScore<Pos, Move, TBase extends Constructor<Model<Pos, Move>>>(Base: TBase) {
   abstract class C extends Base implements ScoreModel<Pos> {
     scores: Record<string, [number, Pos]>;
 
-    constructor(position: Pos) {
-      super(position);
+    constructor(...args: any) {
+      super(...args);
       this.scores = $state({});
     }
 
@@ -331,6 +316,29 @@ export function ScoreMixin<Pos, Move>(Base: new (position: Pos) => Model<Pos, Mo
           showWin: isNewRecord && showWin === "onNewRecord" || showWin === "always"
         }
       }
+    }
+
+    loadRecords<Pos>() {
+      const scores = localStorage.getItem(page.url.pathname);
+      let data;
+      if (!scores) {
+        return;
+      }
+      try {
+        data = JSON.parse(scores);
+      } catch {
+        return
+      }
+      if (typeof Array.isArray(data) && data.length === 2 && data[0] === VERSION) {
+        this.scores = data[1];
+      }
+    }
+
+    saveRecord() {
+      const scores = {...this.scores};
+      delete scores["$custom"];
+      //save to storage
+      localStorage.setItem(page.url.pathname, JSON.stringify([VERSION, scores]));
     }
   }
   return C;
