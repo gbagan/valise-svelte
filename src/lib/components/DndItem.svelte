@@ -1,9 +1,8 @@
 <script lang="ts" generics="Pos, D, P">
-  import { type Model, type Methods, playA } from '$lib/model';
+  import { Model } from '$lib/model.svelte';
   interface Props {
-    model: Model<Pos>;
+    model: Model<Pos, {from: D, to: D }>;
     dragged: D | null;
-    methods: Methods<Pos, {from: D, to: D }>;
     id: D;
     draggable?: boolean;
     droppable?: boolean;
@@ -19,11 +18,11 @@
   }
 
   let { model=$bindable(), dragged=$bindable(), draggable, droppable, equals,
-        methods, id, argument, render }: Props = $props();
+        id, argument, render }: Props = $props();
   
   let candrop = $derived(
     !!droppable && dragged !== null
-    && methods.play({from: dragged, to: id}) !== null
+    && model.play({from: dragged, to: id}) !== null
   );
 
   function onpointerdown(e: PointerEvent) {
@@ -34,7 +33,7 @@
   function onpointerup(e: PointerEvent) {
     e.stopPropagation();
     if (dragged !== null) {
-      playA(model, methods, {from: dragged, to: id});
+      model.playA({from: dragged, to: id});
     }
     dragged = null;
   }

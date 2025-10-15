@@ -1,6 +1,6 @@
 <script lang="ts">
   import { delay, mod, range, repeat, swap } from '$lib/util';
-  import {type Model, type Methods, initModel, newGame} from '$lib/model';
+  import { Model } from '$lib/model.svelte';
   import Template from '$lib/components/Template.svelte';
   import * as I from '$lib/components/Icons';
   import Config from '$lib/components/Config.svelte';
@@ -12,7 +12,29 @@
   type Location = { kind: "panel", id: number } | { kind: "wheel", id: number } | {kind: "board"};
   type Move = {from: Location, to: Location};
 
-  let model: Model<Position> = $state(initModel([]));
+  class RoueModel extends Model<Position, Move> {
+    constructor() {
+      super([]);
+    }
+
+    play({from, to}: Move): Position | null {
+      if (from.kind === "panel" && to.kind === "wheel") {
+        return model.position.with(to.id, from.id);
+      } else if (from.kind === "wheel" && to.kind === "wheel") {
+        return swap(model.position, from.id, to.id);
+      } else if (from.kind === "wheel" && to.kind === "board") {
+        return model.position.with(from.id, null);
+      } else {
+        return null;
+      }
+    }
+
+    initialPosition = () => repeat(size, null);
+    isLevelFinished = () => false;
+    onNewGame = () => rotation = 0;
+  }
+
+  let model = $state(new RoueModel());
   let size = $state(5);
   let rotation = $state(0);
   let dragged: Location | null = $state.raw(null);
@@ -47,24 +69,6 @@
     }
     return used;
   })
-
-  function play({from, to}: Move): Position | null {
-    if (from.kind === "panel" && to.kind === "wheel") {
-      return model.position.with(to.id, from.id);
-    } else if (from.kind === "wheel" && to.kind === "wheel") {
-      return swap(model.position, from.id, to.id);
-    } else if (from.kind === "wheel" && to.kind === "board") {
-      return model.position.with(from.id, null);
-    } else {
-      return null;
-    }
-  }
-
-  const initialPosition  = () => repeat(size, null);
-  const isLevelFinished = () => false;
-  const onNewGame = () => rotation = 0;
-
-  const methods: Methods<Position, Move> = { play, initialPosition, isLevelFinished, onNewGame };
 
   const colors = [ "blue", "red", "magenta", "orange", "brown", "cyan", "gray", "black" ];
 
@@ -106,7 +110,7 @@
   }
 
   // svelte-ignore state_referenced_locally
-  newGame(model, methods)
+  model.newGame()
 </script>
 
 {#snippet board2(_: null, _dragged: boolean, _droppable: boolean,
@@ -160,7 +164,7 @@
       bind:dragged={dragged}
       draggedElement={draggedDisk} 
     >
-      <DndItem bind:model={model} {methods}
+      <DndItem bind:model={model}
         id={{kind: "board"}}
         argument={null}
         bind:dragged={dragged}
@@ -169,7 +173,7 @@
       />
       {#each range(0, size) as color}
         {#if !usedColors[color]}  
-          <DndItem bind:model={model} {methods}
+          <DndItem bind:model={model}
             id={{kind: "panel", id: color}}
             argument={[color, -65 + 130 * color / (size - 1), -100]}
             bind:dragged={dragged}
@@ -188,7 +192,7 @@
       {/each}
       <g class="outer-wheel" style:transform="rotate({360 * rotation / size}deg)">
        {#each aligned as align, i (i)}
-          <DndItem bind:model={model} {methods}
+          <DndItem bind:model={model}
             id={{kind: "wheel", id: i}}
             argument={[i, align]}
             bind:dragged={dragged}
@@ -200,7 +204,7 @@
           {#if color !== null}
             {@const x = 64 * Math.cos(2 * i * Math.PI / size)}
             {@const y = 64 * Math.sin(2 * i * Math.PI / size)}
-            <DndItem bind:model={model} {methods}
+            <DndItem bind:model={model}
               id={{kind: "wheel", id: i}}
               argument={[color, x, y]}
               bind:dragged={dragged}
@@ -237,10 +241,10 @@
       values={[4, 5, 6, 7, 8]}
       selected={size}
       disabled={model.locked}
-      setter={s => newGame(model, methods, () => size = s)}
+      setter={s => model.newGame(() => size = s)}
     />
     <I.Group title="Options">
-      <I.Reset bind:model={model} {methods} />
+      <I.Reset bind:model={model} />
       <I.Rules bind:model={model} />
     </I.Group>
   </Config>
@@ -255,7 +259,7 @@
   en faisant varier le nombre de couleurs que tu utilises.
 {/snippet}
 
-<Template bind:model={model} {methods} {board} {config} {rules} />
+<Template bind:model={model} {board} {config} {rules} />
 
 <style>
   .board {
