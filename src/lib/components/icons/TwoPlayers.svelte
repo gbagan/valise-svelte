@@ -1,18 +1,17 @@
 <script lang="ts" generics="Pos,Move">
-  import { type Model, type Methods, type Mode, newGame, computerPlays } from '$lib/model';
+  import { type Model, type Mode } from '$lib/model.svelte';
   import Icon from "./Icon.svelte";
   import SelectGroup from "./SelectGroup.svelte";
 
   interface Props {
-    model: Model<Pos>;
-    methods: Methods<Pos, Move>;
+    model: Model<Pos, Move>;
   }
   
-  const {model=$bindable(), methods }: Props = $props();
+  const {model=$bindable() }: Props = $props();
 
   const onclickHandler = () => {
     model.computerStarts = true;
-    computerPlays(model, methods);
+    model.computerPlays();
   };
 </script>
 
@@ -23,7 +22,7 @@
   tooltip={["IA mode facile", "IA mode expert", "Affronte un autre joueur"]}
   selected={model.mode}
   disabled={model.locked}
-  setter={mode => newGame(model, methods, () => model.mode = mode)}
+  setter={mode => model.newGame(() => model.mode = mode)}
 >
   <Icon
     text="2P⇨"

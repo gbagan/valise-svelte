@@ -1,6 +1,6 @@
 <script lang="ts">
   import { random, range, shuffle, take } from '$lib/util';
-  import {type Model, type Methods, initModel, playA, newGame } from '$lib/model';
+  import { Model } from '$lib/model.svelte';
   import Template from '$lib/components/Template.svelte';
   import * as I from '$lib/components/Icons';
   import Config from '$lib/components/Config.svelte';
@@ -8,31 +8,35 @@
   type Position = number[];
   type Move = number;
 
-  let model: Model<Position> = $state(initModel([]));
+  class BaseBallModel extends Model<Position, Move> {
+    constructor() {
+      super([]);
+    }
+
+    play(i: number): Position | null {
+      const position = this.position;
+      const j = missingPeg;
+      const x = position[i];
+      const y = position[j];
+      if ([1, baseCount-1, -1, -baseCount+1].includes((x >> 1) - (y >> 1))) {
+        return position.with(i, y).with(j, x);
+      } else {
+        return null;
+      }
+    }
+
+    isLevelFinished = () => this.position.every((i, j) => i >> 1 == j >> 1);
+    initialPosition = () => shuffle(range(0, 2*baseCount));
+    onNewGame = () => missingPeg = random(0, 2 * baseCount);
+  }
+  
+  let model = $state(new BaseBallModel());
+
   let baseCount = $state(5);
   let missingPeg = $state(1);
 
-  function play(i: number): Position | null {
-    const position = model.position;
-    const j = missingPeg;
-    const x = position[i];
-    const y = position[j];
-    if ([1, baseCount-1, -1, -baseCount+1].includes((x >> 1) - (y >> 1))) {
-      return position.with(i, y).with(j, x);
-    } else {
-      return null;
-    }
-  }
-
-  const isLevelFinished = () => model.position.every((i, j) => i >> 1 == j >> 1);
-  const initialPosition = () => shuffle(range(0, 2*baseCount))
-  const onNewGame = () => missingPeg = random(0, 2 * baseCount);
-
-  const methods: Methods<Position, Move> = { play, isLevelFinished, initialPosition, onNewGame };
-
-  let levelFinished = $derived(isLevelFinished());
-
-
+  let levelFinished = $derived(model.isLevelFinished());
+  
   const colors = [ "blue", "red", "green", "magenta", "orange", "black", "cyan", "gray" ];
 
   const transformPeg = (position: number) => {
@@ -49,9 +53,9 @@
     const y = 0.5 + 0.35 * Math.sin(angle);
     return `translate(${100*x}%, ${100*y}%) rotate(45deg)`;
   }
-
+  
   // svelte-ignore state_referenced_locally
-  newGame(model, methods);
+  model.newGame();
 
 </script>
 
@@ -79,8 +83,8 @@
               width="7"
               height="7"
               fill={colors[peg / 2 | 0]}
-              onclick={() => playA(model, methods, peg)}
-              style:cursor={play(peg) !== null ? "pointer" : "not-allowed"}
+              onclick={() => model.playA(peg)}
+              style:cursor={model.play(peg) !== null ? "pointer" : "not-allowed"}
               style:animation-delay="{1000 + 2000 * peg / baseCount}ms"
               class={{animate: levelFinished}} 
             />
@@ -97,12 +101,12 @@
       title="Nombre de bases"
       values={[4, 5, 6, 7, 8]}
       selected={baseCount}
-      setter={i => newGame(model, methods, () => baseCount = i)}
+      setter={i => model.newGame(() => baseCount = i)}
     />
     <I.Group title="Options">
-      <I.Undo bind:model={model} {methods} />
-      <I.Redo bind:model={model} {methods} />
-      <I.Reset bind:model={model} {methods} />
+      <I.Undo bind:model={model} />
+      <I.Redo bind:model={model} />
+      <I.Reset bind:model={model} />
       <I.Rules bind:model={model} />
     </I.Group>
   </Config>
@@ -116,7 +120,7 @@
   Pour déplacer un jeton, il te suffit de <strong>cliquer</strong> dessus.
 {/snippet}
 
-<Template bind:model={model} {methods} {board} {config} {rules} />
+<Template bind:model={model} {board} {config} {rules} />
 
 <style>
   .board {

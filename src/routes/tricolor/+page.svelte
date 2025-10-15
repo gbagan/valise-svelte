@@ -1,6 +1,6 @@
 <script lang="ts">
   import { generate, random, repeat } from '$lib/util';
-  import {type Model, type Methods, initModel, playA, newGame } from '$lib/model';
+  import { Model } from '$lib/model.svelte';
   import Template from '$lib/components/Template.svelte';
   import * as I from '$lib/components/Icons';
   import Config from '$lib/components/Config.svelte';
@@ -8,7 +8,25 @@
   type Position = number[];
   type Move = number;
 
-  let model: Model<Position> = $state(initModel([]));
+  class TricolorModel extends Model<Position, Move> {
+    constructor() {
+      super([]);
+    }
+
+    play = (move: Move) => this.position.map((color, i) => 
+      inRange(move, i) ? (color + 1) % colorCount : color
+    );
+
+    initialPosition = () =>
+      shuffle 
+      ? generate(size, () => random(0, colorCount))
+      : repeat(size, 1);
+
+    isLevelFinished = () => this.position.every(i => i === 0);
+  }
+
+  let model = $state(new TricolorModel());
+
   let size = $state(5);
   let colorCount = $state(2);
   let range = $state(1);
@@ -20,23 +38,10 @@
     return Math.min(diff, size - diff) <= range;
   }
   
-  const play = (move: Move) => model.position.map((color, i) => 
-    inRange(move, i) ? (color + 1) % colorCount : color
-  );
-
-  const initialPosition = () =>
-    shuffle 
-    ? generate(size, () => random(0, colorCount))
-    : repeat(size, 1);
-
-  const isLevelFinished = () => model.position.every(i => i === 0);
-
-  const methods: Methods<Position, Move> = { play, isLevelFinished, initialPosition };
-  
   // svelte-ignore state_referenced_locally
-  newGame(model, methods);
+  model.newGame();
 
-  let levelFinished = $derived.by(isLevelFinished);
+  let levelFinished = $derived(model.isLevelFinished());
 
   const colors = [ "green", "yellow", "red", "magenta", "blue" ];
 
@@ -56,7 +61,7 @@
     stroke={hoverCell !== null && inRange(i, hoverCell) ? "lightgreen" : "black"}
     fill={levelFinished ? "" : colors[color]}
     style:transform={translateCell(i)}
-    onclick={() => playA(model, methods, i)}
+    onclick={() => model.playA(i)}
     onpointerenter={() => hoverCell = i}
     onpointerleave={() => hoverCell = null}
   />
@@ -96,29 +101,29 @@
       title="Nombre de feux"
       values={[4, 5, 6, 7, 8, 9, 10, 11, 12, 13]}
       selected={size}
-      setter={i => newGame(model, methods, () => size = i)}
+      setter={i => model.newGame(() => size = i)}
     />
     <I.SelectGroup
       title="Nombre de couleurs"
       values={[2, 3, 4, 5]}
       selected={colorCount}
-      setter={i => newGame(model, methods, () => colorCount = i)}
+      setter={i => model.newGame(() => colorCount = i)}
     />
     <I.SelectGroup
       title="Portée"
       values={[1, 2, 3]}
       selected={range}
-      setter={i => newGame(model, methods, () => range = i)}
+      setter={i => model.newGame(() => range = i)}
     />
     <I.Group title="Options">
-      <I.Undo bind:model={model} {methods} />
-      <I.Redo bind:model={model} {methods} />
-      <I.Reset bind:model={model} {methods} />
+      <I.Undo bind:model={model} />
+      <I.Redo bind:model={model} />
+      <I.Reset bind:model={model} />
       <I.Icon
         text="#shuffle"
         tooltip="Mélanger"
         selected={shuffle}
-        onclick={() => newGame(model, methods, () => shuffle = !shuffle)}
+        onclick={() => model.newGame(() => shuffle = !shuffle)}
       />
       <I.Rules bind:model={model} />  
     </I.Group>
@@ -133,7 +138,7 @@
   Le but est que tous les jetons soient de couleur <strong>verte</strong>.
 {/snippet}
 
-<Template bind:model={model} {methods} {board} {config} {rules} />
+<Template bind:model={model} {board} {config} {rules} />
 
 <style>
   .board {

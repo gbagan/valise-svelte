@@ -1,13 +1,11 @@
 <script lang="ts" generics="Pos, Move">
-  import { setGridSize, type Model, type Methods, type SizeLimit, newGame, 
-    isScoreModel, isScoreMethods, isSizeModel } from '$lib/model';
+  import { type Model, type SizeLimit,  isScoreModel, isSizeModel } from '$lib/model.svelte';
   import Dialog from '$lib/components/Dialog.svelte';
   import IncDecGrid from '$lib/components/IncDecGrid.svelte';
   import { confetti } from '$lib/confetti';
 
   interface Props {
-    model: Model<Pos>;
-    methods: Methods<Pos, Move>;
+    model: Model<Pos, Move>;
     board: () => any;
     config: () => any;
     rules: () => any;
@@ -18,7 +16,7 @@
   }
 
   const { board, config, rules, bestScore, custom, winTitle, sizeLimit,
-          model=$bindable(), methods}: Props = $props();
+          model=$bindable()}: Props = $props();
 </script>
 
 {#snippet winPanel(title: string, visible: boolean)}
@@ -40,7 +38,7 @@
       showRowButtons={model.customSize && sizeLimit.minRows < sizeLimit.maxRows}
       showColButtons={model.customSize && sizeLimit.minCols < sizeLimit.maxCols}
       locked={model.locked}
-      resize={(row, col) => setGridSize(model, methods, row, col, sizeLimit)}
+      resize={(row, col) => model.setGridSize(row, col, sizeLimit)}
     >
       {@render board()}
     </IncDecGrid>
@@ -57,15 +55,15 @@
     </Dialog>
   {:else if model.dialog === "customize"}
     {@render custom?.()}
-  {:else if model.dialog == "score" && isScoreModel(model) && isScoreMethods(methods)}
+  {:else if model.dialog == "score" && isScoreModel(model)}
     <Dialog title="Meilleur score" onOk={() => model.dialog = null}>
-      {@const position = model.scores[methods.scoreHash() ?? "$custom"][1] }
+      {@const position = model.scores[model.scoreHash() ?? "$custom"][1] }
       {@render bestScore?.(position)}
     </Dialog>
   {:else if model.newGameAction}
     <Dialog
       title="Nouvelle Partie"
-      onOk={() => newGame(model, methods)}
+      onOk={() => model.newGame()}
       onCancel={() => model.newGameAction = null}
     >
       Tu es sur le point de créer une nouvelle partie. Ta partie en cours sera perdue. Es-tu sûr(e)?

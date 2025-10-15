@@ -1,18 +1,17 @@
 <script lang="ts" generics="Pos,Move">
-  import { type Model, type Methods, reset } from '$lib/model';
+  import { type Model } from '$lib/model.svelte';
   import Icon from "./Icon.svelte";
 
   interface Props {
-    model: Model<Pos>;
-    methods: Methods<Pos, Move>;
+    model: Model<Pos, Move>;
   }
 
-  const {model=$bindable(), methods}: Props = $props();
+  const { model=$bindable() }: Props = $props();
 </script>
 
 <Icon
   text="#reset"
   tooltip="Recommence la partie"
   disabled={model.locked || model.history.length === 0}
-  onclick={() => reset(model, methods)}
+  onclick={() => model.reset()}
 />
