@@ -1,91 +1,17 @@
 <script lang="ts">
-  import { allDistinct, diffCoords, gridStyle, random, range, repeat } from '$lib/util';
-  import {type Model, type Methods, type SizeLimit, type SizeModel, 
-    initModel, newGame, playA} from '$lib/model';
+  import {default as Model, type Mode } from './model.svelte';
+  import { gridStyle, repeat } from '$lib/util';
+  import type { SizeLimit } from '$lib/model.svelte';
   import Template from '$lib/components/Template.svelte';
   import PointerTracker from '$lib/components/PointerTracker.svelte';
   import * as I from '$lib/components/Icons';
   import Config from '$lib/components/Config.svelte';
 
-  type Position = number[];
-  type Move = number;
-  type Mode = 1 | 2;
+  let model = $state(new Model());
 
-  let model: Model<Position> & SizeModel = $state({
-    ...initModel([]),
-    rows: 4,
-    columns: 6,
-    customSize: false,
-  });
-
-  let exit: number | null = $state(null);
-  let mode: Mode = $state(1);
-
-  let levelFinished = $derived(
-    exit !== null 
-    && model.position.length > 0
-    && model.position.length == model.columns * model.rows
-        + (exit === model.position[0] ? 1 : 0)
-  );
-
-  // renvoie un chemin horizontal ou vertical entre u et v si celui ci existe (u exclus du chemin)
-  function pathBetween(columns: number, u: number, v: number): number[] | null {
-    const [row, col] = diffCoords(columns, u, v);
-    if (row == 0) {
-      return u < v ? range(u+1, v+1) : range(u-1, v-1, -1);
-    } else if (col == 0) {
-      return u < v ? range(u + columns, v+1, columns) : range(u - columns, v-1, -columns);
-    } else {
-      return null;
-    }
-  }
-
-  // teste si un chemin est valide (sans répétition de sommets)
-  // les extrémités peuvent être identiques si le chemin forme un cycle hamiltonien)
-  // on ne peut pas passer par le sommet de sortie sauf si c'est le sommet final
-  function isValidPath(path: number[]) {
-    if (exit == null || path.length <= 2) {
-        return true;
-    }
-    const path2 = path.slice(1);
-    const path3 = path2.slice(0, -1);
-    const begin = path[0];
-    const end = path.at(-1)!;
-    return allDistinct(path2)
-        && !path3.includes(exit)
-        && !path3.includes(end)
-        && (begin !== end
-            || path.length === model.rows * model.columns 
-                + (begin === exit ? 1 : 0) 
-                && end === exit
-            )
-  }
-
-  function play(v: Move): Position | null {
-    if (model.position.length === 0) {
-      return mode === 2 ? [v] : null;
-    } else {
-      const last = model.position.at(-1)!;
-      const p = pathBetween (model.columns, last, v);
-      if (p === null || p.length === 0) {
-        return null;
-      }
-      const p2 = model.position.concat(p);
-      return isValidPath(p2) ? p2 : null;
-    }
-  }
-
-  const isLevelFinished = () => levelFinished;
-
-  const initialPosition = () => exit === null ? [] : [exit];
-  
-  function onNewGame() {
-    exit = mode === 1 ? random(0, model.rows * model.columns) : null; 
-  }
+  let levelFinished = $derived(model.isLevelFinished());
 
   const sizeLimit: SizeLimit = { minRows: 2, minCols: 2, maxRows: 9, maxCols: 9 };
-  
-  const methods: Methods<Position, Move> = {play, isLevelFinished, initialPosition, onNewGame};
 
   let grid = $derived.by(() => {
     const g = repeat(model.rows * model.columns, false);
@@ -103,19 +29,6 @@
         return `${i === 0 ? 'M' : 'L'}${x} ${y}`
       }).join("")
   );
-
-  function selectSquare(square: number) {
-    if (model.position.length === 0) {
-        model.position = [square];
-    } else if (exit === null) {
-        exit = square;
-    } else {
-        playA(model, methods, square)
-    }
-  }
-
-  // svelte-ignore state_referenced_locally
-  newGame(model, methods);
 </script>
 
 {#snippet square(x: number, y: number, darken: boolean, trap: boolean, door: boolean, onclick: () => void)}
@@ -151,7 +64,7 @@
       height="80"
       style:transform="translate({100*x}%, {100*y}%)"
     />
-  {:else if exit === null}
+  {:else if model.exit === null}
     <use
       href="#paths-door"
       class="pointer"
@@ -176,8 +89,8 @@
             row * 100,
             model.help && (row + col) % 2 === 0,
             trapped && index !== model.position.at(-1) && !levelFinished,
-            index === exit,
-            () => selectSquare(index)
+            index === model.exit,
+            () => model.selectSquare(index)
           )}
         {/each}
         <path
@@ -201,20 +114,20 @@
       values={[1, 2]}
       text={["#paths-mode0", "#paths-mode1"]}
       tooltip={["Mode 1", "Mode 2"]}
-      selected={mode}
-      setter={((m: Mode) => newGame(model, methods, () => mode = m))}
+      selected={model.gameMode}
+      setter={((m: Mode) => model.newGame(() => model.gameMode = m))}
     />
 
-    <I.SizesGroup bind:model={model} {methods}
+    <I.SizesGroup bind:model={model}
       values={[[4, 6], [5, 5], [3, 8]]}
       customSize={true}
     />
 
     <I.Group title="Options">
       <I.Help bind:model={model} />
-      <I.Undo bind:model={model} {methods} />
-      <I.Redo bind:model={model} {methods} />
-      <I.Reset bind:model={model} {methods} />
+      <I.Undo bind:model={model} />
+      <I.Redo bind:model={model} />
+      <I.Reset bind:model={model} />
       <I.Rules bind:model={model} />
     </I.Group>
   </Config>
@@ -245,7 +158,7 @@
   </p>
 {/snippet}
 
-<Template bind:model={model} {methods} {board} {config} {rules} {sizeLimit} />
+<Template bind:model={model} {board} {config} {rules} {sizeLimit} />
 
 <style>
   .board-container {
@@ -289,8 +202,6 @@
     transition: all 500ms linear;
     pointer-events: none;
   }
-
-
 
   @keyframes drawline {
     70%, 80% {

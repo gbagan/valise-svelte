@@ -1,68 +1,34 @@
 <script lang="ts">
-  import { random, range, shuffle, take } from '$lib/util';
-  import { Model } from '$lib/model.svelte';
+  import Model from './model.svelte';
   import Template from '$lib/components/Template.svelte';
   import * as I from '$lib/components/Icons';
   import Config from '$lib/components/Config.svelte';
 
-  type Position = number[];
-  type Move = number;
-
-  class BaseBallModel extends Model<Position, Move> {
-    constructor() {
-      super([]);
-    }
-
-    play(i: number): Position | null {
-      const position = this.position;
-      const j = missingPeg;
-      const x = position[i];
-      const y = position[j];
-      if ([1, baseCount-1, -1, -baseCount+1].includes((x >> 1) - (y >> 1))) {
-        return position.with(i, y).with(j, x);
-      } else {
-        return null;
-      }
-    }
-
-    isLevelFinished = () => this.position.every((i, j) => i >> 1 == j >> 1);
-    initialPosition = () => shuffle(range(0, 2*baseCount));
-    onNewGame = () => missingPeg = random(0, 2 * baseCount);
-  }
-  
-  let model = $state(new BaseBallModel());
-
-  let baseCount = $state(5);
-  let missingPeg = $state(1);
-
+  let model = $state(new Model());
   let levelFinished = $derived(model.isLevelFinished());
   
   const colors = [ "blue", "red", "green", "magenta", "orange", "black", "cyan", "gray" ];
 
   const transformPeg = (position: number) => {
     const mid = position / 2 | 0;
-    const angle = 2 * mid * Math.PI / baseCount;
+    const angle = 2 * mid * Math.PI / model.baseCount;
     const x = 0.42 + 0.35 * Math.cos(angle) + 0.1 * (position % 2);
     const y = 0.46 + 0.35 * Math.sin(angle);
     return `translate(${100*x}%, ${100*y}%)`;
   }
 
   const transformBase = (i: number) => {
-    const angle = 2 * i * Math.PI / baseCount;
+    const angle = 2 * i * Math.PI / model.baseCount;
     const x = 0.5 + 0.35 * Math.cos(angle);
     const y = 0.5 + 0.35 * Math.sin(angle);
     return `translate(${100*x}%, ${100*y}%) rotate(45deg)`;
   }
-  
-  // svelte-ignore state_referenced_locally
-  model.newGame();
-
 </script>
 
 {#snippet board()}
   <div class="ui-board board">
     <svg viewBox="0 0 100 100">
-      {#each take(colors, baseCount) as color, i}
+      {#each colors.slice(0, model.baseCount) as color, i}
         <rect
           class="base"
           stroke={color}
@@ -71,7 +37,7 @@
       {/each}
 
       {#each model.position as pos, peg}
-        {#if peg !== missingPeg}
+        {#if peg !== model.missingPeg}
           <g
             class="player"
             style:transform={transformPeg(pos)}
@@ -85,7 +51,7 @@
               fill={colors[peg / 2 | 0]}
               onclick={() => model.playA(peg)}
               style:cursor={model.play(peg) !== null ? "pointer" : "not-allowed"}
-              style:animation-delay="{1000 + 2000 * peg / baseCount}ms"
+              style:animation-delay="{1000 + 2000 * peg / model.baseCount}ms"
               class={{animate: levelFinished}} 
             />
           </g>
@@ -100,8 +66,8 @@
     <I.SelectGroup
       title="Nombre de bases"
       values={[4, 5, 6, 7, 8]}
-      selected={baseCount}
-      setter={i => model.newGame(() => baseCount = i)}
+      selected={model.baseCount}
+      setter={i => model.newGame(() => model.baseCount = i)}
     />
     <I.Group title="Options">
       <I.Undo bind:model={model} />

@@ -1,54 +1,14 @@
 <script lang="ts">
-  import { delay, mod, range, repeat, swap } from '$lib/util';
-  import { Model } from '$lib/model.svelte';
+  import { default as Model, type Location } from './model.svelte';
+  import { range, repeat } from '$lib/util';
   import Template from '$lib/components/Template.svelte';
   import * as I from '$lib/components/Icons';
   import Config from '$lib/components/Config.svelte';
   import DndBoard from '$lib/components/DndBoard.svelte';
   import DndItem from '$lib/components/DndItem.svelte';
-  import { tick } from 'svelte';
 
-  type Position = (number | null)[];
-  type Location = { kind: "panel", id: number } | { kind: "wheel", id: number } | {kind: "board"};
-  type Move = {from: Location, to: Location};
-
-  class RoueModel extends Model<Position, Move> {
-    constructor() {
-      super([]);
-    }
-
-    play({from, to}: Move): Position | null {
-      if (from.kind === "panel" && to.kind === "wheel") {
-        return model.position.with(to.id, from.id);
-      } else if (from.kind === "wheel" && to.kind === "wheel") {
-        return swap(model.position, from.id, to.id);
-      } else if (from.kind === "wheel" && to.kind === "board") {
-        return model.position.with(from.id, null);
-      } else {
-        return null;
-      }
-    }
-
-    initialPosition = () => repeat(size, null);
-    isLevelFinished = () => false;
-    onNewGame = () => rotation = 0;
-  }
-
-  let model = $state(new RoueModel());
-  let size = $state(5);
-  let rotation = $state(0);
-  let dragged: Location | null = $state.raw(null);
-
-  // tableau indiquant quelles sont les balles alignées avec leur couleur
-  let aligned = $derived(model.position.map((v, i) =>
-    // todo vérifier le mod 
-    v !== null && mod(i + rotation, size) === v
-  ));
-
-  // comme isValidRotation mais avec seconde conditition en moins 
-  let isValidRotation2 = $derived(aligned.filter(x => x).length === 1);
-  // une rotation est valide si exactement une couleur est alignée et il y a une balle pour chaque couleur 
-  let isValidRotation = $derived(isValidRotation2 && model.position.every(v => v !== null)); 
+  let model = $state(new Model());
+  let dragged = $state<Location | null>(null);
 
   let draggedColor: number | null = $derived.by(() => {
     if (dragged === null || dragged.kind === "board") {
@@ -61,7 +21,7 @@
   });
 
   let usedColors: boolean[] = $derived.by(() => {
-    const used = repeat(size, false);
+    const used = repeat(model.size, false);
     for (const c of model.position) {
         if (c !== null) {
             used[c] = true;
@@ -71,22 +31,6 @@
   })
 
   const colors = [ "blue", "red", "magenta", "orange", "brown", "cyan", "gray", "black" ];
-
-  async function check() { 
-    model.locked = true;
-    for (let i = 0; i < size; i++) {
-      if (!isValidRotation) {
-        model.locked = false;
-        return;
-      }
-      rotation += 1;
-      await delay(600);
-    }
-    model.showWin = false;
-    await tick();
-    model.showWin = true;
-    model.locked = false;
-  }
 
   function polarToCartesian(centerX: number, centerY: number, radius: number, angle: number): [number, number] {
     return [ centerX + radius * Math.cos(angle), centerY + radius * Math.sin(angle) ];
@@ -125,9 +69,9 @@
    onpointerdown?: (e: PointerEvent) => void, onpointerup?: (e: PointerEvent) => void)
 }
   <path
-    d={pizza2(0, 0, 50, 80, 2 * Math.PI * (i - 0.5) / size, 2 * Math.PI * (i + 0.5) / size)}
+    d={pizza2(0, 0, 50, 80, 2 * Math.PI * (i - 0.5) / model.size, 2 * Math.PI * (i + 0.5) / model.size)}
     class={["wheel-part", {droppable}]}
-    fill={!aligned ? "#F0B27A" : isValidRotation2 ? "lightgreen" : "#F5B7B1"}
+    fill={!aligned ? "#F0B27A" : model.isValidRotation2 ? "lightgreen" : "#F5B7B1"}
     {onpointerdown} {onpointerup}
   />
 {/snippet}
@@ -156,7 +100,6 @@
   />
 {/snippet}
 
-
 {#snippet board()}
   <div class="board-ui board">
     <DndBoard
@@ -171,27 +114,27 @@
         droppable={true}
         render={board2}
       />
-      {#each range(0, size) as color}
+      {#each range(0, model.size) as color}
         {#if !usedColors[color]}  
           <DndItem bind:model={model}
             id={{kind: "panel", id: color}}
-            argument={[color, -65 + 130 * color / (size - 1), -100]}
+            argument={[color, -65 + 130 * color / (model.size - 1), -100]}
             bind:dragged={dragged}
             draggable={true}
             render={disk}
           />
         {/if}
       {/each}
-      {#each colors.slice(0, size) as color, i}
+      {#each colors.slice(0, model.size) as color, i}
         <path
-          d={pizza(0, 0, 50, 2 * Math.PI * (i - 0.5) / size, 2 * Math.PI * (i + 0.5) / size)}
+          d={pizza(0, 0, 50, 2 * Math.PI * (i - 0.5) / model.size, 2 * Math.PI * (i + 0.5) / model.size)}
           fill={color}
           stroke="black"
           pointer-events="none"
         />
       {/each}
-      <g class="outer-wheel" style:transform="rotate({360 * rotation / size}deg)">
-       {#each aligned as align, i (i)}
+      <g class="outer-wheel" style:transform="rotate({360 * model.rotation / model.size}deg)">
+       {#each model.aligned as align, i (i)}
           <DndItem bind:model={model}
             id={{kind: "wheel", id: i}}
             argument={[i, align]}
@@ -202,8 +145,8 @@
         {/each}
         {#each model.position as color, i}
           {#if color !== null}
-            {@const x = 64 * Math.cos(2 * i * Math.PI / size)}
-            {@const y = 64 * Math.sin(2 * i * Math.PI / size)}
+            {@const x = 64 * Math.cos(2 * i * Math.PI / model.size)}
+            {@const y = 64 * Math.sin(2 * i * Math.PI / model.size)}
             <DndItem bind:model={model}
               id={{kind: "wheel", id: i}}
               argument={[color, x, y]}
@@ -219,17 +162,17 @@
     <button
       class="ui-button ui-button-primary btn-left"
       disabled={model.locked}
-      onclick={() => rotation -= 1}
+      onclick={() => model.rotation -= 1}
     >↶</button>
     <button
       class="ui-button ui-button-primary btn-right"
       disabled={model.locked}
-      onclick={() => rotation += 1}
+      onclick={() => model.rotation += 1}
     >↷</button>
     <button
       class="ui-button ui-button-primary btn-validate"
-      disabled={model.locked || !isValidRotation}
-      onclick={check}
+      disabled={model.locked || !model.isValidRotation}
+      onclick={() => model.check()}
     >Valider</button>
   </div>
 {/snippet}
@@ -239,9 +182,9 @@
     <I.SelectGroup
       title="Nombre de couleurs"
       values={[4, 5, 6, 7, 8]}
-      selected={size}
+      selected={model.size}
       disabled={model.locked}
-      setter={s => model.newGame(() => size = s)}
+      setter={s => model.newGame(() => model.size = s)}
     />
     <I.Group title="Options">
       <I.Reset bind:model={model} />

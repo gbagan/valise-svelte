@@ -23,10 +23,10 @@
 
   function play([dir, x]: Move): Position | null {
     switch (dir) {
-        case "left": return {...model.position, left: x};
-        case "right": return {...model.position, right: x};
-        case "top": return {...model.position, top: x};
-        default: return {...model.position, bottom: x};
+      case "left": return {...model.position, left: x};
+      case "right": return {...model.position, right: x};
+      case "top": return {...model.position, top: x};
+      default: return {...model.position, bottom: x};
     }
   }
 

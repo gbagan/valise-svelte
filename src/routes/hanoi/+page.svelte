@@ -1,42 +1,18 @@
 <script lang="ts">
-  import { range } from '$lib/util';
-  import {type Model, type Methods, initModel, newGame } from '$lib/model';
+  import Model from './model.svelte';
   import Template from '$lib/components/Template.svelte';
   import * as I from '$lib/components/Icons';
   import Config from '$lib/components/Config.svelte';
   import DndBoard from '$lib/components/DndBoard.svelte';
   import DndItem from '$lib/components/DndItem.svelte';
 
-  type Position = number[][];
-  type Move = {from: number, to: number};
-
-  let model: Model<Position> = $state(initModel([]));
-  let diskCount = $state(4);
+  let model = $state(new Model());
   let dragged: number | null = $state(null);
-
-  function play({ from, to }: Move) {
-    const position = model.position;
-    const last = position[from].at(-1);
-    if (from === to || last === undefined || last < (position[to].at(-1) ?? -1)) {
-        return null;
-    }
-    const init = position[from].slice(0, -1);
-    return position.with(from, init).with(to, position[to].concat([last]));
-  }
-
-  const initialPosition = () => [range(0, diskCount), [], []];
-  const isLevelFinished = () => model.position[0].length === 0 && model.position[1].length === 0;
-
-  const methods: Methods<Position, Move> = {play, initialPosition, isLevelFinished};
 
   const colors = [ "blue", "red", "green", "magenta", "orange", "gray", "cyan" ];
 
   let stepCount = $derived(model.history.length);
-
   let winTitle = $derived(`Tu as gagné en ${stepCount} étapes`);
-
-  // svelte-ignore state_referenced_locally
-  newGame(model, methods)
 </script>
 
 {#snippet tower(i: number)}
@@ -86,7 +62,7 @@
     <DndBoard viewBox="0 0 200 100" bind:dragged={dragged} {draggedElement}>
       {#each model.position as disks, column}
         {@render tower(column)}
-        <DndItem bind:model={model} bind:dragged={dragged} {methods}
+        <DndItem bind:model={model} bind:dragged={dragged}
           id={column}
           argument={column}
           render={dropZone}
@@ -94,7 +70,7 @@
         />
         {#each disks as d, i}
           {@const isTop = i === disks.length - 1}
-          <DndItem bind:model={model} bind:dragged={dragged} {methods}
+          <DndItem bind:model={model} bind:dragged={dragged}
             id={column}
             argument={[40+60*column, 90-10*i, d, isTop]}
             render={disk}
@@ -112,13 +88,13 @@
     <I.SelectGroup
       title="Nombre de disques"
       values={[4, 5, 6, 7, 8]}
-      selected={diskCount}
-      setter={n => newGame(model, methods, () => diskCount = n)}
+      selected={model.diskCount}
+      setter={n => model.newGame(() => model.diskCount = n)}
     />
     <I.Group title="Options">
-      <I.Undo bind:model={model} {methods} />
-      <I.Redo bind:model={model} {methods} />
-      <I.Reset bind:model={model} {methods} />
+      <I.Undo bind:model={model} />
+      <I.Redo bind:model={model} />
+      <I.Reset bind:model={model} />
       <I.Rules bind:model={model} />
     </I.Group>
   </Config>
@@ -133,7 +109,7 @@
   </ul>
 {/snippet}
 
-<Template bind:model={model} {methods} {board} {config} {rules} {winTitle} />
+<Template bind:model={model} {board} {config} {rules} {winTitle} />
 
 <style>
   .board {
