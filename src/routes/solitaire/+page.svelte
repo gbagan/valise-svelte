@@ -1,7 +1,6 @@
 <script lang="ts">
   import { diffCoords, generate, generate2, gridStyle, random, repeat } from '$lib/util';
-  import {type Model, type ScoreModel, type Methods, type ScoreMethods, type SizeModel, type SizeLimit,
-    initModel, newGame, updateScore, loadRecords} from '$lib/model';
+  import { Model, WithSize, WithScore, type SizeLimit } from '$lib/model.svelte';
   import Template from '$lib/components/Template.svelte';
   import Icon from '$lib/components/icons/Icon.svelte';
   import * as I from '$lib/components/Icons';
@@ -15,14 +14,81 @@
   type Position = boolean[];
   type Move = {from: number, to: number};
 
-  let model: Model<Position> & SizeModel & ScoreModel<Position> = $state({
-    ...initModel([]),
-    rows: 5,
-    columns: 1,
-    customSize: false,
-    scores: {},
-  });
+  class SolitaireModel extends WithScore(WithSize(Model<Position, Move>)) {
+    constructor() {
+      super([]);
+      this.rows = 5;
+      this.columns = 1;
+    }
 
+    play(move: Move): Position | null {
+      const {from, to} = move;
+      const between = betweenMove2(move);
+      if (between === null) {
+       return null;
+      }
+      const pbetween = this.position[between];
+      const pfrom = this.position[from];
+      const pto = this.position[to];
+      const hto = holes[to];
+      if (!pfrom || !pbetween || !hto || pto) {
+        return null;
+      }
+      const position = this.position.slice();
+      position[from] = false;
+      position[between] = false;
+      position[to] = true;
+      return position;
+    }
+
+    initialPosition = () => this.position;
+
+    isLevelFinished = () => this.position.every((p, i) =>
+      !p || [2, -2, 2 * this.columns, -2 * this.columns, this.rows - 2].every(d =>
+        this.play({from: i, to: i+d}) === null
+      )
+    );
+
+    onNewGame() {
+      let columns = this.columns;
+      let rows = this.rows;
+      if (boardType === "english") {
+        holes = generate2(7, 7, (row, col) =>
+          Math.min(row, 6 - row) >= 2 || Math.min(col, 6 - col) >= 2 
+        );
+        this.position = holes.with(24, false);
+        this.customSize = false;
+      } else if (boardType === "french") {
+        holes = generate2(7, 7, (row, col) =>
+          Math.min(row, 6 - row) + Math.min(col, 6 - col) >= 2 
+        );
+        this.position = holes.with(24, false);
+        this.customSize = false;
+      } else if (boardType === "circle") {
+        holes = repeat(rows, true);
+        const empty = random(0, rows);
+        this.position = generate(rows, x => x !== empty);
+        this.customSize = true;
+      } else if (boardType === "grid3") {
+        holes = repeat(3 * columns, true);
+        this.position = generate(3 * columns, i => i < 2 * columns);
+        this.customSize = true;
+      } else { // boardType === "random"
+        holes = repeat(3 * columns, true);
+        const bools = generate(columns, () => Math.random() < 0.5);
+        this.position = bools.concat(repeat(columns, true), bools.map(x => !x));
+        this.customSize = true;
+      }
+    }
+
+    objective = () => "minimize" as "minimize";
+    score = () => model.position.filter(x => x).length;
+    // todo à vérifier
+    scoreHash = () => boardType === "random" ? null : `${boardType},${model.rows},${model.columns}`;
+    updateScore = () => this.updateScore2(true, "always");
+  }
+
+  let model = $state(new SolitaireModel());
   let holes: boolean[] = $state([]);
   let help: 0 | 1 | 2 = $state(0);
   let boardType: Board = $state("circle");
@@ -56,69 +122,9 @@
         return null;
       } else {
         return model.rows === 4 && !model.position[x] ? (x + 2) % 4 : x; 
-    }
+      }
     } else {
-        return betweenMove(move);
-    }
-  }
-
-  function play(move: Move): Position | null {
-    const {from, to} = move;
-    const between = betweenMove2(move);
-    if (between === null) {
-       return null;
-    }
-    const pbetween = model.position[between];
-    const pfrom = model.position[from];
-    const pto = model.position[to];
-    const hto = holes[to];
-    if (!pfrom || !pbetween || !hto || pto) {
-        return null;
-    }
-    const position = model.position.slice();
-    position[from] = false;
-    position[between] = false;
-    position[to] = true;
-    return position;
-  }
-
-  const initialPosition = () => model.position;
-
-  const isLevelFinished = () => model.position.every((p, i) =>
-    !p || [2, -2, 2 * model.columns, -2 * model.columns, model.rows - 2].every(d =>
-      play({from: i, to: i+d}) === null
-    )
-  );
-
-  function onNewGame() {
-    let columns = model.columns;
-    let rows = model.rows;
-    if (boardType === "english") {
-      holes = generate2(7, 7, (row, col) =>
-        Math.min(row, 6 - row) >= 2 || Math.min(col, 6 - col) >= 2 
-      );
-      model.position = holes.with(24, false);
-      model.customSize = false;
-    } else if (boardType === "french") {
-      holes = generate2(7, 7, (row, col) =>
-        Math.min(row, 6 - row) + Math.min(col, 6 - col) >= 2 
-      );
-      model.position = holes.with(24, false);
-      model.customSize = false;
-    } else if (boardType === "circle") {
-      holes = repeat(rows, true);
-      const empty = random(0, rows);
-      model.position = generate(rows, x => x !== empty);     
-      model.customSize = true;
-    } else if (boardType === "grid3") {
-      holes = repeat(3 * columns, true);
-      model.position = generate(3 * columns, i => i < 2 * columns);
-      model.customSize = true;
-    } else { // boardType === "random"
-      holes = repeat(3 * columns, true);
-      const bools = generate(columns, () => Math.random() < 0.5);
-      model.position = bools.concat(repeat(columns, true), bools.map(x => !x));
-      model.customSize = true;
+      return betweenMove(move);
     }
   }
 
@@ -130,19 +136,8 @@
     : { minRows: 7, maxRows: 7, minCols: 7, maxCols: 7 }
   );
 
-  const objective = "minimize";
-  const score = () => model.position.filter(x => x).length;
-  // todo à vérifier
-  const scoreHash = () => boardType === "random" ? null : `${boardType},${model.rows},${model.columns}`;
-
-  const methods: Methods<Position, Move> & ScoreMethods = {
-    play, isLevelFinished, initialPosition, onNewGame,
-    objective, score, scoreHash
-  };
-  methods.updateScore = () => updateScore(model, methods, true, "always");
-
   let winTitle = $derived.by(() => {
-    const score = methods.score();
+    const score = model.score();
     const s = score > 1 ? "s" : "";
     return `${score} pièce${s} restante${s}`;
   });
@@ -186,11 +181,10 @@
   }
 
   // svelte-ignore state_referenced_locally
-  newGame(model, methods);
+  model.newGame();
   onMount(() => {
-    loadRecords(model);
+    model.loadRecords();
   });
-
 </script>
 
 
@@ -246,7 +240,7 @@
       {/if}
       {#each holes as hasHole, i}
         {#if hasHole}
-          <DndItem bind:model={model} bind:dragged={dragged} {methods}
+          <DndItem bind:model={model} bind:dragged={dragged}
             id={i}
             argument={i}
             droppable={interactive}
@@ -256,7 +250,7 @@
       {/each}
       {#each position as hasPeg, i}
         {#if hasPeg}
-          <DndItem bind:model={model} bind:dragged={dragged} {methods}
+          <DndItem bind:model={model} bind:dragged={dragged}
             id={i}
             argument={i}
             draggable={interactive}
@@ -288,16 +282,16 @@
       text={["#circle", "3xN", "#shuffle", "#tea", "#bread"]}
       tooltip={["3xN", "Cercle", "Aléatoire", "Anglais", "Français"]}
       selected={boardType}
-      setter={(i) => newGame(model, methods, () => setBoard(i as Board))}
+      setter={i => model.newGame(() => setBoard(i as Board))}
     />
     <I.Group title="Options">
       <Icon text="#help" tooltip="Aide" selected={help > 0} onclick={() => help = (help + 1) % 3} />
-      <I.Undo bind:model={model} {methods} />
-      <I.Redo bind:model={model} {methods} />
-      <I.Reset bind:model={model} {methods} />
+      <I.Undo bind:model={model} />
+      <I.Redo bind:model={model} />
+      <I.Reset bind:model={model} />
       <I.Rules bind:model={model} />
     </I.Group>
-    <I.BestScore bind:model={model} {methods} />
+    <I.BestScore bind:model={model} />
   </Config>
 {/snippet}
 
@@ -305,7 +299,7 @@
   todo
 {/snippet}
 
-<Template bind:model={model} {methods} {board} {config} {rules} {winTitle} {bestScore} {sizeLimit} />
+<Template bind:model={model} {board} {config} {rules} {winTitle} {bestScore} {sizeLimit} />
 
 <style>
   .board-container {
