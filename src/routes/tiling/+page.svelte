@@ -1,147 +1,28 @@
 <script lang="ts">
+  import {default as Model, type TileType} from './model.svelte';
   import { coords, gridStyle, mod, repeat } from '$lib/util';
-  import {type Model, type Methods, type SizeModel, type SizeLimit,
-    initModel, newGame, playA} from '$lib/model';
+  import { type SizeLimit } from '$lib/model.svelte';
   import Template from '$lib/components/Template.svelte';
   import * as I from '$lib/components/Icons';
   import Config from '$lib/components/Config.svelte';
   import PointerTracker from '$lib/components/PointerTracker.svelte';
   import Dialog from '$lib/components/Dialog.svelte';
 
-  type Coord = [row: number, col: number];
-  type Tile = Coord[];
-  type TileType = "type1" | "type2" | "type3" | "custom";
-
-  const rotate90 = (tile: Tile) => tile.map(([row, col]) => [col, -row]) as Tile;
-
-  function rotate(tile: Tile, n: number) {
-    for (let i = 0; i < n; i++) {
-      tile = rotate90(tile);
-    }
-    return tile;
-  }
-
-  const translate = (tile: Tile, [row, col]: Coord) => tile.map(([r,c]) => [row + r, col + c]) as Tile;
-
-  // une position représente pour chaque position dans la grille ce que contient la case
-  //   0: ne contient rien,
-  //   -1: contient un évier,
-  //    n > 0 contient un morceau de tuile
-  // les morceaux de tuiles ayant le même numéro appartiennent à la même tuile
-  // une partie est terminé si toute case contient un évier ou un morceau de tuile
-  // un coup peut consister à poser une tuile ou à en retirer une
-
-  type Position = number[];
-  type Move = number; // todo
-
-  let model: Model<Position> & SizeModel = $state({
-    ...initModel([]),
-    rows: 5,
-    columns: 5,
-    customSize: false,
-  });
-
-  let rotation = $state(0);
-  let tileType: TileType = $state("type1");
-  let sinkCount = $state(0);
+  let model = $state(new Model());
   let hoverSquare: number | null = $state(null);
-  let customTile: [number, number][] = $state([]);
-
-  let tile: Tile = $derived.by(() => {
-    switch (tileType) {
-      case "type1": return [ [0, 0], [0, 1] ];
-      case "type2": return [ [0, 0], [0, 1], [0, -1] ];
-      case "type3": return [ [0, 0], [0, 1], [1, 0] ];
-      default: return customTile;
-    }
-  });
-
-  let customTileGrid = $derived.by(() => {
-    const res = repeat(25, false);
-    for (const [row, col] of customTile) {
-      res[row * 5 + col + 12] = true;
-    }
-    return res;
-  });  
-
-  // renvoie la liste des positions où devra être posée une tuile,  -1 est une position invalide
-  function tilePositions(index: number): number[] {
-    const columns = model.columns;
-    let tile2 = rotate(tile, mod(rotation, 4));
-    tile2 = translate(tile2, coords(columns, index));
-    return tile2.map(([row, col]) => 0 <= col && col < columns ? row * columns + col : - 1);
-  }
-
-  // teste si une tuile peut être posée à partir de la liste des positions otenues par tilePositions
-  const canPutTile = (tile: number[]) => tile.every(i => model.position[i] === 0);
-
-  // renvoie la liste des positions des éviers
-  let sinks = $derived(model.position.map((v, i) => v == -1 ? i : null).filter(x => x !== null));
 
   let inConflict = $derived(
     hoverSquare !== null 
-    && (model.position[hoverSquare] !== 0 || play(hoverSquare) === null)
+    && (model.position[hoverSquare] !== 0 || model.play(hoverSquare) === null)
   );
-
-  function play(index: Move): Position | null {
-    const tilePos = tilePositions(index);
-    if (canPutTile(tilePos)) {
-      const m = Math.max(...model.position) + 1;
-      const position = model.position.slice();
-      for (const i of tilePos) {
-        position[i] = m;
-      }
-      return position;
-    } else if (model.position[index] > 0) {
-      const c = model.position[index];
-      return model.position.map(x => x === c ? 0 : x);
-    } else {
-      return null;
-    }
-  }
-
-  const isLevelFinished = () => model.position.every(x => x !== 0);
-  const initialPosition = () => repeat(model.columns * model.rows, 0);
-  const onNewGame = () => rotation = 0;
-
-  const methods: Methods<Position, Move> = { play, isLevelFinished, initialPosition, onNewGame };
-
-  // view
 
   const sizeLimit: SizeLimit = {minRows: 3, minCols: 3, maxRows: 10, maxCols: 10};
 
   const border = (i: number, d: number) => model.position[i] !== model.position[i+d];
 
-  function selectSquare(index: number) {
-    if (sinks.length < sinkCount) {
-      model.position[index] = -1;
-    } else {
-      playA(model, methods, index);
-    }
-  }
-
-  function flipCustomTile(i: number) {
-    let [row, col] = coords(5, i);
-    row -= 2;
-    col -= 2;
-    let idx = customTile.findIndex(([r, c]) => r === row && c === col);
-    if (idx === -1) {
-        customTile.push([row, col])
-    } else {
-        customTile.slice(idx, 1);
-    }
-  }
-
-  const setTileType = (type: TileType) => newGame(model, methods, () => {
-    tileType = type;
-    if (type === "custom") {
-      model.dialog = "customize";
-    }
-  });
-
   function handleKeydown(e: KeyboardEvent) {
     if (e.key === " ") {
-      rotation += 1;
+      model.rotation += 1;
     }
   }
 
@@ -155,9 +36,6 @@
     onpointerenter?: (e: PointerEvent) => void;
     onpointerleave?: (e: PointerEvent) => void;
   }
-
-  // svelte-ignore state_referenced_locally
-  newGame(model, methods);
 </script>
 
 {#snippet square({isDark, hasBlock, hasSink, row, col,
@@ -180,7 +58,7 @@
 {/snippet}
 
 {#snippet pointer(x: number, y: number)}
-  {#if sinks.length < sinkCount}
+  {#if model.sinks.length < model.sinkCount}
     <use
       href="#sink"
       x="-25"
@@ -192,8 +70,8 @@
     />  
   {:else}
     <g style:transform="translate({100*x}%, {100*y}%)">
-      <g class="pointer" style:transform="rotate({90 * rotation}deg)">
-        {#each tile as [row, col]}
+      <g class="pointer" style:transform="rotate({90 * model.rotation}deg)">
+        {#each model.tile as [row, col]}
           <use
             href="#tile2"
             x={50 * col - 25}
@@ -214,7 +92,7 @@
     <div
       class="ui-board"
       style={gridStyle(model.rows, model.columns, 5)}
-      oncontextmenu={e => {e.preventDefault(); rotation += 1}}
+      oncontextmenu={e => {e.preventDefault(); model.rotation += 1}}
     >
       <PointerTracker {pointer} viewBox="0 0 {50 * model.columns} {50 * model.rows}">
         {#each model.position as pos, index}
@@ -225,7 +103,7 @@
             hasSink: pos === -1,
             row,
             col,
-            onclick: () => selectSquare(index),
+            onclick: () => model.selectSquare(index),
             onpointerenter: () => hoverSquare = index,
             onpointerleave: () => hoverSquare = null,
           })}
@@ -254,7 +132,7 @@
 
 {#snippet config()}
   <Config title="Carrelage">
-    <I.SizesGroup bind:model={model} {methods}
+    <I.SizesGroup bind:model={model}
       values={[ [4, 5], [5, 5], [5, 6], [8, 8] ]}
       customSize={true}
     />
@@ -262,18 +140,18 @@
       title="Motif de la tuile"
       values={["type1", "type2", "type3", "custom"] as TileType[]}
       text={["#beast1", "#beast2", "#beast3", "#customize"]}
-      selected={tileType}
-      setter={setTileType}
+      selected={model.tileType}
+      setter={t => model.setTileType(t)}
     />
     <I.SelectGroup
       title="Nombre d'éviers"
       values={[0, 1, 2]}
-      selected={sinkCount}
-      setter={i => newGame(model, methods, () => sinkCount = i)}
+      selected={model.sinkCount}
+      setter={i => model.newGame(() => model.sinkCount = i)}
     />
     <I.Group title="Options">
       <I.Help bind:model={model} />
-      <I.Reset bind:model={model} {methods} />
+      <I.Reset bind:model={model} />
       <I.Rules bind:model={model} />
     </I.Group>
   </Config>
@@ -286,13 +164,13 @@
   >
     <div class="customtile-container">
       <svg viewBox="0 0 250 250">
-        {#each customTileGrid as block, i}
+        {#each model.customTileGrid as block, i}
           {@const [row, col] = coords(5, i)}
           {@render square({
             hasBlock: block,
             row,
             col,
-            onclick: () => flipCustomTile(i),
+            onclick: () => model.flipCustomTile(i),
           })}
         {/each}
       </svg>
@@ -316,7 +194,7 @@
 {/snippet}
 
 <svelte:window on:keydown={handleKeydown} />
-<Template bind:model={model} {methods} {board} {config} {rules} {custom} {sizeLimit} />
+<Template bind:model={model} {board} {config} {rules} {custom} {sizeLimit} />
 
 <style>
   .container {

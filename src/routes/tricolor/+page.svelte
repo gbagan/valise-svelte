@@ -1,53 +1,18 @@
 <script lang="ts">
-  import { generate, random, repeat } from '$lib/util';
-  import { Model } from '$lib/model.svelte';
+  import Model from './model.svelte';
   import Template from '$lib/components/Template.svelte';
   import * as I from '$lib/components/Icons';
   import Config from '$lib/components/Config.svelte';
 
-  type Position = number[];
-  type Move = number;
-
-  class TricolorModel extends Model<Position, Move> {
-    constructor() {
-      super([]);
-    }
-
-    play = (move: Move) => this.position.map((color, i) => 
-      inRange(move, i) ? (color + 1) % colorCount : color
-    );
-
-    initialPosition = () =>
-      shuffle 
-      ? generate(size, () => random(0, colorCount))
-      : repeat(size, 1);
-
-    isLevelFinished = () => this.position.every(i => i === 0);
-  }
-
-  let model = $state(new TricolorModel());
-
-  let size = $state(5);
-  let colorCount = $state(2);
-  let range = $state(1);
+  let model = $state(new Model());
   let hoverCell: number | null = $state(null);
-  let shuffle = $state(false);
-
-  function inRange(i: number, j: number) {
-    const diff = Math.abs(i - j);
-    return Math.min(diff, size - diff) <= range;
-  }
-  
-  // svelte-ignore state_referenced_locally
-  model.newGame();
-
   let levelFinished = $derived(model.isLevelFinished());
 
   const colors = [ "green", "yellow", "red", "magenta", "blue" ];
 
   function translateCell(i: number) {
-    const x = 50 + 35 * Math.cos(2 *  i * Math.PI / size);
-    const y = 45 + 35 * Math.sin(2 *  i * Math.PI / size);
+    const x = 50 + 35 * Math.cos(2 *  i * Math.PI / model.size);
+    const y = 45 + 35 * Math.sin(2 *  i * Math.PI / model.size);
     return `translate(${x}px, ${y}px)`;
   }
 </script>
@@ -58,7 +23,7 @@
   <circle
     r="7.5"
     class={["cell", {finished: levelFinished}]}
-    stroke={hoverCell !== null && inRange(i, hoverCell) ? "lightgreen" : "black"}
+    stroke={hoverCell !== null && model.inRange(i, hoverCell) ? "lightgreen" : "black"}
     fill={levelFinished ? "" : colors[color]}
     style:transform={translateCell(i)}
     onclick={() => model.playA(i)}
@@ -68,9 +33,9 @@
 {/snippet}
 
 {#snippet colorCycle()}
-  {#each colors.slice(0, colorCount) as color, i}
+  {#each colors.slice(0, model.colorCount) as color, i}
     <circle
-      cx={95 + 15 * (i - colorCount)}
+      cx={95 + 15 * (i - model.colorCount)}
       cy="95"
       r="3"
       fill={color}
@@ -78,7 +43,7 @@
     <path
       d="M0 2H4V0l3 3l-3 3v-2h-4Z"
       fill="black"
-      style:transform="translate({99 + 15 * (i - colorCount)}px, 92px)"
+      style:transform="translate({99 + 15 * (i - model.colorCount)}px, 92px)"
     />
   {/each}
   <circle cx="95" cy="95" r="3" fill="green" />
@@ -100,20 +65,20 @@
     <I.SelectGroup
       title="Nombre de feux"
       values={[4, 5, 6, 7, 8, 9, 10, 11, 12, 13]}
-      selected={size}
-      setter={i => model.newGame(() => size = i)}
+      selected={model.size}
+      setter={i => model.newGame(() => model.size = i)}
     />
     <I.SelectGroup
       title="Nombre de couleurs"
       values={[2, 3, 4, 5]}
-      selected={colorCount}
-      setter={i => model.newGame(() => colorCount = i)}
+      selected={model.colorCount}
+      setter={i => model.newGame(() => model.colorCount = i)}
     />
     <I.SelectGroup
       title="Portée"
       values={[1, 2, 3]}
-      selected={range}
-      setter={i => model.newGame(() => range = i)}
+      selected={model.range}
+      setter={i => model.newGame(() => model.range = i)}
     />
     <I.Group title="Options">
       <I.Undo bind:model={model} />
