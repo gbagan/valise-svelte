@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { diffCoords, gridStyle, repeat } from '$lib/util';
-  import {type Model, type ScoreModel, type Methods, type ScoreMethods, type SizeModel,
-    initModel, newGame, updateScore, loadRecords} from '$lib/model';
+  import { default as Model, type Position } from './model.svelte';
+  import { gridStyle } from '$lib/util';
   import Template from '$lib/components/Template.svelte';
   import * as I from '$lib/components/Icons';
   import Config from '$lib/components/Config.svelte';
@@ -9,65 +8,18 @@
   import DndItem from '$lib/components/DndItem.svelte';
   import { onMount } from 'svelte';
 
-  type Position = number[];
-  type Move = {from: number, to: number};
-
-  let model: Model<Position> & SizeModel & ScoreModel<Position> = $state({
-    ...initModel([]),
-    rows: 4,
-    columns: 4,
-    customSize: false,
-    scores: {},
-  });
-
+  let model = $state(new Model());
   let dragged: number | null = $state(null);
-
-  function play({ from, to }: Move) {
-    const position = model.position;
-    const [row, col] = diffCoords(model.columns, from, to);
-    const pfrom = position[from];
-    const pto = position[to];
-    if (pfrom > 0 && pfrom <= pto && row * row + col * col === 1) {
-      return position.with(from, 0).with(to, pfrom+pto);
-    } else {
-      return null;
-    }
-  }
-
-  const initialPosition = () => repeat(model.rows * model.columns, 1);
-
-  const isLevelFinished = () => {
-    const position = model.position;
-    const columns = model.columns;
-    return position.every((x, i) => {
-      let y = (i + 1) % columns == 0 ? 0 : position[i + 1];
-      let z = position[i + columns] ?? 0;
-      return x * (y + z) === 0
-    })
-  }
-
-  const score = () => model.position.filter(v => v > 0).length;
-  const scoreHash = () => `${model.rows},${model.columns}`;
-  const objective = "minimize";
-
-  const methods: Methods<Position, Move> & ScoreMethods = {
-    play, isLevelFinished, initialPosition,
-    score, scoreHash, objective
-  };
-  methods.updateScore = () => updateScore(model, methods, true, "always");
-
   const sizeLimit = { minRows: 1, minCols: 2, maxRows: 6, maxCols: 12 };
 
   let winTitle = $derived.by(() => {
-    const score = methods.score();
+    const score = model.score();
     const s = score > 1 ? "s" : "";
     return `${score} case${s} restante${s}`;
   });
 
-  // svelte-ignore state_referenced_locally
-  newGame(model, methods);
   onMount(() => {
-    loadRecords(model);
+    model.loadRecords();
   });
 </script>
 
@@ -101,7 +53,7 @@
       >
         {#each model.position as val, i}
           {#if val !== 0}
-            <DndItem bind:model={model} bind:dragged={dragged} {methods}
+            <DndItem bind:model={model} bind:dragged={dragged}
               id={i}
               argument={[i, val]}
               draggable={true}
@@ -118,17 +70,17 @@
 
 {#snippet config()}
   <Config title="Jeu d'acquisition">
-    <I.SizesGroup bind:model={model} {methods}
+    <I.SizesGroup bind:model={model}
       values={[[2, 2], [4, 4], [5, 5], [6, 6]]}
       customSize={true}
     />
     <I.Group title="Options">
-      <I.Undo bind:model={model} {methods} />
-      <I.Redo bind:model={model} {methods} />
-      <I.Reset bind:model={model} {methods} />
+      <I.Undo bind:model={model} />
+      <I.Redo bind:model={model} />
+      <I.Reset bind:model={model} />
       <I.Rules bind:model={model} />
     </I.Group>
-    <I.BestScore bind:model={model} {methods} />
+    <I.BestScore bind:model={model} />
   </Config>
 {/snippet}
 
@@ -146,15 +98,13 @@
   </div>
 {/snippet}
 
-
-
 {#snippet rules()}
   À chaque tour de ce jeu, tu peux déplacer une pile de jetons vers une case adjacente
   qui contient au moins autant de jetons.<br/>
   Le but est de finir la partie avec le moins de cases contenant des piles de jetons.
 {/snippet}
 
-<Template bind:model={model} {methods} {board} {config} {rules} {bestScore} {winTitle} {sizeLimit} />
+<Template bind:model={model} {board} {config} {rules} {bestScore} {winTitle} {sizeLimit} />
 
 <style>
   .board-container {
