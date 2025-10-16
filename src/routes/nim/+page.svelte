@@ -1,74 +1,21 @@
 <script lang="ts">
-  import { generate, random, range } from '$lib/util';
-  import {type Model, type Methods, initModel, playA, newGame, winTitleFor2Player } from '$lib/model';
+  import { range } from '$lib/util';
+  import Model from './model.svelte';
   import Template from '$lib/components/Template.svelte';
   import * as I from '$lib/components/Icons';
   import Config from '$lib/components/Config.svelte';
 
-  type Position = [number, number][];
-  type Move = {pile: number, pos: number};
-
-  let model: Model<Position> = $state({...initModel([]), mode: "random"});
-  let length = $state(10);
-  let pileCount = $state(4);
-
-  const canPlay = (move: Move) => {
-    const [p1, p2] = model.position[move.pile];
-    return move.pos != p1 && move.pos != p2
-        && (model.turn === 1 ? move.pos < p2 : move.pos > p1)
-  }
-
-  function play(move: Move): Position | null {
-    if (!canPlay(move)) {
-      return null;
-    }
-    const [p1, p2] = model.position[move.pile];
-    return model.position.with(move.pile, model.turn === 1 ? [move.pos, p2] : [p1, move.pos]);
-  }
-
-  const initialPosition = () =>
-    generate(pileCount, () => length === 5 ? [0, 4] : [random(0, 5), random(5, 10)]) as Position;
-
-  const isLevelFinished = () => 
-    model.position.every(([p1, p2]) =>
-      p2 - p1 === 1 && p1 == (model.turn === 2 ? length - 2 : 0)
-    );
-
-  function possibleMoves(): Move[] {
-    const moves = [];
-    for (let i = 0; i < pileCount; i++) {
-      for (let j = 0; j < length; j++) {
-        moves.push({pile: i, pos: j});
-      }
-    }
-
-    const cmpKey = (move: Move) => {
-      const [x, y] = model.position[move.pile];
-      return model.turn === 1 ? x - move.pos : move.pos - y; 
-    }
-
-    return moves
-      .filter(canPlay)
-      .toSorted((m1, m2) => cmpKey(m1) - cmpKey(m2))
-  }
-
-  const isLosingPosition = () =>
-    model.position.reduce((acc, [x, y]) => acc ^ (y - x - 1), 0) === 0
-
-  const methods: Methods<Position, Move> = { play, isLevelFinished, initialPosition, possibleMoves, isLosingPosition };
+  let model = $state(new Model());
 
   let turnMessage = $derived(
-    isLevelFinished() 
+    model.isLevelFinished() 
     ? "Partie finie"
     : model.turn === 1
     ? "Tour du joueur bleu"
     : "Tour du joueur rouge"
   );
 
-   let winTitle = $derived(winTitleFor2Player(model));
-
-  // svelte-ignore state_referenced_locally
-    newGame(model, methods);
+  let winTitle = $derived(model.winTitleFor2Player());
 </script>
 
 {#snippet row(i: number)}
@@ -81,8 +28,8 @@
   <rect
     class="square"
     style:transform="translate({(length === 5 ? 30 : 5) + 10 * j}px, {15 + 19 * i}px) rotate(45deg)"
-    style:cursor={canPlay({pile:i, pos: j}) ? "pointer" : "not-allowed"}
-    onclick={() => playA(model, methods, {pile: i, pos: j})}
+    style:cursor={model.canPlay({pile:i, pos: j}) ? "pointer" : "not-allowed"}
+    onclick={() => model.playA({pile: i, pos: j})}
   />
 {/snippet}
 
@@ -100,9 +47,9 @@
 {#snippet board()}
   <div class="ui-board board">
     <svg viewBox="0 0 100 100">
-      {#each range(0, pileCount) as i}
+      {#each range(0, model.pileCount) as i}
         {@render row(i)}
-        {#each range(0, length) as j}
+        {#each range(0, model.length) as j}
           {@render square(i, j)}
         {/each}
       {/each}
@@ -121,22 +68,22 @@
     <I.SelectGroup 
       title="Taille des rangées"
       values={[ 1, 2, 3, 4, 5 ]}
-      selected={pileCount}
+      selected={model.pileCount}
       disabled={model.locked}
-      setter={i => newGame(model, methods, () => pileCount = i)}
+      setter={i => model.newGame(() => model.pileCount = i)}
     />
     <I.SelectGroup 
       title="Taille des rangées"
       values={[ 10, 5 ]}
-      selected={length}
+      selected={model.length}
       disabled={model.locked}
-      setter={i => newGame(model, methods, () => length = i)}
+      setter={i => model.newGame(() => model.length = i)}
     />
-    <I.TwoPlayers bind:model={model} {methods} />
+    <I.TwoPlayers bind:model={model} />
     <I.Group title="Options">
-      <I.Undo bind:model={model} {methods} />
-      <I.Redo bind:model={model} {methods} />
-      <I.Reset bind:model={model} {methods} />
+      <I.Undo bind:model={model} />
+      <I.Redo bind:model={model} />
+      <I.Reset bind:model={model} />
       <I.Rules bind:model={model} />
     </I.Group>
   </Config>
@@ -152,7 +99,7 @@
   Tu gagnes la partie si ton adversaire n'a aucun mouvement possible.
 {/snippet}
 
-<Template bind:model={model} {methods} {board} {config} {rules} {winTitle} />
+<Template bind:model={model} {board} {config} {rules} {winTitle} />
 
 <style>
   .board {
