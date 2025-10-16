@@ -1,64 +1,20 @@
 <script lang="ts">
+  import Model from './model.svelte';
   import { generate, range, repeat } from '$lib/util';
-  import {type Model, type Methods, type SizeLimit, type SizeModel,
-          initModel, playA, turnMessage, newGame, winTitleFor2Player } from '$lib/model';
+  import { type SizeLimit } from '$lib/model.svelte';
   import Template from '$lib/components/Template.svelte';
   import * as I from '$lib/components/Icons';
   import Config from '$lib/components/Config.svelte';
 
-  type Position = number;
-  type Move = number;
-  
-  let model: Model<Position> & SizeModel = $state({
-    ...initModel(20),
-    mode: 'expert',
-    rows: 20,
-    columns: 0,
-    customSize: true,
-  });
+  let model = $state(new Model());
 
-  let moves: number[] = $state([1, 2, 3]);
-  let marked: boolean[] = $state([]);
-  
-  const canPlay = (v: number) => {
-    const position = model.position;
-    const maximum = Math.max(...moves);
-    return moves.includes(position-v) || position > 0 && v == 0 && position <= maximum
-  }
-
-  let losingPositions: boolean[] = $derived.by(() => {
-    const rows = model.rows;
-    const losing = new Array(rows+1);
-    losing[0] = true;
-    for (let i = 1; i <= rows; i++) {
-      losing[i] = moves.every(m => i - m >= 0 && !losing[i-m]);
-    }
-    return losing;
-  });
-
-  const play = (v: number) => canPlay(v) ? v : null;
-  const initialPosition = () => model.rows;
-  const isLevelFinished = () => model.position === 0;
-  const possibleMoves = () => range(0, model.rows+1).filter(canPlay);
-  const isLosingPosition = () => losingPositions[model.position];
-  const onNewGame = () => marked = repeat(model.rows, false);
-
-  const methods: Methods<Position, Move> = { play, isLevelFinished, initialPosition, onNewGame, possibleMoves, isLosingPosition };   
-
-  let reachable = $derived(generate(model.rows+1, canPlay));
+  let reachable = $derived(generate(model.rows+1, i => model.canPlay(i)));
 
   const sizeLimit: SizeLimit = {
     minRows: 5,
     maxRows: 30,
     minCols: 0,
     maxCols: 0,
-  }
-
-  function movesSetter(move: number) {
-    const next = [1, 2, 3, 4, 5].filter(m => (m === move) != moves.includes(m));
-    if (next.length > 0) {
-      newGame(model, methods, () => moves = next);
-    }
   }
 
   type Cartesian = { x: number, y: number };
@@ -111,19 +67,16 @@
   let cartesianPoints = $derived(polarPoints.map(polarToCartesian));
   let frogPoint = $derived(polarPoints[model.position]);
 
-  let message = $derived(turnMessage(model, methods));
-  let winTitle = $derived(winTitleFor2Player(model));
+  let message = $derived(model.turnMessage());
+  let winTitle = $derived(model.winTitleFor2Player());
 
   const onLilyClick = (e: MouseEvent, i: number) => {
     if (e.shiftKey) {
-      marked[i] = !marked[i];
+      model.marked[i] = !model.marked[i];
     } else {
-      playA(model, methods, i)
+      model.playA(i)
     }
   }
-
-  // svelte-ignore state_referenced_locally
-    newGame(model, methods);
 </script>
 
 
@@ -151,7 +104,7 @@
     onclick={e => onLilyClick(e, i)}
     oncontextmenu={e => {
       e.preventDefault();
-      marked[i] = !marked[i];
+      model.marked[i] = !model.marked[i];
     }}
   />
 {/snippet}
@@ -184,7 +137,7 @@
         {#if model.help}
           <text x={p.x} y={p.y} class="index">{model.rows - i}</text>
         {/if}
-        {#if marked[i] && i !== model.position}
+        {#if model.marked[i] && i !== model.position}
           <use href="#frog2" x={p.x-20} y={p.y-20} width="20" height="20" class="frog marked" />
         {/if}
       {/each}
@@ -199,16 +152,16 @@
     <I.MultiSelectGroup
       title="Déplacements autorisés"
       values={[1, 2, 3, 4, 5]}
-      selected={moves}
+      selected={model.moves}
       disabled={model.locked}
-      setter={movesSetter}
+      setter={i => model.movesSetter(i)}
     />
-    <I.TwoPlayers bind:model={model} {methods} />
+    <I.TwoPlayers bind:model={model} />
     <I.Group title="Options">
       <I.Help bind:model={model} />
-      <I.Undo bind:model={model} {methods} />
-      <I.Redo bind:model={model} {methods} />
-      <I.Reset bind:model={model} {methods} />
+      <I.Undo bind:model={model} />
+      <I.Redo bind:model={model} />
+      <I.Reset bind:model={model} />
       <I.Rules bind:model={model} />
     </I.Group>
   </Config>
@@ -225,7 +178,7 @@
   <strong>shift + clic gauche</strong>.
 {/snippet}
 
-<Template bind:model={model} {methods} {board} {config} {rules} {winTitle} {sizeLimit} />
+<Template bind:model={model} {board} {config} {rules} {winTitle} {sizeLimit} />
 
 <style>
   .board {

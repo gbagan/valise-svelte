@@ -24,7 +24,7 @@ export abstract class Model<Pos, Move> {
   help = $state(false);
   showWin = $state(false);
   dialog: "rules" | "score" | "customize" | null = $state("rules");
-  newGameAction: (() => void) | null = null;
+  newGameAction: (() => void) | null = $state(null);
   locked: boolean = $state(false);
 
   abstract play(m: Move): (Pos | null);
