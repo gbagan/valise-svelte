@@ -1,78 +1,14 @@
 <script lang="ts">
-  import { generate2, gridStyle, random, range } from '$lib/util';
-  import {type Model, type Methods, type SizeModel, initModel, playA, newGame, winTitleFor2Player, turnMessage, type SizeLimit } from '$lib/model';
+  import { default as Model, type Move, type SoapMode } from './model.svelte';
+  import { generate2, gridStyle } from '$lib/util';
+  import { type SizeLimit } from '$lib/model.svelte';
   import PointerTracker from '$lib/components/PointerTracker.svelte';
   import Template from '$lib/components/Template.svelte';
   import * as I from '$lib/components/Icons';
   import Config from '$lib/components/Config.svelte';
 
-  type Position = {left: number, right: number, top: number, bottom: number};
-  type Move = ["left" | "right" | "top" | "bottom", number];
-  type SoapMode = "corner" | "border" | "standard" | "custom";
-
-  let model: Model<Position> & SizeModel = $state({
-    ...initModel({left: 0, right: 0, top: 0, bottom: 0}),
-    rows: 6,
-    columns: 7,
-    customSize: false,
-    mode: "random"
-  });
-  let soap: [number, number] | null = $state(null);
-  let soapMode: SoapMode = $state("corner");
+  let model = $state(new Model());
   let moveWhenHover: Move | null = $state(null);
-
-  function play([dir, x]: Move): Position | null {
-    switch (dir) {
-      case "left": return {...model.position, left: x};
-      case "right": return {...model.position, right: x};
-      case "top": return {...model.position, top: x};
-      default: return {...model.position, bottom: x};
-    }
-  }
-
-  function isLevelFinished() {
-    const {left, right, top, bottom} = model.position;
-    return left === right - 1 && top === bottom - 1;
-  }
-
-  const initialPosition = () => ({left: 0, right: model.columns, top: 0, bottom: model.rows});
-
-  function onNewGame() {
-    if (soapMode === "custom") {
-      soap = null;
-    } else {
-      const row = soapMode === "standard" ? random(0, model.rows) : 0;
-      const col = soapMode !== "corner" ? random(0, model.columns) : 0;
-      soap = [row, col];
-    }
-  }
-
-  function isLosingPosition(): boolean {
-    if (soap === null) {
-      return false;
-    }
-    const [row, col] = soap;
-    const {left, right, top, bottom} = model.position;
-    return ((col - left) ^ (right - col - 1) ^ (row - top) ^ (bottom - row - 1)) === 0;
-  }
-
-  function possibleMoves(): Move[] {
-    if (soap === null) {
-       return [];
-    }
-    const [row, col] = soap;
-    const {left, right, top, bottom} = model.position;
-    const l = range(left+1, col+1).map(i => ["left", i] as Move);
-    const r = range(col+1, right).map(i => ["right", i] as Move);
-    const t = range(top+1, row+1).map(i => ["top", i] as Move);
-    const b = range(row+1, bottom).map(i => ["bottom", i] as Move);
-    return l.concat(r, t, b);
-  }
-
-  const methods: Methods<Position, Move> = {
-    play, isLevelFinished, initialPosition, onNewGame,
-    isLosingPosition, possibleMoves
-  }
 
   function isInside(row: number, col: number): boolean {
     const {left, right, top, bottom} = model.position;
@@ -80,7 +16,7 @@
   }
 
   let grid = $derived(generate2(model.rows, model.columns, (row, col) => [row, col]));
-  let pmoves = $derived(possibleMoves());
+  let pmoves = $derived(model.possibleMoves());
 
   let cutLine = $derived.by(() => {
     if (moveWhenHover === null) {
@@ -95,20 +31,10 @@
     }
   });
 
-  let message = $derived(soap === null ? "Place le savon" : turnMessage(model, methods));
-  let winTitle = $derived(winTitleFor2Player(model));
+  let message = $derived(model.soap === null ? "Place le savon" : model.turnMessage());
+  let winTitle = $derived(model.winTitleFor2Player());
 
   const sizeLimit: SizeLimit = { minRows: 4, minCols: 4, maxRows: 10, maxCols: 10 };
-
-  function putSoap(s: [number, number]) {
-    if (soap === null) {
-      soap = s;
-    }
-  }
-
-
-  // svelte-ignore state_referenced_locally
-  newGame(model, methods);
 </script>
 
 {#snippet cutter(row: number, col: number, move: Move)}
@@ -119,14 +45,14 @@
     cy={50 * row}
     r="7"
     class="cutter"
-    onclick={() => {moveWhenHover = null; playA(model, methods, move)}}
+    onclick={() => {moveWhenHover = null; model.playA(move)}}
     onpointerenter={() => moveWhenHover = move}
     onpointerleave={() => moveWhenHover = null}
   />
 {/snippet}
 
 {#snippet pointer(x: number, y: number)}
-  {#if soap === null}
+  {#if model.soap === null}
     <use
       href="#skull"
       class="pointer"
@@ -150,11 +76,11 @@
           <!-- svelte-ignore a11y_no_static_element_interactions -->
           <rect
             class={["square", {
-              soap: soap !== null && soap[0] === row && soap[1] === col,
+              soap: model.soap !== null && model.soap[0] === row && model.soap[1] === col,
               hidden: !isInside(row, col)
             }]}
             style:transform="translate({50*col}px, {50*row}px)"
-            onclick={() => putSoap([row, col])  }
+            onclick={() => model.putSoap([row, col])}
           />
         {/each}
         {#each pmoves as [dir, i]}
@@ -167,8 +93,8 @@
           {/if}
         {/each}
 
-        {#if soap !== null}
-          {@const [row, col] = soap}
+        {#if model.soap !== null}
+          {@const [row, col] = model.soap}
           <use
             href="#skull"
             x={50*col+12}
@@ -189,21 +115,21 @@
 
 {#snippet config()}
   <Config title="Chocolat">
-    <I.SizesGroup bind:model={model} {methods} values={[[6, 7]]} customSize={true} />
+    <I.SizesGroup bind:model={model} values={[[6, 7]]} customSize={true} />
     <I.SelectGroup
       title="Emplacement du savon"
       values={["corner", "border", "standard", "custom"]}
       text={["#choc-mode0", "#choc-mode1", "#choc-mode2", "#customize"]}
       tooltip={["Dans le coin", "Sur le bord", "N'importe où", "Personnalisé"]}
-      selected={soapMode}
+      selected={model.soapMode}
       disabled={model.locked}
-      setter={(m: SoapMode) => newGame(model, methods, () => soapMode = m)}
+      setter={(m: SoapMode) => model.newGame(() => model.soapMode = m)}
     />
-    <I.TwoPlayers bind:model={model} {methods} />
+    <I.TwoPlayers bind:model={model} />
     <I.Group title="Options">
-      <I.Undo bind:model={model} {methods} />
-      <I.Redo bind:model={model} {methods} />
-      <I.Reset bind:model={model} {methods} />
+      <I.Undo bind:model={model} />
+      <I.Redo bind:model={model} />
+      <I.Reset bind:model={model} />
       <I.Rules bind:model={model} />
     </I.Group>
   </Config>
@@ -217,7 +143,7 @@
   Lorsqu'il ne reste que le carré empoisonné, le joueur qui doit jouer a <strong>perdu</strong>.
 {/snippet}
 
-<Template bind:model={model} {methods} {board} {config} {rules} {winTitle} {sizeLimit} />
+<Template bind:model={model} {board} {config} {rules} {winTitle} {sizeLimit} />
 
 <style>
   .board-container {

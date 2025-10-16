@@ -16,16 +16,16 @@ export interface SizeLimit {
 
 export abstract class Model<Pos, Move> {
   position: Pos;
-  history: Pos[];
-  redoHistory: Pos[];
-  turn: Turn;
-  computerStarts: boolean;
-  mode: Mode;
-  help: boolean;
-  showWin: boolean;
-  dialog: "rules" | "score" | "customize" | null;
-  newGameAction: (() => void) | null;
-  locked: boolean;
+  history: Pos[] = $state([]);
+  redoHistory: Pos[] = $state([]);
+  turn: Turn = $state(1);
+  computerStarts = $state(false);
+  mode: Mode = $state("solo");
+  help = $state(false);
+  showWin = $state(false);
+  dialog: "rules" | "score" | "customize" | null = $state("rules");
+  newGameAction: (() => void) | null = null;
+  locked: boolean = $state(false);
 
   abstract play(m: Move): (Pos | null);
   abstract initialPosition(): Pos;
@@ -35,19 +35,9 @@ export abstract class Model<Pos, Move> {
 
   constructor(position: Pos) {
     this.position = $state.raw(position);
-    this.history = $state([]);
-    this.redoHistory = $state([]);
-    this.turn = $state(1);
-    this.computerStarts = $state(false);
-    this.mode = $state("solo");
-    this.help = $state(false);
-    this.showWin = $state(false);
-    this.dialog = $state("rules");
-    this.newGameAction = null;
-    this.locked = false;
   }
 
-  private playHelper(move: Move, push?: boolean): boolean {
+  protected playHelper(move: Move, push?: boolean): boolean {
     const position = this.play(move);
     if (position === null)
       return false;
@@ -226,6 +216,53 @@ function defaultComputerMove<Pos, Move>(model: Model<Pos>, methods: Methods<Pos,
 
 type Constructor<T = {}> = abstract new (...args: any[]) => T;
 
+export interface CombinatorialModel<Pos, Move> {
+  isLosingPosition: () => boolean;
+  possibleMoves: () => Move[];
+}
+
+export function WithCombinatorial<Pos, Move, TBase extends Constructor<Model<Pos, Move>>>(Base: TBase) {
+  abstract class C extends Base implements CombinatorialModel<Pos, Move> {
+    abstract isLosingPosition(): boolean;
+    abstract possibleMoves(): Move[];
+
+    constructor(...args: any) {
+      super(...args);
+      this.mode = "random";
+    }
+  
+    computerMove(): Move | null {
+      if (this.isLevelFinished()) {
+        return null;
+      }
+      const moves = this.possibleMoves();
+      let bestMove = null;
+      if (this.mode === "expert") {
+        const position = this.position;
+        for (const move of moves) {
+          let found = false;
+          this.playHelper(move);
+          if (this.isLosingPosition()) {
+            found = true;
+          }
+          this.position = position;
+          this.turn = this.turn == 1 ? 2 : 1;
+          if (found) {
+            bestMove = move;
+            break;
+          }
+        }
+      }
+      if (bestMove !== null) {
+        return bestMove;
+      } else {
+        return randomPick(moves)
+      }
+    }
+  } 
+
+  return C;
+}
 
 export interface SizeModel {
   rows: number;
@@ -242,15 +279,12 @@ export function isSizeModel<Pos, Move>(model: Model<Pos, Move>): model is Model<
 
 export function WithSize<Pos, Move, TBase extends Constructor<Model<Pos, Move>>>(Base: TBase) {
   abstract class C extends Base implements SizeModel {
-    rows: number;
-    columns: number;
-    customSize: boolean;
+    rows = $state(0);
+    columns = $state(0);
+    customSize = $state(false);
 
     constructor(...args: any) {
       super(...args);
-      this.rows = $state(0);
-      this.columns = $state(0);
-      this.customSize = $state(false);
     }
 
     setGridSize(rows: number, columns: number, sizeLimit?: SizeLimit) {
@@ -318,7 +352,7 @@ export function WithScore<Pos, Move, TBase extends Constructor<Model<Pos, Move>>
       }
     }
 
-    loadRecords<Pos>() {
+    loadRecords() {
       const scores = localStorage.getItem(page.url.pathname);
       let data;
       if (!scores) {
