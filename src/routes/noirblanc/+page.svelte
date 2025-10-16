@@ -1,95 +1,15 @@
 <script lang="ts">
-  import { diffCoords, gridStyle, repeat } from '$lib/util';
-  import {type Model, type ScoreModel, type Methods, type SizeLimit, type SizeModel,
-    initModel, newGame, playA} from '$lib/model';
+  import { default as Model, type Mode } from './model.svelte';
+  import { gridStyle } from '$lib/util';
+  import { type SizeLimit } from '$lib/model.svelte';
   import Template from '$lib/components/Template.svelte';
   import * as I from '$lib/components/Icons';
   import Config from '$lib/components/Config.svelte';
 
-  type Position = {light: boolean[], played: boolean[]};
-  type Move = number;
-  type Mode = 0 | 1 | 2 | 3;
-  
-  let model: Model<Position> & SizeModel & ScoreModel<Position> = $state({
-    ...initModel({light: [], played: []}),
-    rows: 3,
-    columns: 3,
-    customSize: false,
-    scores: {},
-  });
-  let mode: Mode = $state(0);
-  let level: number = $state(0); // le niveau en cours
-  let maxLevels: number[] = $state([ 0, 1, 1, 0 ]);
-
-  // indique si index1 est voisine de index2 selon le mode de jeu en cours
-  // c'est à dire que si l'on active index1, index2 va changer de couleur
-  function neighbor(index1: number, index2: number): boolean {
-    let [row, col] = diffCoords(model.columns, index1, index2);
-    return row * row + col * col === 1
-      || mode % 3 == 0 && index1 === index2
-      || mode >= 2 && index1 !== index2 && row * col == 0
-  }
-
-  // met à jour le tableau light en fonction du coup joué à la position index
-  const toggleCell = (light: boolean[], index: number) =>
-    light.map((b, i) => b !== neighbor(index, i)); 
- 
-  function play(move: Move): Position | null {
-    const {light, played} = model.position;
-    return {
-      light: toggleCell(light, move),
-      played: played.with(move, !played[move])
-    }
-  };
-
-  function initialPosition(): Position {
-    const size = model.rows * model.columns;
-    // todo
-    const light = repeat(size, true);
-    return { light, played: repeat(size, false) }
-  }
-
-  const isLevelFinished = () => model.position.light.every(b => !b);
-  
-  const sizes: [number, number][] = [ [3, 3], [4, 4], [2, 10], [3, 10], [5, 5]]; 
-
-  function onNewGame() {
-    if (level < 5) {
-      const [rows, columns] = sizes[level];
-      model.customSize = false;
-      model.rows = rows;
-      model.columns = columns;
-    } else if (!model.customSize) {
-      model.customSize = true;
-      model.rows = 8;
-      model.columns = 8;  
-    }
-  }
-
-  const methods: Methods<Position, Move> = { play, isLevelFinished, initialPosition, onNewGame }; 
-
-  // si le niveau est fini, on met à jour les nivaux débloqués
-  // et on passe au niveau suivant
-  async function play2(i: number) {
-    await playA(model, methods, i);
-    if (methods.isLevelFinished()) {
-      maxLevels[mode] = level >= 4 ? 6 : level + (mode === 0 || mode === 3 ? 1 : 2)
-      //saveToStorage
-      newGame(model, methods, () => level = Math.min(level+1, 6));
-    }
-  }
-
-  const changeMode = (i: Mode) => newGame(model, methods, () => {
-    mode = i;
-    level = 0;
-  });
-
-  const changeLevel = (i: number) => newGame(model, methods, () => level = i);
-
+  let model = $state(new Model());
 
   const levelTexts = ["3x3", "4x4", "2x10", "3x10", "5x5", "NxM", "#lo-rand"];
   const levelText = (i: number, unblocked: boolean) => unblocked ? levelTexts[i] : "#locked";
-
 
   const levelTooltips: (string | null)[] = [
     null, null, null, null, null,
@@ -98,9 +18,6 @@
   const levelTooltip = (i: number, unblocked: boolean) => unblocked ? levelTooltips[i] : "Difficulté non débloquée";
 
   const sizeLimit: SizeLimit = { minRows: 2, minCols: 2, maxRows: 12, maxCols: 12 };
-
-  // svelte-ignore state_referenced_locally
-  newGame(model, methods);
 </script>
 
 {#snippet square(light: boolean, cross: boolean, style: string, onclick: () => void)}
@@ -131,7 +48,7 @@
         {@const row = i / model.columns | 0}
         {@const col = i % model.columns}
         {@const style = `width:${86/cols}%;height:${86/rows}%;left:${(100*col+7)/cols}%;top:${(100*row+7)/rows}%;`}
-        {@render square(light, model.help && model.position.played[i], style, () => play2(i))}
+        {@render square(light, model.help && model.position.played[i], style, () => (console.log(model), model.playA(i)))}
       {/each}
     </div>
   </div>
@@ -143,22 +60,22 @@
       title="Mode de jeu"
       values={[0, 1, 2, 3] as Mode[]}
       text={i => `#lo-mode${i+1}`}
-      selected={mode}
-      setter={changeMode}
+      selected={model.gameMode}
+      setter={i => model.changeMode(i)}
     />
     <I.SelectGroup
       title="Difficulté"
       values={[0, 1, 2, 3, 4, 5, 6]}
-      text={i => levelText(i, i <= maxLevels[mode])}
-      tooltip={i => levelTooltip(i, i <= maxLevels[mode])}
-      disabled={i => i > maxLevels[mode]}
-      selected={level}
-      setter={changeLevel}
+      text={i => levelText(i, i <= model.maxLevels[model.gameMode])}
+      tooltip={i => levelTooltip(i, i <= model.maxLevels[model.gameMode])}
+      disabled={i => i > model.maxLevels[model.gameMode]}
+      selected={model.level}
+      setter={i => model.changeLevel(i)}
     />
 
     <I.Group title="Options">
       <I.Help bind:model={model} />
-      <I.Reset bind:model={model} {methods} />
+      <I.Reset bind:model={model} />
       <I.Rules bind:model={model} />
     </I.Group>
   </Config>
@@ -171,7 +88,7 @@
   Selon le mode choisi, les règles pour retourner les tuiles changent.
 {/snippet}
 
-<Template bind:model={model} {methods} {board} {config} {rules} {sizeLimit} />
+<Template bind:model={model} {board} {config} {rules} {sizeLimit} />
 
 <style>
   .board-container {

@@ -1,6 +1,6 @@
 <script lang="ts">
   import {default as Model, type TileType} from './model.svelte';
-  import { coords, gridStyle, mod, repeat } from '$lib/util';
+  import { coords, gridStyle } from '$lib/util';
   import { type SizeLimit } from '$lib/model.svelte';
   import Template from '$lib/components/Template.svelte';
   import * as I from '$lib/components/Icons';

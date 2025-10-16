@@ -87,8 +87,8 @@
       <I.Icon
         text="#shuffle"
         tooltip="Mélanger"
-        selected={shuffle}
-        onclick={() => model.newGame(() => shuffle = !shuffle)}
+        selected={model.shuffle}
+        onclick={() => model.newGame(() => model.shuffle = !model.shuffle)}
       />
       <I.Rules bind:model={model} />  
     </I.Group>

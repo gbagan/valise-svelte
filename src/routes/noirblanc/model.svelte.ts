@@ -1,0 +1,88 @@
+import { Model, WithScore, WithSize } from '$lib/model.svelte';
+import { diffCoords, repeat } from '$lib/util';
+
+type Position = {light: boolean[], played: boolean[]};
+type Move = number;
+export type Mode = 0 | 1 | 2 | 3;
+
+const sizes: [number, number][] = [ [3, 3], [4, 4], [2, 10], [3, 10], [5, 5]]; 
+  
+export default class extends WithSize(Model<Position, Move>) {
+  gameMode: Mode = $state(0);
+  level = $state(0); // le niveau en cours
+  maxLevels = $state([ 0, 1, 1, 0 ]);
+
+  constructor() {
+    super({light: [], played: [] });
+    this.rows = 3;
+    this.columns = 3;
+    this.customSize = false;
+    this.newGame();
+  }
+
+  // indique si index1 est voisine de index2 selon le mode de jeu en cours
+  // c'est à dire que si l'on active index1, index2 va changer de couleur
+  neighbor(index1: number, index2: number): boolean {
+    const [row, col] = diffCoords(this.columns, index1, index2);
+    return row * row + col * col === 1
+      || this.gameMode % 3 == 0 && index1 === index2
+      || this.gameMode >= 2 && index1 !== index2 && row * col == 0
+  }
+
+  // met à jour le tableau light en fonction du coup joué à la position index
+  toggleCell = (light: boolean[], index: number) =>
+    light.map((b, i) => b !== this.neighbor(index, i)); 
+ 
+  play(move: Move): Position | null {
+    const {light, played} = this.position;
+    return {
+      light: this.toggleCell(light, move),
+      played: played.with(move, !played[move])
+    }
+  };
+
+  initialPosition(): Position {
+    const size = this.rows * this.columns;
+    // todo
+    const light = repeat(size, true);
+    return { light, played: repeat(size, false) }
+  }
+
+  isLevelFinished = () => this.position.light.every(b => !b);
+
+  onNewGame() {
+    if (this.level < 5) {
+      const [rows, columns] = sizes[this.level];
+      this.customSize = false;
+      this.rows = rows;
+      this.columns = columns;
+    } else if (!this.customSize) {
+      this.customSize = true;
+      this.rows = 8;
+      this.columns = 8;  
+    }
+  }
+
+  // si le niveau est fini, on met à jour les nivaux débloqués
+  // et on passe au niveau suivant
+  async playA(i: number) {
+    await super.playA(i);
+    if (this.isLevelFinished()) {
+      this.maxLevels[this.gameMode] =
+        this.level >= 4 
+        ? 6 
+        : this.level + (this.gameMode === 0 || this.gameMode === 3 ? 1 : 2)
+      //saveToStorage
+      this.newGame(() => this.level = Math.min(this.level+1, 6));
+    }
+  }
+
+  changeMode = (i: Mode) => this.newGame(() => {
+    this.gameMode = i;
+    this.level = 0;
+  });
+
+  changeLevel = (i: number) => this.newGame(() => {
+    this.level = i;
+  });
+}
