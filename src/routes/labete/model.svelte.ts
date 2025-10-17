@@ -1,4 +1,4 @@
-import { coords, countBy, generate2, gridStyle, mod, getPointerPosition, repeat } from '$lib/util';
+import { coords, countBy, generate2, mod, repeat } from '$lib/util';
 import { Model, WithScore, WithSize } from '$lib/model.svelte';
 
 export enum Mode { Standard, Cylinder, Torus };

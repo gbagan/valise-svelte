@@ -7,7 +7,7 @@
   import { page } from '$app/state';
   import { resolve } from '$app/paths';
 
-  let isHome = $derived(page.url.pathname === resolve('/'));
+  let isHome = $derived(page.route.id === '/');
 </script>
 
 <div class={["layout", isHome ? "valise" : "game"]}>

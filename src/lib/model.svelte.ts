@@ -353,7 +353,11 @@ export function WithScore<Pos, Move, TBase extends Constructor<Model<Pos, Move>>
     }
 
     loadRecords() {
-      const scores = localStorage.getItem(page.url.pathname);
+      const routeId = page.route.id;
+      if (!routeId) {
+        return;
+      }
+      const scores = localStorage.getItem(routeId);
       let data;
       if (!scores) {
         return;
@@ -369,10 +373,14 @@ export function WithScore<Pos, Move, TBase extends Constructor<Model<Pos, Move>>
     }
 
     saveRecord() {
+      const routeId = page.route.id;
+      if (!routeId) {
+        return;
+      }
       const scores = {...this.scores};
       delete scores["$custom"];
       //save to storage
-      localStorage.setItem(page.url.pathname, JSON.stringify([VERSION, scores]));
+      localStorage.setItem(routeId, JSON.stringify([VERSION, scores]));
     }
   }
   return C;
