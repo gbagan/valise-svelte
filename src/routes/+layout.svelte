@@ -1,12 +1,11 @@
 <script lang="ts">
-  type Props = { children: () => any }
-
-  const { children }: Props = $props();
-
   import "../app.css";
   import { page } from '$app/state';
   import { resolve } from '$app/paths';
+  import type { Snippet } from "svelte";
 
+  type Props = { children: Snippet }
+  const { children }: Props = $props();
   let isHome = $derived(page.route.id === '/');
 </script>
 

@@ -1,4 +1,5 @@
 <script lang="ts" generics="A">
+  import type { Snippet } from "svelte";
   import Icon from "./Icon.svelte";
   import IconGroup from "./IconGroup.svelte";
 
@@ -10,7 +11,7 @@
     tooltip?: string[] | ((v: A) => (string | null));
     disabled?: boolean[] | ((v: A) => boolean) | boolean;
     setter: (val: A) => void;
-    children?: () => any;
+    children?: Snippet;
   }
   
   const {title, values, selected, text, tooltip, disabled, setter, children}: Props = $props();

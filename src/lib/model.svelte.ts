@@ -214,15 +214,15 @@ function defaultComputerMove<Pos, Move>(model: Model<Pos>, methods: Methods<Pos,
 }
 */
 
-type Constructor<T = {}> = abstract new (...args: any[]) => T;
+type Constructor<T> = abstract new (...args: any[]) => T;
 
-export interface CombinatorialModel<Pos, Move> {
+export interface CombinatorialModel<Move> {
   isLosingPosition: () => boolean;
   possibleMoves: () => Move[];
 }
 
 export function WithCombinatorial<Pos, Move, TBase extends Constructor<Model<Pos, Move>>>(Base: TBase) {
-  abstract class C extends Base implements CombinatorialModel<Pos, Move> {
+  abstract class C extends Base implements CombinatorialModel<Move> {
     abstract isLosingPosition(): boolean;
     abstract possibleMoves(): Move[];
 

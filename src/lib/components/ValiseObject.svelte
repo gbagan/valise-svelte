@@ -27,7 +27,7 @@
 
   let isDragging = false;
 
-  const onpointerdown = (e: PointerEvent) => {
+  const onpointerdown = () => {
     if (!drag) {
         return;
     }

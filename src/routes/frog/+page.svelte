@@ -1,6 +1,6 @@
 <script lang="ts">
   import Model from './model.svelte';
-  import { generate, range, repeat } from '$lib/util';
+  import { generate, range } from '$lib/util';
   import { type SizeLimit } from '$lib/model.svelte';
   import Template from '$lib/components/Template.svelte';
   import * as I from '$lib/components/Icons';

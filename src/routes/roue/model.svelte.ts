@@ -1,4 +1,4 @@
-import { delay, mod, range, repeat, swap } from '$lib/util';
+import { delay, mod, repeat, swap } from '$lib/util';
 import { Model } from '$lib/model.svelte';
 import { tick } from 'svelte';
 

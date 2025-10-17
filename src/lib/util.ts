@@ -53,7 +53,7 @@ export function swap<A>(arr: A[], i: number, j: number): A[] {
 export function minBy<A>(arr: A[], fn: (x: A) => number) {
   let min = null;
   let bestScore = Infinity;
-  let n = arr.length;
+  const n = arr.length;
   for (let i = 0; i < n; i++) {
     const x = arr[i];
     const score = fn(x);
@@ -121,7 +121,7 @@ export function clone<A>(value: A): A {
     return value.map(item => clone(item)) as A;
   }
 
-  const clonedObj = {} as any;
+  const clonedObj = {} as A;
   for (const key in value) {
     if (Object.prototype.hasOwnProperty.call(value, key)) {
       clonedObj[key] = clone(value[key]);

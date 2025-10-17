@@ -1,7 +1,7 @@
 import { answer, makeArenaGraph, type Arena, type ArenaGraph } from "$lib/arena";
 import type { Edge, Graph } from "$lib/graph";
 import { Model, WithSize, Mode } from "$lib/model.svelte";
-import { allDistinct, countBy, generate, generate2, getPointerPosition, minBy, randomPick, range, sublists } from "$lib/util";
+import { allDistinct, countBy, generate, generate2, minBy, randomPick, range, sublists } from "$lib/util";
 
 type Conf = number[];
 type AdjGraph = number[][];
@@ -124,7 +124,7 @@ function makeEDS(graph: AdjGraph, rulesName: Rules, k: number) {
 export enum GraphKind { Path, Cycle, Grid, Biclique, Custom }
 export enum Phase { Preparation, Game }
 type Position = { guards: number[], attacked: number | null };
-type Move = number | number[]   // attack | defense;
+type Move = number | number[]   // attack | defense;
 
 const path = (n: number) => ({
   title: "Chemin",

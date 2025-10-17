@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Snippet } from "svelte";
   import Icon from "./icons/Icon.svelte";
   
   interface Props {
@@ -8,7 +9,7 @@
     rows: number;
     columns: number;
     resize: (row: number, col: number) => void;
-    children: () => any;
+    children: Snippet;
   }
 
   const {locked, rows, columns, showRowButtons, showColButtons, resize, children }: Props = $props();

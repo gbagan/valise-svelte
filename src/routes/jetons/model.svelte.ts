@@ -34,8 +34,8 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
     const position = this.position;
     const columns = this.columns;
     return position.every((x, i) => {
-      let y = (i + 1) % columns == 0 ? 0 : position[i + 1];
-      let z = position[i + columns] ?? 0;
+      const y = (i + 1) % columns == 0 ? 0 : position[i + 1];
+      const z = position[i + columns] ?? 0;
       return x * (y + z) === 0
     })
   }

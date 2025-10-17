@@ -1,9 +1,11 @@
 <script lang="ts">
+  import type { Snippet } from "svelte";
+
   interface Props {
     title: string;
     onOk?: () => void;
     onCancel?: () => void;
-    children: any;
+    children: Snippet;
   }
   
   let { title, onOk, onCancel, children }: Props = $props();

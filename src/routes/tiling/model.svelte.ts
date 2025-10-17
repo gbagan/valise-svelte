@@ -105,7 +105,7 @@ export default class extends WithSize(Model<Position, Move>) {
     let [row, col] = coords(5, i);
     row -= 2;
     col -= 2;
-    let idx = this.customTile.findIndex(([r, c]) => r === row && c === col);
+    const idx = this.customTile.findIndex(([r, c]) => r === row && c === col);
     if (idx === -1) {
         this.customTile.push([row, col])
     } else {

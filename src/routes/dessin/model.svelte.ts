@@ -50,7 +50,7 @@ export default class extends WithScore(Model<Position, Move>) {
 
   edgesOf(position: Position): Edge[] {
     const res: Edge[] = [];
-    let n = position.length - 1;
+    const n = position.length - 1;
     for (let i = 0; i < n; i++) {
       let u = position[i];
       let v = position[i+1];

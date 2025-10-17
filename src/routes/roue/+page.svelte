@@ -76,7 +76,7 @@
   />
 {/snippet}
 
-{#snippet disk([color, x, y]: [number, number, number], dragged2: boolean, droppable: boolean,
+{#snippet disk([color, x, y]: [number, number, number], dragged2: boolean, _droppable: boolean,
    onpointerdown?: (e: PointerEvent) => void, onpointerup?: (e: PointerEvent) => void)
 }
   <circle cx={x} cy={y} r="8"

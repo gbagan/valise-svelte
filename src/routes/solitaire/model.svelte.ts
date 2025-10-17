@@ -78,8 +78,8 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
   );
 
   onNewGame() {
-    let columns = this.columns;
-    let rows = this.rows;
+    const columns = this.columns;
+    const rows = this.rows;
     if (this.boardType === Board.English) {
       this.holes = generate2(7, 7, (row, col) =>
         Math.min(row, 6 - row) >= 2 || Math.min(col, 6 - col) >= 2 

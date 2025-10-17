@@ -1,16 +1,17 @@
-<script lang="ts" generics="Pos, Move">
+<script lang="ts" generics="Position, Move">
   import { type Model, type SizeLimit,  isScoreModel, isSizeModel } from '$lib/model.svelte';
   import Dialog from '$lib/components/Dialog.svelte';
   import IncDecGrid from '$lib/components/IncDecGrid.svelte';
   import { confetti } from '$lib/confetti';
+    import type { Snippet } from 'svelte';
 
   interface Props {
-    model: Model<Pos, Move>;
-    board: () => any;
-    config: () => any;
-    rules: () => any;
-    bestScore?: (position: Pos) => any;
-    custom?: () => any;
+    model: Model<Position, Move>;
+    board: Snippet;
+    config: Snippet;
+    rules: Snippet;
+    bestScore?: Snippet<[Position]>;
+    custom?: Snippet;
     winTitle?: string;
     sizeLimit?: SizeLimit;
   }

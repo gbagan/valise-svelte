@@ -1,4 +1,4 @@
-import { Model, WithScore, WithSize } from '$lib/model.svelte';
+import { Model, WithSize } from '$lib/model.svelte';
 import { diffCoords, repeat } from '$lib/util';
 
 type Position = {light: boolean[], played: boolean[]};

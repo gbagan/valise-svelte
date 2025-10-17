@@ -1,13 +1,14 @@
 <script lang="ts" generics="Drag">
   import { getPointerPosition } from '$lib/util';
+  import type { Snippet } from 'svelte';
 
   interface Props {
     viewBox: string;
     class?: string;
     style?: string;
     dragged: Drag | null;
-    children: () => any;
-    draggedElement: (style: string) => any;
+    children: Snippet;
+    draggedElement: Snippet<[style: string]>;
   }
   
   let { viewBox, class: className, style, children, draggedElement, dragged=$bindable() }: Props = $props();

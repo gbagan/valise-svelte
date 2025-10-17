@@ -39,9 +39,9 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
   customBeast: Beast2 = $state([[]]);
 
   constructor() {
-    super([]),
+    super([]);
     this.rows = 5;
-    this.columns = 5,
+    this.columns = 5;
     this.customSize = false;
     this.newGame()
   }
@@ -143,7 +143,7 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
     let [row, col] = coords(5, i);
     row -= 2;
     col -= 2;
-    let idx = this.customBeast[0].findIndex(([r, c]) => r === row && c === col);
+    const idx = this.customBeast[0].findIndex(([r, c]) => r === row && c === col);
     if (idx === -1) {
       this.customBeast[0].push([row, col])
     } else {

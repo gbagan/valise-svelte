@@ -1,5 +1,7 @@
 <script lang="ts" generics="Pos, D, P">
   import { Model } from '$lib/model.svelte';
+  import type { Snippet } from 'svelte';
+
   interface Props {
     model: Model<Pos, {from: D, to: D }>;
     dragged: D | null;
@@ -8,13 +10,13 @@
     droppable?: boolean;
     equals?: (x: D, y: D) => boolean;
     argument: P;
-    render: (
-        argument: P,
-        draggable: boolean,
-        candrop: boolean,
-        onpointerdown?: (e: PointerEvent) => void,
-        onpointerup?: (e: PointerEvent) => void,
-    ) => any;
+    render: Snippet<[
+      argument: P,
+      draggable: boolean,
+      candrop: boolean,
+      onpointerdown?: (e: PointerEvent) => void,
+      onpointerup?: (e: PointerEvent) => void,
+    ]>;
   }
 
   let { model=$bindable(), dragged=$bindable(), draggable, droppable, equals,
