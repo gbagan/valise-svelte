@@ -1,11 +1,11 @@
-<script lang="ts" generics="Pos">
-  import { type Model } from '$lib/model';
+<script lang="ts" generics="Pos, Move">
+  import { type Model } from '$lib/model.svelte';
   import Icon from "./Icon.svelte";
 
   type Interaction = "click" | "press";
 
   interface Props {
-    model: Model<Pos>;
+    model: Model<Pos, Move>;
     interaction?: Interaction
   }
 

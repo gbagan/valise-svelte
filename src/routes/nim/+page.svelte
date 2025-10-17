@@ -19,7 +19,7 @@
 </script>
 
 {#snippet row(i: number)}
-  <rect class="row {length === 5? "row-5" : "row-10"}" y={10+19*i}/>
+  <rect class="row {model.length === 5? "row-5" : "row-10"}" y={10+19*i}/>
 {/snippet}
 
 {#snippet square(i: number, j: number)}
@@ -27,7 +27,7 @@
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <rect
     class="square"
-    style:transform="translate({(length === 5 ? 30 : 5) + 10 * j}px, {15 + 19 * i}px) rotate(45deg)"
+    style:transform="translate({(model.length === 5 ? 30 : 5) + 10 * j}px, {15 + 19 * i}px) rotate(45deg)"
     style:cursor={model.canPlay({pile:i, pos: j}) ? "pointer" : "not-allowed"}
     onclick={() => model.playA({pile: i, pos: j})}
   />
@@ -40,7 +40,7 @@
     height="8"
     class="player"
     fill={player === 0 ? "blue" : "red"}
-    style:transform="translate({ (length === 5 ? 26 : 1) + 10 * j}px, {11 + 19 * i}px)"
+    style:transform="translate({ (model.length === 5 ? 26 : 1) + 10 * j}px, {11 + 19 * i}px)"
   />
 {/snippet}
 
