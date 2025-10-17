@@ -1,5 +1,5 @@
 <script lang="ts">
-  import {default as Model, type Mode } from './model.svelte';
+  import {default as Model, Mode } from './model.svelte';
   import { gridStyle, repeat } from '$lib/util';
   import type { SizeLimit } from '$lib/model.svelte';
   import Template from '$lib/components/Template.svelte';
@@ -111,11 +111,11 @@
   <Config title="Chemins">
     <I.SelectGroup
       title="Mode de jeu"
-      values={[1, 2]}
+      values={[Mode.Mode1, Mode.Mode2]}
       text={["#paths-mode0", "#paths-mode1"]}
       tooltip={["Mode 1", "Mode 2"]}
       selected={model.gameMode}
-      setter={((m: Mode) => model.newGame(() => model.gameMode = m))}
+      setter={(m => model.newGame(() => model.gameMode = m))}
     />
 
     <I.SizesGroup bind:model={model}

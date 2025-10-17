@@ -11,6 +11,9 @@
 
   let model = $state(new Model());
 
+  // pour l'animation quand le niveau est fini
+  let counter = $state(0);
+
   onMount(() => {
     model.loadRecords();
   });
@@ -82,7 +85,7 @@
           class="line1"
         />
       {/each}
-      {#each pathDescriptions as {path, length, start}, i (`${i},${model.counter}`)}
+      {#each pathDescriptions as {path, length, start}, i (`${i},${counter}`)}
         <path
           d={path}
           class={["line2", {animate: levelFinished}]}
@@ -91,7 +94,7 @@
           style:animation-duration="{length}s"
           style:animation-delay="{start}s"
           stroke={colors[i] ?? "red"}
-          onanimationend={i < pathDescriptions.length - 1 ? null : () => model.counter += 1}
+          onanimationend={i < pathDescriptions.length - 1 ? null : () => counter += 1}
         />
       {/each}
       {#if !levelFinished}

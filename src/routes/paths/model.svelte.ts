@@ -3,11 +3,11 @@ import { Model, WithSize } from '$lib/model.svelte';
 
 type Position = number[];
 type Move = number;
-export type Mode = 1 | 2;
+export enum Mode { Mode1, Mode2 };
 
 export default class extends WithSize(Model<Position, Move>) {
   exit: number | null = $state(null);
-  gameMode: Mode = $state(1);
+  gameMode = $state(Mode.Mode1);
 
   constructor() {
     super([]);
@@ -52,7 +52,7 @@ export default class extends WithSize(Model<Position, Move>) {
 
   play(v: Move): Position | null {
     if (this.position.length === 0) {
-      return this.gameMode === 2 ? [v] : null;
+      return this.gameMode === Mode.Mode2 ? [v] : null;
     } else {
       const last = this.position.at(-1)!;
       const p = this.pathBetween(last, v);

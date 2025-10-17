@@ -8,8 +8,6 @@ export type Position = Move[];
 export default class extends WithScore(Model<Position, Move>) {
   graphIndex: number | "custom" = $state(0);
   customGraph: Graph = $state({ title: "Graphe personnalisé", vertices: [], edges: []});
-  // pour l'animation quand le niveau est fini
-  counter = $state(0);
   
   constructor() {
     super([]);
