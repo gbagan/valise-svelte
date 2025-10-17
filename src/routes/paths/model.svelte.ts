@@ -73,7 +73,7 @@ export default class extends WithSize(Model<Position, Move>) {
   initialPosition = () => this.exit === null ? [] : [this.exit];
   
   onNewGame() {
-    this.exit = this.gameMode === 1 ? random(0, this.rows * this.columns) : null;
+    this.exit = this.gameMode === Mode.Mode1 ? random(0, this.rows * this.columns) : null;
   }
 
   selectSquare(square: number) {
