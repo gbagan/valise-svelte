@@ -1,14 +1,14 @@
 import { Model, WithSize, WithScore, Objective } from '$lib/model.svelte';
 import { diffCoords, generate, generate2, random, repeat } from '$lib/util';
 
-export type Board = "french" | "english" | "circle" | "grid3" | "random";
+export enum Board { French, English, Circle, Grid3, Random };
 export type Position = boolean[];
 type Move = {from: number, to: number};
 
 export default class extends WithScore(WithSize(Model<Position, Move>)) {
   holes: boolean[] = $state([]);
   help2 = $state(0);
-  boardType: Board = $state("circle");
+  boardType = $state(Board.Circle);
   
   constructor() {
     super([]);
@@ -37,7 +37,7 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
   // Traite le cas particulier du plateau circulaire de taille 4
   betweenMove2(move: Move): number | null {
     const {from, to} = move;
-    if (this.boardType === "circle") {
+    if (this.boardType === Board.Circle) {
       const x = this.betweenInCircle(from, to, this.rows);
       if (x === null) {
         return null;
@@ -80,24 +80,24 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
   onNewGame() {
     let columns = this.columns;
     let rows = this.rows;
-    if (this.boardType === "english") {
+    if (this.boardType === Board.English) {
       this.holes = generate2(7, 7, (row, col) =>
         Math.min(row, 6 - row) >= 2 || Math.min(col, 6 - col) >= 2 
       );
       this.position = this.holes.with(24, false);
       this.customSize = false;
-    } else if (this.boardType === "french") {
+    } else if (this.boardType === Board.French) {
       this.holes = generate2(7, 7, (row, col) =>
         Math.min(row, 6 - row) + Math.min(col, 6 - col) >= 2 
       );
       this.position = this.holes.with(24, false);
       this.customSize = false;
-    } else if (this.boardType === "circle") {
+    } else if (this.boardType === Board.Circle) {
       this.holes = repeat(rows, true);
       const empty = random(0, rows);
       this.position = generate(rows, x => x !== empty);
       this.customSize = true;
-    } else if (this.boardType === "grid3") {
+    } else if (this.boardType === Board.Grid3) {
       this.holes = repeat(3 * columns, true);
       this.position = generate(3 * columns, i => i < 2 * columns);
       this.customSize = true;
@@ -112,18 +112,18 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
   objective = () => Objective.Minimize;
   score = () => this.position.filter(x => x).length;
   // todo à vérifier
-  scoreHash = () => this.boardType === "random" ? null : `${this.boardType},${this.rows},${this.columns}`;
+  scoreHash = () => this.boardType === Board.Random ? null : `${this.boardType},${this.rows},${this.columns}`;
   updateScore = () => this.updateScore2(true, "always");
 
   setBoard(b: Board) {
     this.boardType = b;
     switch (b) {
-      case "circle":
+      case Board.Circle:
         this.rows = 6;
         this.columns = 1;
         break;
-      case "grid3":
-      case "random":
+      case Board.Grid3:
+      case Board.Random:
         this.rows = 3;
         this.columns = 5;
         break;

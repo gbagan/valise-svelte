@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { default as Model, type Position, type Board } from './model.svelte';
+  import { default as Model, type Position, Board } from './model.svelte';
   import { gridStyle } from '$lib/util';
   import { type SizeLimit } from '$lib/model.svelte';
   import Template from '$lib/components/Template.svelte';
@@ -14,9 +14,9 @@
   let dragged: number | null = $state(null);
 
   let sizeLimit: SizeLimit = $derived(
-    model.boardType === "circle"
+    model.boardType === Board.Circle
     ? { minRows: 3, maxRows: 12, minCols: 1, maxCols: 1 }
-    : model.boardType === "grid3" || model.boardType === "random"
+    : model.boardType === Board.Grid3 || model.boardType === Board.Random
     ? { minRows: 3, maxRows: 3, minCols: 1, maxCols: 12 }
     : { minRows: 7, maxRows: 7, minCols: 7, maxCols: 7 }
   );
@@ -30,7 +30,7 @@
   function itemTransform(i: number): string {
     const row = i / model.columns | 0;
     const col = i % model.columns;
-    if (model.boardType === "circle") {
+    if (model.boardType === Board.Circle) {
       const x = 125 + Math.sin(2 * Math.PI * i / model.rows) * 90;
       const y = 125 + Math.cos(2 * Math.PI * i / model.rows) * 90;
       return `translate(${x}px,${y}px)`;
@@ -58,7 +58,7 @@
 {#snippet hole(i: number, _dragged: boolean, droppable: boolean,
   onpointerdown?: (e: PointerEvent) => void, onpointerup?: (e: PointerEvent) => void)
 }
-  {#if model.help2 > 0 && model.boardType !== "circle"}
+  {#if model.help2 > 0 && model.boardType !== Board.Circle}
     <rect
       x="-25.0"
       y="-25.0"
@@ -96,13 +96,13 @@
 {#snippet genericBoard(position: boolean[], interactive: boolean)}
   <div
     class="ui-board"
-    style={model.boardType === "circle" ? "width:100%;height:100%;" : gridStyle(model.rows, model.columns, 5)}
+    style={model.boardType === Board.Circle ? "width:100%;height:100%;" : gridStyle(model.rows, model.columns, 5)}
   >
     <DndBoard
-      viewBox={model.boardType === "circle" ? "0 0 250 250" : `0 0 ${50 * model.columns} ${50 * model.rows}`}
+      viewBox={model.boardType === Board.Circle ? "0 0 250 250" : `0 0 ${50 * model.columns} ${50 * model.rows}`}
       bind:dragged={dragged} {draggedElement}
     >
-      {#if model.boardType === "circle"}
+      {#if model.boardType === Board.Circle}
         <circle cx="125" cy="125" r="90" class="circle" />
       {/if}
       {#each model.holes as hasHole, i}
@@ -145,7 +145,7 @@
   <Config title="Les reines">
     <I.SelectGroup
       title="Plateau"
-      values={["circle", "grid3", "random", "english", "french"] as Board[]}
+      values={[Board.Circle, Board.Grid3, Board.Random, Board.English, Board.French]}
       text={["#circle", "3xN", "#shuffle", "#tea", "#bread"]}
       tooltip={["3xN", "Cercle", "Aléatoire", "Anglais", "Français"]}
       selected={model.boardType}
