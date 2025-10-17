@@ -3,11 +3,11 @@ import { Model, WithCombinatorial, WithSize } from '$lib/model.svelte';
 
 type Position = {left: number, right: number, top: number, bottom: number};
 export type Move = ["left" | "right" | "top" | "bottom", number];
-export type SoapMode = "corner" | "border" | "standard" | "custom";
+export enum SoapMode { Corner, Border, Standard, Custom };
 
 export default class extends WithCombinatorial(WithSize(Model<Position, Move>)) {
   soap: [number, number] | null = $state(null);
-  soapMode: SoapMode = $state("corner");
+  soapMode = $state(SoapMode.Corner);
 
   constructor() {
     super({left: 0, right: 0, top: 0, bottom: 0});
@@ -34,11 +34,11 @@ export default class extends WithCombinatorial(WithSize(Model<Position, Move>)) 
   initialPosition = () => ({left: 0, right: this.columns, top: 0, bottom: this.rows});
 
   onNewGame() {
-    if (this.soapMode === "custom") {
+    if (this.soapMode === SoapMode.Custom) {
       this.soap = null;
     } else {
-      const row = this.soapMode === "standard" ? random(0, this.rows) : 0;
-      const col = this.soapMode !== "corner" ? random(0, this.columns) : 0;
+      const row = this.soapMode === SoapMode.Standard ? random(0, this.rows) : 0;
+      const col = this.soapMode !== SoapMode.Corner ? random(0, this.columns) : 0;
       this.soap = [row, col];
     }
   }

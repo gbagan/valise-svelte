@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { default as Model, type Move, type SoapMode } from './model.svelte';
+  import { default as Model, type Move, SoapMode } from './model.svelte';
   import { generate2, gridStyle } from '$lib/util';
   import { type SizeLimit } from '$lib/model.svelte';
   import PointerTracker from '$lib/components/PointerTracker.svelte';
@@ -118,12 +118,12 @@
     <I.SizesGroup bind:model={model} values={[[6, 7]]} customSize={true} />
     <I.SelectGroup
       title="Emplacement du savon"
-      values={["corner", "border", "standard", "custom"]}
+      values={[SoapMode.Corner, SoapMode.Border, SoapMode.Standard, SoapMode.Custom]}
       text={["#choc-mode0", "#choc-mode1", "#choc-mode2", "#customize"]}
       tooltip={["Dans le coin", "Sur le bord", "N'importe où", "Personnalisé"]}
       selected={model.soapMode}
       disabled={model.locked}
-      setter={(m: SoapMode) => model.newGame(() => model.soapMode = m)}
+      setter={m => model.newGame(() => model.soapMode = m)}
     />
     <I.TwoPlayers bind:model={model} />
     <I.Group title="Options">

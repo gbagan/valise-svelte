@@ -96,10 +96,18 @@
 {#snippet genericBoard(position: boolean[], interactive: boolean)}
   <div
     class="ui-board"
-    style={model.boardType === Board.Circle ? "width:100%;height:100%;" : gridStyle(model.rows, model.columns, 5)}
+    style={
+      model.boardType === Board.Circle 
+      ? "width:100%;height:100%;" 
+      : gridStyle(model.rows, model.columns, 5)
+    }
   >
     <DndBoard
-      viewBox={model.boardType === Board.Circle ? "0 0 250 250" : `0 0 ${50 * model.columns} ${50 * model.rows}`}
+      viewBox={
+        model.boardType === Board.Circle 
+        ? "0 0 250 250"
+        : `0 0 ${50 * model.columns} ${50 * model.rows}`
+      }
       bind:dragged={dragged} {draggedElement}
     >
       {#if model.boardType === Board.Circle}
