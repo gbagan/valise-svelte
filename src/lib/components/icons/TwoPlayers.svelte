@@ -1,5 +1,5 @@
 <script lang="ts" generics="Pos,Move">
-  import { type Model, type Mode } from '$lib/model.svelte';
+  import { type Model, Mode } from '$lib/model.svelte';
   import Icon from "./Icon.svelte";
   import SelectGroup from "./SelectGroup.svelte";
 
@@ -17,7 +17,7 @@
 
 <SelectGroup
   title="Mode de jeu"
-  values={["random", "expert", "duel"] as Mode[]}
+  values={[Mode.Random, Mode.Expert, Mode.Duel]}
   text={["#school", "#enstein", "#duel"]}
   tooltip={["IA mode facile", "IA mode expert", "Affronte un autre joueur"]}
   selected={model.mode}
@@ -27,7 +27,7 @@
   <Icon
     text="2P⇨"
     tooltip="L'IA commence"
-    disabled={model.locked || model.computerStarts || model.mode === "duel" || model.history.length > 0}
+    disabled={model.locked || model.computerStarts || model.mode === Mode.Duel || model.history.length > 0}
     onclick={onclickHandler}
   />
 </SelectGroup>

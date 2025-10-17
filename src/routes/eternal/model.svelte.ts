@@ -1,6 +1,6 @@
 import { answer, makeArenaGraph, type Arena, type ArenaGraph } from "$lib/arena";
 import type { Edge, Graph } from "$lib/graph";
-import { Model, WithSize } from "$lib/model.svelte";
+import { Model, WithSize, Mode } from "$lib/model.svelte";
 import { allDistinct, countBy, generate, generate2, getPointerPosition, minBy, randomPick, range, sublists } from "$lib/util";
 
 type Conf = number[];
@@ -223,7 +223,7 @@ export default class extends WithSize(Model<Position, Move>) {
     this.rows = 6;
     this.columns = 0;
     this.customSize = true;
-    this.mode = "duel";
+    this.mode = Mode.Duel;
     this.newGame();
   }
 
@@ -243,7 +243,7 @@ export default class extends WithSize(Model<Position, Move>) {
   adjGraph = $derived(edgesToGraph(this.graph.vertices.length, this.graph.edges));
 
   arena = $derived(
-    this.mode === "duel" ? null : makeEDS(this.adjGraph, this.rulesName, this.guardCount)
+    this.mode === Mode.Duel ? null : makeEDS(this.adjGraph, this.rulesName, this.guardCount)
   );
 
   validate = () => {
@@ -335,7 +335,7 @@ export default class extends WithSize(Model<Position, Move>) {
   computerMove(): Move | null {
     if (this.levelFinished) {
       return null;
-    } else if (!this.arena || this.mode === "random") {
+    } else if (!this.arena || this.mode === Mode.Random) {
       return this.randomMove();
     }
     const {guards, attacked} = this.position;

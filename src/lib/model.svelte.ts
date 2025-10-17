@@ -5,7 +5,7 @@ import { page } from "$app/state";
 const VERSION = 1;
 
 export type Turn = 1 | 2;
-export type Mode = "solo" | "random" | "expert" | "duel"
+export enum Mode { Solo, Random, Expert, Duel };
 
 export interface SizeLimit {
   minRows: number;
@@ -20,7 +20,7 @@ export abstract class Model<Pos, Move> {
   redoHistory: Pos[] = $state([]);
   turn: Turn = $state(1);
   computerStarts = $state(false);
-  mode: Mode = $state("solo");
+  mode = $state(Mode.Solo);
   help = $state(false);
   showWin = $state(false);
   dialog: "rules" | "score" | "customize" | null = $state("rules");
@@ -71,7 +71,7 @@ export abstract class Model<Pos, Move> {
       this.showWin = false;
       await tick();
       this.showWin = true;
-    } else if (this.mode === "expert" || this.mode === "random") {
+    } else if (this.mode === Mode.Expert || this.mode === Mode.Random) {
       this.locked = true;
       await delay(1000);
       this.computerPlays();
@@ -123,7 +123,7 @@ export abstract class Model<Pos, Move> {
   saveRecord() {}
 
   private changeTurn() {
-    if (this.mode === "duel") {
+    if (this.mode === Mode.Duel) {
       this.turn = this.turn === 1 ? 2 : 1;
     } else {
       this.turn = this.computerStarts ? 2 : 1;
@@ -167,7 +167,7 @@ export abstract class Model<Pos, Move> {
       return "Partie finie"
     } else if ((this.turn === 1) !== this.computerStarts) {
       return "Tour du premier joueur"
-    } else if (this.mode === "duel") {
+    } else if (this.mode === Mode.Duel) {
       return "Tour du second joueur"
     } else {
       return "Tour de l'IA"
@@ -175,7 +175,7 @@ export abstract class Model<Pos, Move> {
   }
 
   winTitleFor2Player() {
-    return this.mode === "duel"
+    return this.mode === Mode.Duel
       ? `Le ${this.turn === 2 ? "premier" : "second"} joueur gagne`
       : (this.turn === 2) !== this.computerStarts
       ? "Tu as gagné"
@@ -228,7 +228,7 @@ export function WithCombinatorial<Pos, Move, TBase extends Constructor<Model<Pos
 
     constructor(...args: any) {
       super(...args);
-      this.mode = "random";
+      this.mode = Mode.Random;
     }
   
     computerMove(): Move | null {
@@ -237,7 +237,7 @@ export function WithCombinatorial<Pos, Move, TBase extends Constructor<Model<Pos
       }
       const moves = this.possibleMoves();
       let bestMove = null;
-      if (this.mode === "expert") {
+      if (this.mode === Mode.Expert) {
         const position = this.position;
         for (const move of moves) {
           let found = false;
