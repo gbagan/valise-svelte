@@ -1,4 +1,4 @@
-import { Model, WithSize, WithScore } from '$lib/model.svelte';
+import { Model, WithSize, WithScore, Objective } from '$lib/model.svelte';
 import { diffCoords, generate, generate2, random, repeat } from '$lib/util';
 
 export type Board = "french" | "english" | "circle" | "grid3" | "random";
@@ -109,7 +109,7 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
     }
   }
 
-  objective = () => "minimize" as "minimize";
+  objective = () => Objective.Minimize;
   score = () => this.position.filter(x => x).length;
   // todo à vérifier
   scoreHash = () => this.boardType === "random" ? null : `${this.boardType},${this.rows},${this.columns}`;

@@ -1,4 +1,4 @@
-import { Model, WithScore, WithSize } from "$lib/model.svelte";
+import { Model, WithScore, WithSize, Objective } from "$lib/model.svelte";
 import { diffCoords, generate, repeat } from "$lib/util";
 
 export type Piece = "R" | "B" | "K" | "N" | "Q" | "custom" | null;
@@ -89,7 +89,7 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
   isLevelFinished = () => false;
   onNewGame = () => this.selectedPiece = this.allowedPieces[0];
 
-  objective = () => "maximize" as "maximize";
+  objective = () => Objective.Maximize;
   score = () => this.isValidPosition ? this.position.filter(p => p !== null).length : 0;
   scoreHash = () => this.multiPieces || this.allowedPieces.includes("custom")
     ? null

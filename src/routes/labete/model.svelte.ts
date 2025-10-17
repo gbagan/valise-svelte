@@ -1,5 +1,5 @@
 import { coords, countBy, generate2, mod, repeat } from '$lib/util';
-import { Model, WithScore, WithSize } from '$lib/model.svelte';
+import { Model, Objective, WithScore, WithSize } from '$lib/model.svelte';
 
 export enum Mode { Standard, Cylinder, Torus };
 type Beast = [number, number][];
@@ -122,9 +122,8 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
     this.squareColors = repeat(this.rows * this.columns, 0);
   }
 
-  objective = () => "minimize" as "minimize";
+  objective = () => Objective.Minimize;
   score = () => countBy(this.position, x => x);
-  // todo
   scoreHash = () => this.beastType === BeastType.Custom
     ? null
     : `${this.columns},${this.rows},${this.mode},${this.beastType}`;

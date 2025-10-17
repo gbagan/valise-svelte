@@ -1,5 +1,5 @@
 import { diffCoords, repeat } from '$lib/util';
-import { Model, WithScore, WithSize } from '$lib/model.svelte';
+import { Model, Objective, WithScore, WithSize } from '$lib/model.svelte';
 
 export type Position = number[];
 type Move = {from: number, to: number};
@@ -42,6 +42,6 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
 
   score = () => this.position.filter(v => v > 0).length;
   scoreHash = () => `${this.rows},${this.columns}`;
-  objective = () => "minimize" as "minimize";
+  objective = () => Objective.Minimize;
   updateScore = () => this.updateScore2(true, "always");
 }

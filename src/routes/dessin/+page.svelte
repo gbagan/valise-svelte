@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getCoordsOfEdge, type Edge, type Graph } from "$lib/graph";
-  import { Model, WithScore } from "$lib/model.svelte";
+  import { Model, WithScore, Objective } from "$lib/model.svelte";
   import GraphEditor from "$lib/components/GraphEditor.svelte";
   import * as I from '$lib/components/Icons';
   import Config from '$lib/components/Config.svelte';
@@ -282,7 +282,7 @@
     initialPosition = () => [];
     isLevelFinished = () => positionEdges.length === graph.edges.length;
 
-    objective = () => "minimize" as "minimize";
+    objective = () => Objective.Minimize;
     score = () => raiseCount;
     scoreHash = () => graphIndex === "custom" ? null : "" + graphIndex;
 

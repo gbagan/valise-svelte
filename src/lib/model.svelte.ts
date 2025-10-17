@@ -308,12 +308,13 @@ export function WithSize<Pos, Move, TBase extends Constructor<Model<Pos, Move>>>
 }
 
 type ShowWinPolicy = "onNewRecord" | "always" | "never";
+export enum Objective { Minimize, Maximize }
 
-export interface ScoreModel<Pos> {
-  scores: Record<string, [number, Pos]>;
+export interface ScoreModel<Position> {
+  scores: Record<string, [number, Position]>;
   score: () => number;
   scoreHash: () => string | null;
-  objective: () => "minimize" | "maximize";
+  objective: () => Objective;
 }
 
 export function isScoreModel<Pos, Move>(model: Model<Pos, Move>): model is Model<Pos, Move> & ScoreModel<Pos> {
@@ -331,7 +332,7 @@ export function WithScore<Pos, Move, TBase extends Constructor<Model<Pos, Move>>
 
     abstract score: () => number;
     abstract scoreHash: () => string | null;
-    abstract objective: () => "minimize" | "maximize";
+    abstract objective: () => Objective;
 
     updateScore2(onlyWhenFinished: boolean, showWin: ShowWinPolicy) {
       if (onlyWhenFinished && !this.isLevelFinished()) {
@@ -339,7 +340,7 @@ export function WithScore<Pos, Move, TBase extends Constructor<Model<Pos, Move>>
       } else {
         const score = this.score();
         const hash = this.scoreHash() ?? "$custom";
-        const cmp = (a: number, b: number) => this.objective() === "minimize" ? a < b : a > b;
+        const cmp = (a: number, b: number) => this.objective() === Objective.Minimize ? a < b : a > b;
         const oldScore = this.scores[hash];
         const isNewRecord = !oldScore || cmp(score, oldScore[0]);
         if (isNewRecord) {
