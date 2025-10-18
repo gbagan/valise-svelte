@@ -1,6 +1,7 @@
 import { answer, makeArenaGraph, type Arena, type ArenaGraph } from "$lib/arena";
 import type { Edge, Graph } from "$lib/graph";
-import { Model, WithSize, Mode } from "$lib/model.svelte";
+import { Model, Mode } from "$lib/model.svelte";
+import { WithSize } from "$lib/size.svelte";
 import { allDistinct, countBy, generate, generate2, minBy, randomPick, range, sublists } from "$lib/util";
 
 type Conf = number[];

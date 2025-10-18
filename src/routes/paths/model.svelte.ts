@@ -1,5 +1,6 @@
 import { allDistinct, diffCoords, random, range } from '$lib/util';
-import { Model, WithSize } from '$lib/model.svelte';
+import { Model } from '$lib/model.svelte';
+import { WithSize } from '$lib/size.svelte';
 
 type Position = number[];
 type Move = number;

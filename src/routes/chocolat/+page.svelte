@@ -1,7 +1,7 @@
 <script lang="ts">
   import { default as Model, type Move, SoapMode } from './model.svelte';
   import { generate2, gridStyle } from '$lib/util';
-  import { type SizeLimit } from '$lib/model.svelte';
+  import { type SizeLimit } from '$lib/size.svelte';
   import PointerTracker from '$lib/components/PointerTracker.svelte';
   import Template from '$lib/components/Template.svelte';
   import * as I from '$lib/components/Icons';

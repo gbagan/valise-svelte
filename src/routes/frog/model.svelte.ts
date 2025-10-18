@@ -1,5 +1,6 @@
 import { range, repeat } from '$lib/util';
-import { Model, WithCombinatorial, WithSize } from '$lib/model.svelte';
+import { Model, WithCombinatorial } from '$lib/model.svelte';
+import { WithSize } from '$lib/size.svelte';
 
 type Position = number;
 type Move = number;

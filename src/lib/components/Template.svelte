@@ -1,5 +1,8 @@
 <script lang="ts" generics="Position, Move">
-  import { type Model, type SizeLimit,  Dialog, isScoreModel, isSizeModel } from '$lib/model.svelte';
+  import { type Model, Dialog } from '$lib/model.svelte';
+  import { type SizeLimit } from '$lib/size.svelte';
+  import { isScoreModel } from '$lib/score.svelte';
+  import { isSizeModel } from '$lib/size.svelte';
   import CDialog from '$lib/components/Dialog.svelte';
   import IncDecGrid from '$lib/components/IncDecGrid.svelte';
   import { confetti } from '$lib/confetti';

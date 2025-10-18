@@ -1,19 +1,11 @@
 import { tick } from "svelte";
 import { delay, randomPick } from "./util";
-import { page } from "$app/state";
 
-const VERSION = 1;
+export const VERSION = 1;
 
 export enum Mode { Solo, Random, Expert, Duel };
 export enum Dialog { None, Rules, Score, Customize, NewGame };
 export enum Turn { Player1, Player2 }
-
-export interface SizeLimit {
-  minRows: number;
-  maxRows: number;
-  minCols: number;
-  maxCols: number;
-}
 
 export abstract class Model<Position, Move> {
   #position: Position;
@@ -146,13 +138,7 @@ export abstract class Model<Position, Move> {
     return null;
   }
 
-  newGame(action?: () => void) {
-    if (!this.#newGameAction && action && this.#history.length > 0 && !this.isLevelFinished()) {
-      this.#newGameAction = action;
-      this.#dialog = Dialog.NewGame;
-      return;
-    }
-
+  protected resetAttributes() {
     this.#history = [];
     this.#redoHistory = [];
     this.help = false;
@@ -161,6 +147,15 @@ export abstract class Model<Position, Move> {
     //if (this.isScoreModel(this)) {
     //  delete this.scores["$custom"];
     //}
+  }
+
+
+  newGame(action?: () => void) {
+    if (!this.#newGameAction && action && this.#history.length > 0 && !this.isLevelFinished()) {
+      this.#newGameAction = action;
+      this.#dialog = Dialog.NewGame;
+      return;
+    }
 
     (action || this.#newGameAction || (() => {}))();
     this.onNewGame();
@@ -242,7 +237,7 @@ export abstract class Model<Position, Move> {
   }
 }
 
-type Constructor<T> = abstract new (...args: any[]) => T;
+export type Constructor<T> = abstract new (...args: any[]) => T;
 
 export function WithCombinatorial<Pos, Move, TBase extends Constructor<Model<Pos, Move>>>(Base: TBase) {
   abstract class C extends Base {
@@ -284,133 +279,5 @@ export function WithCombinatorial<Pos, Move, TBase extends Constructor<Model<Pos
     }
   } 
 
-  return C;
-}
-
-export interface SizeModel {
-  rows: number;
-  columns: number;
-  customSize: boolean;
-  setGridSize: (rows: number, columns: number, sizeLimit?: SizeLimit) => void;
-}
-
-export function isSizeModel<Pos, Move>(model: Model<Pos, Move>): model is Model<Pos, Move> & SizeModel {
-  return (model as Partial<SizeModel>).rows !== undefined 
-    && (model as Partial<SizeModel>).columns !== undefined
-    && (model as Partial<SizeModel>).customSize !== undefined
-}
-
-export function WithSize<Pos, Move, TBase extends Constructor<Model<Pos, Move>>>(Base: TBase) {
-  abstract class C extends Base implements SizeModel {
-    rows = $state(0);
-    columns = $state(0);
-    customSize = $state(false);
-
-    constructor(...args: any[]) {
-      super(...args);
-    }
-
-    setGridSize(rows: number, columns: number, sizeLimit?: SizeLimit) {
-      if (!sizeLimit) {
-        return
-      }
-      const {minRows, maxRows, minCols, maxCols} = sizeLimit;
-  
-      if (rows < minRows || rows > maxRows || columns < minCols || columns > maxCols) {
-        return;
-      }
-
-      this.newGame(() => {
-        this.rows = rows;
-        this.columns = columns;
-      });
-    }
-  }
-
-  return C;
-}
-
-type ShowWinPolicy = "onNewRecord" | "always" | "never";
-export enum Objective { Minimize, Maximize }
-
-export interface ScoreModel<Position> {
-  bestScore: () => number | null;
-  bestPosition: () => Position | null;
-}
-
-export function isScoreModel<Pos, Move>(model: Model<Pos, Move>): model is Model<Pos, Move> & ScoreModel<Pos> {
-  return typeof (model as any).bestScore === "function";
-}
-
-export function WithScore<Position, Move, TBase extends Constructor<Model<Position, Move>>>(Base: TBase) {
-  abstract class C extends Base implements ScoreModel<Position> {
-    #scores: Record<string, [number, Position]> = $state({});
-
-    protected abstract score: () => number;
-    protected abstract scoreHash: () => string | null;
-    protected abstract objective: () => Objective;
-
-    protected updateScore2(onlyWhenFinished: boolean, showWin: ShowWinPolicy) {
-      if (onlyWhenFinished && !this.isLevelFinished()) {
-        return { isNewRecord: false, showWin: false }
-      } else {
-        const score = this.score();
-        const hash = this.scoreHash() ?? "$custom";
-        const cmp = (a: number, b: number) => this.objective() === Objective.Minimize ? a < b : a > b;
-        const oldScore = this.#scores[hash];
-        const isNewRecord = !oldScore || cmp(score, oldScore[0]);
-        if (isNewRecord) {
-          this.#scores[hash] = [score, this.position];
-        }
-        return {
-          isNewRecord,
-          showWin: isNewRecord && showWin === "onNewRecord" || showWin === "always"
-        }
-      }
-    }
-
-    bestScore(): number | null {
-      const hash = this.scoreHash() ?? "$custom";
-      const record = this.#scores[hash];
-      return record ? record[0] : null;
-    }
-
-    bestPosition(): Position | null {
-      const hash = this.scoreHash() ?? "$custom";
-      const record = this.#scores[hash];
-      return record ? record[1] : null;
-    }
-
-    loadRecords() {
-      const routeId = page.route.id;
-      if (!routeId) {
-        return;
-      }
-      const scores = localStorage.getItem(routeId);
-      let data;
-      if (!scores) {
-        return;
-      }
-      try {
-        data = JSON.parse(scores);
-      } catch {
-        return
-      }
-      if (typeof Array.isArray(data) && data.length === 2 && data[0] === VERSION) {
-        this.#scores = data[1];
-      }
-    }
-
-    protected onNewRecord() {
-      const routeId = page.route.id;
-      if (!routeId) {
-        return;
-      }
-      const scores = {...this.#scores};
-      delete scores["$custom"];
-      //save to storage
-      localStorage.setItem(routeId, JSON.stringify([VERSION, scores]));
-    }
-  }
   return C;
 }

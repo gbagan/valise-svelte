@@ -1,7 +1,7 @@
 <script lang="ts">
   import { default as Model, type Mode } from './model.svelte';
   import { gridStyle } from '$lib/util';
-  import { type SizeLimit } from '$lib/model.svelte';
+  import { type SizeLimit } from '$lib/size.svelte';
   import Template from '$lib/components/Template.svelte';
   import * as I from '$lib/components/Icons';
   import Config from '$lib/components/Config.svelte';

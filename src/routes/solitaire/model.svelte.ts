@@ -1,4 +1,6 @@
-import { Model, WithSize, WithScore, Objective } from '$lib/model.svelte';
+import { Model } from '$lib/model.svelte';
+import { Objective, WithScore } from '$lib/score.svelte';
+import { WithSize } from '$lib/size.svelte';
 import { countBy, diffCoords, generate, generate2, random, repeat } from '$lib/util';
 
 export enum Board { French, English, Circle, Grid3, Random };

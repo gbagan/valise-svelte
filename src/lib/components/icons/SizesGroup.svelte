@@ -1,5 +1,6 @@
 <script lang="ts" generics="Position,Move">
-  import { type Model, type SizeModel } from '$lib/model.svelte';
+  import { type Model } from '$lib/model.svelte';
+  import { type SizeModel } from '$lib/size.svelte';
   import Icon from "./Icon.svelte";
   import IconGroup from "./IconGroup.svelte";
 

@@ -1,4 +1,5 @@
-import { Model, WithSize } from "$lib/model.svelte";
+import { Model } from "$lib/model.svelte";
+import { WithSize } from "$lib/size.svelte";
 import { coords, mod, repeat } from "$lib/util";
 
 type Coord = [row: number, col: number];

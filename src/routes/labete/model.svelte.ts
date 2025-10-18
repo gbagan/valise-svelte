@@ -1,5 +1,7 @@
 import { coords, countBy, generate2, mod, repeat } from '$lib/util';
-import { Model, Objective, WithScore, WithSize } from '$lib/model.svelte';
+import { Model } from '$lib/model.svelte';
+import { Objective, WithScore } from '$lib/score.svelte';
+import { WithSize } from '$lib/size.svelte';
 
 export enum Mode { Standard, Cylinder, Torus };
 type Beast = [number, number][];

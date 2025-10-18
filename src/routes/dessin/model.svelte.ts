@@ -1,5 +1,6 @@
 import type { Edge, Graph } from "$lib/graph";
-import { Model, Objective, WithScore } from "$lib/model.svelte";
+import { Model } from "$lib/model.svelte";
+import { Objective, WithScore } from "$lib/score.svelte";
 import graphs from "./graphs";
 
 type Move = number | "raise";

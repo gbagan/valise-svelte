@@ -1,4 +1,6 @@
-import { Model, WithScore, WithSize, Objective } from "$lib/model.svelte";
+import { Model } from "$lib/model.svelte";
+import { Objective, WithScore } from "$lib/score.svelte";
+import { WithSize } from "$lib/size.svelte";
 import { diffCoords, generate, repeat } from "$lib/util";
 
 export type Piece = "R" | "B" | "K" | "N" | "Q" | "custom" | null;
