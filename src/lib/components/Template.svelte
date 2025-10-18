@@ -1,9 +1,9 @@
 <script lang="ts" generics="Position, Move">
-  import { type Model, type SizeLimit,  isScoreModel, isSizeModel } from '$lib/model.svelte';
-  import Dialog from '$lib/components/Dialog.svelte';
+  import { type Model, type SizeLimit,  Dialog, isScoreModel, isSizeModel } from '$lib/model.svelte';
+  import CDialog from '$lib/components/Dialog.svelte';
   import IncDecGrid from '$lib/components/IncDecGrid.svelte';
   import { confetti } from '$lib/confetti';
-    import type { Snippet } from 'svelte';
+  import type { Snippet } from 'svelte';
 
   interface Props {
     model: Model<Position, Move>;
@@ -48,27 +48,27 @@
   {/if}
   {@render config()}
   {@render winPanel(winTitle || "GAGNÉ", model.showWin)}
-  {#if model.dialog === "rules"}
-    <Dialog title="Règles du jeu" onOk={() => model.dialog = null}>
+  {#if model.dialog === Dialog.Rules}
+    <CDialog title="Règles du jeu" onOk={model.closeDialog}>
       <div class="rules">
         {@render rules()}
       </div>
-    </Dialog>
-  {:else if model.dialog === "customize"}
+    </CDialog>
+  {:else if model.dialog === Dialog.Customize}
     {@render custom?.()}
-  {:else if model.dialog == "score" && isScoreModel(model)}
-    <Dialog title="Meilleur score" onOk={() => model.dialog = null}>
+  {:else if model.dialog == Dialog.Score && isScoreModel(model)}
+    <CDialog title="Meilleur score" onOk={model.closeDialog}>
       {@const position = model.bestPosition()! }
       {@render bestScore?.(position)}
-    </Dialog>
-  {:else if model.newGameAction}
-    <Dialog
+    </CDialog>
+  {:else if model.dialog == Dialog.NewGame}
+    <CDialog
       title="Nouvelle Partie"
       onOk={() => model.newGame()}
-      onCancel={() => model.newGameAction = null}
+      onCancel={model.closeDialog}
     >
       Tu es sur le point de créer une nouvelle partie. Ta partie en cours sera perdue. Es-tu sûr(e)?
-    </Dialog>
+    </CDialog>
   {/if}
 </div>
 

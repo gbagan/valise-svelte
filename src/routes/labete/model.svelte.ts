@@ -133,7 +133,7 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
   setBeastType(type: BeastType) {
     this.beastType = type;
     if (type === BeastType.Custom) {
-      this.dialog = "customize";
+      this.openCustomizeDialog();
       this.rows = Math.max(this.rows, 5);
       this.columns = Math.max(this.columns, 5);
     }

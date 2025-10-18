@@ -160,7 +160,7 @@
 {#snippet custom()}
   <Dialog
     title="Personnalise ta tuile"
-    onOk={() => model.dialog = null}
+    onOk={model.closeDialog}
   >
     <div class="customtile-container">
       <svg viewBox="0 0 250 250">

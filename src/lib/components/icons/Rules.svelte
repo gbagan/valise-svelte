@@ -1,5 +1,5 @@
 <script lang="ts" generics="Pos, Move">
-  import { type Model } from '$lib/model.svelte';
+  import { Dialog, type Model } from '$lib/model.svelte';
   import Icon from "./Icon.svelte";
 
   interface Props {
@@ -13,6 +13,6 @@
   text="#rules"
   tooltip="Règles"
   disabled={model.locked}
-  selected={model.dialog === "rules"}
-  onclick={() => model.dialog = "rules"}
+  selected={model.dialog === Dialog.Rules}
+  onclick={model.openRulesDialog}
 />

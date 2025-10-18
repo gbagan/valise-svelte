@@ -14,5 +14,5 @@
   tooltip="Rejoue le coup annulé"
   style="transform:scaleX(-1);"
   disabled={model.locked || model.isRedoHistoryEmpty()}
-  onclick={() => model.redo()}
+  onclick={model.redo}
 />

@@ -18,6 +18,6 @@
     text="#cup"
     tooltip="Meilleur score"
     disabled={model.locked || bestScore === null}
-    onclick={() => model.dialog = "score"}
+    onclick={model.openScoreDialog}
   />
 </IconGroup>

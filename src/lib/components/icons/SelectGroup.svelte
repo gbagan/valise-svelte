@@ -24,7 +24,13 @@
       tooltip={Array.isArray(tooltip) ? tooltip[i] : tooltip ? tooltip(val) : null}
       selected={val === selected}
       onclick={() => setter(val)}
-      disabled={Array.isArray(disabled) ? disabled[i] : typeof disabled === "function" ? disabled(val) : !!disabled}
+      disabled={
+        Array.isArray(disabled) 
+        ? disabled[i] 
+        : typeof disabled === "function" 
+        ? disabled(val) 
+        : !!disabled
+      }
     />
   {/each}
   {@render children?.()}

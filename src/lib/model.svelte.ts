@@ -6,6 +6,7 @@ const VERSION = 1;
 
 export type Turn = 1 | 2;
 export enum Mode { Solo, Random, Expert, Duel };
+export enum Dialog { None, Rules, Score, Customize, NewGame };
 
 export interface SizeLimit {
   minRows: number;
@@ -14,42 +15,71 @@ export interface SizeLimit {
   maxCols: number;
 }
 
-export abstract class Model<Pos, Move> {
-  position: Pos;
-  private history: Pos[] = $state([]);
-  private redoHistory: Pos[] = $state([]);
+export abstract class Model<Position, Move> {
+  #position: Position;
+  #history: Position[] = $state([]);
+  #redoHistory: Position[] = $state([]);
   turn: Turn = $state(1);
   computerStarts = $state(false);
   mode = $state(Mode.Solo);
   help = $state(false);
   showWin = $state(false);
-  dialog: "rules" | "score" | "customize" | null = $state("rules");
-  newGameAction: (() => void) | null = $state(null);
+  #dialog = $state(Dialog.None);
+  #newGameAction: (() => void) | null = $state(null);
   locked: boolean = $state(false);
 
-  abstract play(m: Move): (Pos | null);
-  abstract initialPosition(): Pos;
+  abstract play(m: Move): (Position | null);
+  abstract initialPosition(): Position;
   abstract isLevelFinished(): boolean;
 
   onNewGame() {};
 
-  constructor(position: Pos) {
-    this.position = $state.raw(position);
+  constructor(position: Position) {
+    this.#position = $state.raw(position);
   }
 
-  isHistoryEmpty = () => this.history.length === 0;
-  isRedoHistoryEmpty = () => this.redoHistory.length === 0;
-  historyLength = () => this.history.length;
+  get position() {
+    return this.#position;
+  }
+
+  protected set position(pos: Position) {
+    this.#position = pos;
+  }
+
+  isHistoryEmpty = () => this.#history.length === 0;
+  isRedoHistoryEmpty = () => this.#redoHistory.length === 0;
+  historyLength = () => this.#history.length;
+
+  get dialog() {
+    return this.#dialog;
+  }
+
+  closeDialog = () => {
+    this.#dialog = Dialog.None;
+    this.#newGameAction = null;
+  }
+
+  openRulesDialog = () => {
+    this.#dialog = Dialog.Rules;
+  }
+
+  openScoreDialog = () => {
+    this.#dialog = Dialog.Score;
+  }
+
+  openCustomizeDialog = () => {
+    this.#dialog = Dialog.Customize;
+  }
 
   protected playHelper(move: Move, push?: boolean): boolean {
     const position = this.play(move);
     if (position === null)
       return false;
     if (push) {
-      this.history.push(this.position);
-      this.redoHistory = [];
+      this.#history.push(this.position);
+      this.#redoHistory = [];
     }
-    this.position = position;
+    this.#position = position;
     this.turn = this.turn == 1 ? 2 : 1;
     return true;
   }
@@ -101,13 +131,14 @@ export abstract class Model<Pos, Move> {
   }
 
   newGame(action?: () => void) {
-    if (!this.newGameAction && action && this.history.length > 0 && !this.isLevelFinished()) {
-      this.newGameAction = action;
+    if (!this.#newGameAction && action && this.#history.length > 0 && !this.isLevelFinished()) {
+      this.#newGameAction = action;
+      this.#dialog = Dialog.NewGame;
       return;
     }
 
-    this.history = [];
-    this.redoHistory = [];
+    this.#history = [];
+    this.#redoHistory = [];
     this.help = false;
     this.turn = 1;
     this.computerStarts = false;
@@ -115,13 +146,16 @@ export abstract class Model<Pos, Move> {
     //  delete this.scores["$custom"];
     //}
 
-    (action || this.newGameAction || (() => {}))();
+    (action || this.#newGameAction || (() => {}))();
     this.onNewGame();
     do {
-      this.position = this.initialPosition();
+      this.#position = this.initialPosition();
     } while (this.isLevelFinished());
 
-    this.newGameAction = null;
+    if (this.#dialog === Dialog.NewGame) {
+      this.#dialog = Dialog.None;
+    }
+    this.#newGameAction = null;
   }
 
   saveRecord() {}
@@ -134,35 +168,35 @@ export abstract class Model<Pos, Move> {
     }
   }
 
-  undo() {
-    if (this.history.length === 0) {
+  undo = () => {
+    if (this.#history.length === 0) {
       return;
     }
-    const position = this.history.pop()!;
-    this.redoHistory.push(this.position);
-    this.position = position;
+    const position = this.#history.pop()!;
+    this.#redoHistory.push(this.position);
+    this.#position = position;
     this.changeTurn();
   }
 
-  redo() {
-    if (this.redoHistory.length === 0) {
+  redo = () => {
+    if (this.#redoHistory.length === 0) {
       return;
     }
-    const position = this.redoHistory.pop()!;
-    this.history.push(this.position);
-    this.position = position;
+    const position = this.#redoHistory.pop()!;
+    this.#history.push(this.#position);
+    this.#position = position;
     this.changeTurn();
   }
 
-  reset() {
-    if (this.history.length === 0) {
+  reset = () => {
+    if (this.#history.length === 0) {
       return;
     }
-    const position = this.history[0];
-    this.history = [];
-    this.redoHistory = [];
+    const position = this.#history[0];
+    this.#history = [];
+    this.#redoHistory = [];
     this.turn = 1;
-    this.position = position;
+    this.#position = position;
   }
 
   // un message qui indique à qui est le tour ou si la partie est finie
@@ -186,37 +220,6 @@ export abstract class Model<Pos, Move> {
       : "L'IA gagne";
   }
 }
-
-/*
-function defaultComputerMove<Pos, Move>(model: Model<Pos>, methods: Methods<Pos, Move>): Move | null {
-  if (methods.isLevelFinished()) {
-    return null;
-  }
-  const moves = methods.possibleMoves!();
-  let bestMove = null;
-  if (model.mode === "expert") {
-    const position = model.position;
-    for (const move of moves) {
-      let found = false;
-      playHelper(model, methods, move);
-      if (methods.isLosingPosition!()) {
-        found = true;
-      }
-      model.position = position;
-      model.turn = model.turn == 1 ? 2 : 1;
-      if (found) {
-        bestMove = move;
-        break;
-      }
-    }
-  }
-  if (bestMove !== null) {
-    return bestMove;
-  } else {
-    return randomPick(moves)
-  }
-}
-*/
 
 type Constructor<T> = abstract new (...args: any[]) => T;
 
@@ -325,7 +328,7 @@ export function isScoreModel<Pos, Move>(model: Model<Pos, Move>): model is Model
 
 export function WithScore<Position, Move, TBase extends Constructor<Model<Position, Move>>>(Base: TBase) {
   abstract class C extends Base implements ScoreModel<Position> {
-    private scores: Record<string, [number, Position]> = $state({});
+    #scores: Record<string, [number, Position]> = $state({});
 
     protected abstract score: () => number;
     protected abstract scoreHash: () => string | null;
@@ -338,10 +341,10 @@ export function WithScore<Position, Move, TBase extends Constructor<Model<Positi
         const score = this.score();
         const hash = this.scoreHash() ?? "$custom";
         const cmp = (a: number, b: number) => this.objective() === Objective.Minimize ? a < b : a > b;
-        const oldScore = this.scores[hash];
+        const oldScore = this.#scores[hash];
         const isNewRecord = !oldScore || cmp(score, oldScore[0]);
         if (isNewRecord) {
-          this.scores[hash] = [score, clone(this.position)];
+          this.#scores[hash] = [score, clone(this.position)];
         }
         return {
           isNewRecord,
@@ -352,13 +355,13 @@ export function WithScore<Position, Move, TBase extends Constructor<Model<Positi
 
     bestScore(): number | null {
       const hash = this.scoreHash() ?? "$custom";
-      const record = this.scores[hash];
+      const record = this.#scores[hash];
       return record ? record[0] : null;
     }
 
     bestPosition(): Position | null {
       const hash = this.scoreHash() ?? "$custom";
-      const record = this.scores[hash];
+      const record = this.#scores[hash];
       return record ? record[1] : null;
     }
 
@@ -378,7 +381,7 @@ export function WithScore<Position, Move, TBase extends Constructor<Model<Positi
         return
       }
       if (typeof Array.isArray(data) && data.length === 2 && data[0] === VERSION) {
-        this.scores = data[1];
+        this.#scores = data[1];
       }
     }
 
@@ -387,7 +390,7 @@ export function WithScore<Position, Move, TBase extends Constructor<Model<Positi
       if (!routeId) {
         return;
       }
-      const scores = {...this.scores};
+      const scores = {...this.#scores};
       delete scores["$custom"];
       //save to storage
       localStorage.setItem(routeId, JSON.stringify([VERSION, scores]));

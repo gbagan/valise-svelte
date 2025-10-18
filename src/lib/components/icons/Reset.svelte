@@ -13,5 +13,5 @@
   text="#reset"
   tooltip="Recommence la partie"
   disabled={model.locked || model.isHistoryEmpty()}
-  onclick={() => model.reset()}
+  onclick={model.reset}
 />

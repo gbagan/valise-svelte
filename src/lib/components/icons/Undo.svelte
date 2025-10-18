@@ -13,5 +13,5 @@
   text="#undo"
   tooltip="Annule le dernier coup"
   disabled={model.locked || model.isHistoryEmpty()}
-  onclick={() => model.undo()}
+  onclick={model.undo}
 />

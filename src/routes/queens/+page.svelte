@@ -176,7 +176,7 @@
 {/snippet}
 
 {#snippet custom()}
-  <Dialog title="Personnalise ta pièce" onOk={() => model.dialog = null}>
+  <Dialog title="Personnalise ta pièce" onOk={model.closeDialog}>
     <div class="custompiece-container">
       <div class="ui-board custompiece-grid">
         <svg viewBox="0 0 250 250">

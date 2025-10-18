@@ -74,14 +74,12 @@ export default class extends WithScore(Model<Position, Move>) {
     }
     return edges.findIndex(e => e[0] === u && e[1] === v) !== -1;
   }
-
-  selectCustomGraph = () => this.dialog = "customize";
   
   acceptCustomGraph = (graph: Graph) => {
     if (graph.vertices.length > 0) {
       this.customGraph = graph;
       this.graphIndex = "custom";
     }
-    this.dialog = null;
+    this.closeDialog();
   }
 }

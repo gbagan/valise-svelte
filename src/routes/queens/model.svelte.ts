@@ -120,7 +120,7 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
 
   customize = () => this.newGame(() => {
     this.allowedPieces = ["custom"];
-    this.dialog = "customize";
     this.multiPieces = false;
+    this.openCustomizeDialog();
   });
 }

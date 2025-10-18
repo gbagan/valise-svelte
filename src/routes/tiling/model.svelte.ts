@@ -116,7 +116,7 @@ export default class extends WithSize(Model<Position, Move>) {
   setTileType = (type: TileType) => this.newGame(() => {
     this.tileType = type;
     if (type === "custom") {
-      this.dialog = "customize";
+      this.openCustomizeDialog();
     }
   });
 }

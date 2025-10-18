@@ -157,7 +157,7 @@
 {#snippet custom()}
   <Dialog
     title="Personnalise ta bête"
-    onOk={() => model.dialog = null}
+    onOk={model.closeDialog}
   >
     <div class="custombeast-container">
       <svg viewBox="0 0 250 250">

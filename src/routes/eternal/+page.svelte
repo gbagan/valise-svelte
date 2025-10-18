@@ -158,7 +158,7 @@
         tooltip="Créé ton propre graphe"
         selected={model.graphKind === GraphKind.Custom}
         disabled={model.locked}
-        onclick={model.selectCustomGraph}
+        onclick={model.openCustomizeDialog}
       />
     </I.SelectGroup>
     <I.SelectGroup

@@ -136,7 +136,7 @@
         text="#customize"
         tooltip="Créé ton propre graphe"
         selected={model.graphIndex === "custom"}
-        onclick={model.selectCustomGraph}
+        onclick={model.openCustomizeDialog}
       />
     </I.SelectGroup>
     <I.Group title="Options">

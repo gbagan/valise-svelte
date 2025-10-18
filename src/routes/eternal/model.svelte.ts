@@ -405,13 +405,11 @@ export default class extends WithSize(Model<Position, Move>) {
     }
   })
 
-  selectCustomGraph = () => this.dialog = "customize";
-
   acceptCustomGraph = (graph: Graph) => {
     if (graph.vertices.length > 0) {
       this.customGraph = graph;
       this.graphKind = GraphKind.Custom;
     }
-    this.dialog = null;
+    this.closeDialog();
   }
 }
