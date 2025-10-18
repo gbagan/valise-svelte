@@ -66,19 +66,19 @@
       title="Nombre de feux"
       values={[4, 5, 6, 7, 8, 9, 10, 11, 12, 13]}
       selected={model.size}
-      setter={i => model.newGame(() => model.size = i)}
+      setter={model.setSize}
     />
     <I.SelectGroup
       title="Nombre de couleurs"
       values={[2, 3, 4, 5]}
       selected={model.colorCount}
-      setter={i => model.newGame(() => model.colorCount = i)}
+      setter={model.setColorCount}
     />
     <I.SelectGroup
       title="Portée"
       values={[1, 2, 3]}
       selected={model.range}
-      setter={i => model.newGame(() => model.range = i)}
+      setter={model.setRange}
     />
     <I.Group title="Options">
       <I.Undo bind:model={model} />
@@ -88,7 +88,7 @@
         text="#shuffle"
         tooltip="Mélanger"
         selected={model.shuffle}
-        onclick={() => model.newGame(() => model.shuffle = !model.shuffle)}
+        onclick={model.toggleShuffle}
       />
       <I.Rules bind:model={model} />  
     </I.Group>

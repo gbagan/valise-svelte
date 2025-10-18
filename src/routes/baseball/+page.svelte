@@ -67,7 +67,7 @@
       title="Nombre de bases"
       values={[4, 5, 6, 7, 8]}
       selected={model.baseCount}
-      setter={i => model.newGame(() => model.baseCount = i)}
+      setter={model.setBaseCount}
     />
     <I.Group title="Options">
       <I.Undo bind:model={model} />

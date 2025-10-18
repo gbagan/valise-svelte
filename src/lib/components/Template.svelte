@@ -47,7 +47,7 @@
     {@render board()}
   {/if}
   {@render config()}
-  {@render winPanel(winTitle || "GAGNÉ", model.showWin)}
+  {@render winPanel(winTitle || "GAGNÉ", model.isVictoryShown)}
   {#if model.dialog === Dialog.Rules}
     <CDialog title="Règles du jeu" onOk={model.closeDialog}>
       <div class="rules">

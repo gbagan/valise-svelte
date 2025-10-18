@@ -1,6 +1,5 @@
 import { delay, mod, repeat, swap } from '$lib/util';
 import { Model } from '$lib/model.svelte';
-import { tick } from 'svelte';
 
 type Position = (number | null)[];
 export type Location = { kind: "panel", id: number } | { kind: "wheel", id: number } | {kind: "board"};
@@ -41,18 +40,15 @@ export default class extends Model<Position, Move> {
   onNewGame = () => this.rotation = 0;
 
   async check() { 
-    this.locked = true;
-    for (let i = 0; i < this.size; i++) {
-      if (!this.isValidRotation) {
-        this.locked = false;
-        return;
+    this.lock(async () => {
+      for (let i = 0; i < this.size; i++) {
+        if (!this.isValidRotation) {
+          return;
+        }
+        this.rotation += 1;
+        await delay(600);
       }
-      this.rotation += 1;
-      await delay(600);
-    }
-    this.showWin = false;
-    await tick();
-    this.showWin = true;
-    this.locked = false;
+      await this.showVictory();
+    });
   }
 }

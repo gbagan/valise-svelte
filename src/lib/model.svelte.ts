@@ -23,10 +23,10 @@ export abstract class Model<Position, Move> {
   computerStarts = $state(false);
   mode = $state(Mode.Solo);
   help = $state(false);
-  showWin = $state(false);
+  #isVictoryShown = $state(false);
   #dialog = $state(Dialog.None);
   #newGameAction: (() => void) | null = $state(null);
-  locked: boolean = $state(false);
+  #locked: boolean = $state(false);
 
   abstract play(m: Move): (Position | null);
   abstract initialPosition(): Position;
@@ -44,6 +44,20 @@ export abstract class Model<Position, Move> {
 
   protected set position(pos: Position) {
     this.#position = pos;
+  }
+
+  get isVictoryShown() {
+    return this.#isVictoryShown;
+  }
+
+  async showVictory() {
+    this.#isVictoryShown = false;
+    await tick();
+    this.#isVictoryShown = true;
+  }
+
+  get locked() {
+    return this.#locked;
   }
 
   isHistoryEmpty = () => this.#history.length === 0;
@@ -69,6 +83,12 @@ export abstract class Model<Position, Move> {
 
   openCustomizeDialog = () => {
     this.#dialog = Dialog.Customize;
+  }
+
+  lock = async (action: () => Promise<void>) => {
+    this.#locked = true;
+    await action();
+    this.#locked = false;
   }
 
   protected playHelper(move: Move, push?: boolean): boolean {
@@ -102,14 +122,12 @@ export abstract class Model<Position, Move> {
     }
     
     if (showWin) {
-      this.showWin = false;
-      await tick();
-      this.showWin = true;
+      await this.showVictory();
     } else if (this.mode === Mode.Expert || this.mode === Mode.Random) {
-      this.locked = true;
-      await delay(1000);
-      this.computerPlays();
-      this.locked = false;
+      this.lock(async () => {
+        await delay(1000);
+        this.computerPlays();
+      })
     }
   }
 
@@ -120,9 +138,7 @@ export abstract class Model<Position, Move> {
     }
     this.playHelper(move);
     if (this.isLevelFinished()) {
-      this.showWin = false;
-      await tick();
-      this.showWin = true;
+      await this.showVictory();
     }
   }
 
