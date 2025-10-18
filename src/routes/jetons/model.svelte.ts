@@ -43,5 +43,5 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
   score = () => this.position.filter(v => v > 0).length;
   scoreHash = () => `${this.rows},${this.columns}`;
   objective = () => Objective.Minimize;
-  updateScore = () => this.updateScore2(true, "always");
+  protected updateScore = () => this.updateScore2(true, "always");
 }

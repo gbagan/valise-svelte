@@ -16,8 +16,8 @@ export interface SizeLimit {
 
 export abstract class Model<Pos, Move> {
   position: Pos;
-  history: Pos[] = $state([]);
-  redoHistory: Pos[] = $state([]);
+  private history: Pos[] = $state([]);
+  private redoHistory: Pos[] = $state([]);
   turn: Turn = $state(1);
   computerStarts = $state(false);
   mode = $state(Mode.Solo);
@@ -37,6 +37,10 @@ export abstract class Model<Pos, Move> {
     this.position = $state.raw(position);
   }
 
+  isHistoryEmpty = () => this.history.length === 0;
+  isRedoHistoryEmpty = () => this.redoHistory.length === 0;
+  historyLength = () => this.history.length;
+
   protected playHelper(move: Move, push?: boolean): boolean {
     const position = this.play(move);
     if (position === null)
@@ -50,7 +54,7 @@ export abstract class Model<Pos, Move> {
     return true;
   }
 
-  updateScore(): { isNewRecord: boolean, showWin: boolean } {
+  protected updateScore(): { isNewRecord: boolean, showWin: boolean } {
     return {
       isNewRecord: false,
       showWin: this.isLevelFinished()
@@ -311,30 +315,23 @@ type ShowWinPolicy = "onNewRecord" | "always" | "never";
 export enum Objective { Minimize, Maximize }
 
 export interface ScoreModel<Position> {
-  scores: Record<string, [number, Position]>;
-  score: () => number;
-  scoreHash: () => string | null;
-  objective: () => Objective;
+  bestScore: () => number | null;
+  bestPosition: () => Position | null;
 }
 
 export function isScoreModel<Pos, Move>(model: Model<Pos, Move>): model is Model<Pos, Move> & ScoreModel<Pos> {
-  return !!(model as any).scores
+  return typeof (model as any).bestScore === "function";
 }
 
-export function WithScore<Pos, Move, TBase extends Constructor<Model<Pos, Move>>>(Base: TBase) {
-  abstract class C extends Base implements ScoreModel<Pos> {
-    scores: Record<string, [number, Pos]>;
+export function WithScore<Position, Move, TBase extends Constructor<Model<Position, Move>>>(Base: TBase) {
+  abstract class C extends Base implements ScoreModel<Position> {
+    private scores: Record<string, [number, Position]> = $state({});
 
-    constructor(...args: any) {
-      super(...args);
-      this.scores = $state({});
-    }
+    protected abstract score: () => number;
+    protected abstract scoreHash: () => string | null;
+    protected abstract objective: () => Objective;
 
-    abstract score: () => number;
-    abstract scoreHash: () => string | null;
-    abstract objective: () => Objective;
-
-    updateScore2(onlyWhenFinished: boolean, showWin: ShowWinPolicy) {
+    protected updateScore2(onlyWhenFinished: boolean, showWin: ShowWinPolicy) {
       if (onlyWhenFinished && !this.isLevelFinished()) {
         return { isNewRecord: false, showWin: false }
       } else {
@@ -351,6 +348,18 @@ export function WithScore<Pos, Move, TBase extends Constructor<Model<Pos, Move>>
           showWin: isNewRecord && showWin === "onNewRecord" || showWin === "always"
         }
       }
+    }
+
+    bestScore(): number | null {
+      const hash = this.scoreHash() ?? "$custom";
+      const record = this.scores[hash];
+      return record ? record[0] : null;
+    }
+
+    bestPosition(): Position | null {
+      const hash = this.scoreHash() ?? "$custom";
+      const record = this.scores[hash];
+      return record ? record[1] : null;
     }
 
     loadRecords() {

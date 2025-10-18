@@ -113,7 +113,7 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
   score = () => this.position.filter(x => x).length;
   // todo à vérifier
   scoreHash = () => this.boardType === Board.Random ? null : `${this.boardType},${this.rows},${this.columns}`;
-  updateScore = () => this.updateScore2(true, "always");
+  protected updateScore = () => this.updateScore2(true, "always");
 
   setBoard(b: Board) {
     this.boardType = b;

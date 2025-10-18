@@ -12,6 +12,6 @@
 <Icon
   text="#undo"
   tooltip="Annule le dernier coup"
-  disabled={model.locked || model.history.length === 0}
+  disabled={model.locked || model.isHistoryEmpty()}
   onclick={() => model.undo()}
 />

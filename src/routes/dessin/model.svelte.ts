@@ -46,7 +46,7 @@ export default class extends WithScore(Model<Position, Move>) {
   objective = () => Objective.Minimize;
   score = () => this.raiseCount;
   scoreHash = () => this.graphIndex === "custom" ? null : "" + this.graphIndex;
-  updateScore = () => this.updateScore2(true, "onNewRecord");
+  protected updateScore = () => this.updateScore2(true, "onNewRecord");
 
   edgesOf(position: Position): Edge[] {
     const res: Edge[] = [];

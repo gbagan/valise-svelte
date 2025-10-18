@@ -96,7 +96,7 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
     : `${this.rows},${this.columns},${this.allowedPieces[0]}`;
 
 
-  updateScore = () => this.updateScore2(false, "never")
+  protected updateScore = () => this.updateScore2(false, "never")
 
   toggleMultiPieces() {
     this.multiPieces = !this.multiPieces;

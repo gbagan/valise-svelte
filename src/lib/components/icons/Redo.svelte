@@ -13,6 +13,6 @@
   text="#undo"
   tooltip="Rejoue le coup annulé"
   style="transform:scaleX(-1);"
-  disabled={model.locked || model.redoHistory.length === 0}
+  disabled={model.locked || model.isRedoHistoryEmpty()}
   onclick={() => model.redo()}
 />

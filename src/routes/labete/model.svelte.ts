@@ -128,7 +128,7 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
     ? null
     : `${this.columns},${this.rows},${this.mode},${this.beastType}`;
 
-  updateScore = () => this.updateScore2(true, "onNewRecord");
+  protected updateScore = () => this.updateScore2(true, "onNewRecord");
 
   setBeastType(type: BeastType) {
     this.beastType = type;

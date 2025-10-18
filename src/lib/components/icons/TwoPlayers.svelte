@@ -27,7 +27,7 @@
   <Icon
     text="2P⇨"
     tooltip="L'IA commence"
-    disabled={model.locked || model.computerStarts || model.mode === Mode.Duel || model.history.length > 0}
+    disabled={model.locked || model.computerStarts || model.mode === Mode.Duel || !model.isHistoryEmpty()}
     onclick={onclickHandler}
   />
 </SelectGroup>

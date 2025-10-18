@@ -11,7 +11,7 @@
 
   const colors = [ "blue", "red", "green", "magenta", "orange", "gray", "cyan" ];
 
-  let stepCount = $derived(model.history.length);
+  let stepCount = $derived(model.historyLength());
   let winTitle = $derived(`Tu as gagné en ${stepCount} étapes`);
 </script>
 

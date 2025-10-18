@@ -9,16 +9,15 @@
 
   const {model=$bindable()}: Props = $props();
 
-  let bestScore: [number, Pos] | undefined = $derived(model.scores[model.scoreHash() ?? "$custom"]);
-
-  let title = $derived(`Meilleur score (${bestScore ? "" + bestScore[0] : "∅"})`);
+  let bestScore: number | null = $derived(model.bestScore());
+  let title = $derived(`Meilleur score (${bestScore ?? "∅"})`);
 </script>
 
 <IconGroup title={title}>
   <Icon
     text="#cup"
     tooltip="Meilleur score"
-    disabled={model.locked || !bestScore}
+    disabled={model.locked || bestScore === null}
     onclick={() => model.dialog = "score"}
   />
 </IconGroup>
