@@ -43,7 +43,7 @@ export default class extends WithSize(Model<Position, Move>) {
 
   initialPosition(): Position {
     const size = this.rows * this.columns;
-    // todo
+    // todo niveau aléatoire
     const light = repeat(size, true);
     return { light, played: repeat(size, false) }
   }

@@ -93,7 +93,7 @@
   <circle r="20" width="30" height="30" class="cursor" {style}/> 
 {/snippet}
     
-{#snippet genericBoard(position: boolean[], interactive: boolean)}
+{#snippet genericBoard(position: readonly boolean[], interactive: boolean)}
   <div
     class="ui-board"
     style={

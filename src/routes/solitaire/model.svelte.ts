@@ -1,5 +1,5 @@
 import { Model, WithSize, WithScore, Objective } from '$lib/model.svelte';
-import { diffCoords, generate, generate2, random, repeat } from '$lib/util';
+import { countBy, diffCoords, generate, generate2, random, repeat } from '$lib/util';
 
 export enum Board { French, English, Circle, Grid3, Random };
 export type Position = boolean[];
@@ -110,7 +110,7 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
   }
 
   objective = () => Objective.Minimize;
-  score = () => this.position.filter(x => x).length;
+  score = () => countBy(this.position, x => x);
   // todo à vérifier
   scoreHash = () => this.boardType === Board.Random ? null : `${this.boardType},${this.rows},${this.columns}`;
   protected updateScore = () => this.updateScore2(true, "always");

@@ -27,7 +27,7 @@ export function range(start: number, end: number, step?: number): number[] {
   return res
 }
 
-export function countBy<A>(arr: A[], pred: (x: A, i: number) => boolean): number {
+export function countBy<A>(arr: readonly A[], pred: (x: A, i: number) => boolean): number {
   let count = 0;
   const n = arr.length;
   for (let i = 0; i < n; i++) {
@@ -42,7 +42,7 @@ export function take<A>(arr: A[], n: number): A[] {
   return arr.slice(0, n);
 }
 
-export function swap<A>(arr: A[], i: number, j: number): A[] {
+export function swap<A>(arr: readonly A[], i: number, j: number): A[] {
   const res = arr.slice();
   const tmp = res[i];
   res[i] = res[j];
@@ -50,7 +50,7 @@ export function swap<A>(arr: A[], i: number, j: number): A[] {
   return res; 
 }
 
-export function minBy<A>(arr: A[], fn: (x: A) => number) {
+export function minBy<A>(arr: readonly A[], fn: (x: A) => number) {
   let min = null;
   let bestScore = Infinity;
   const n = arr.length;
@@ -65,7 +65,7 @@ export function minBy<A>(arr: A[], fn: (x: A) => number) {
   return min;
 }
 
-export const maxBy = <A>(arr: A[], fn: (x: A) => number) => minBy(arr, x => -fn(x))
+export const maxBy = <A>(arr: readonly A[], fn: (x: A) => number) => minBy(arr, x => -fn(x))
 
 // renvoie les sous listes de taille k de [0, ... n-1]
 export function sublists(n: number, k: number): number[][] {
@@ -99,7 +99,7 @@ export function randomPick<A>(arr: A[]): A | null {
   }
 }
 
-export function shuffle<A>(arr: A[]): A[] {
+export function shuffle<A>(arr: readonly A[]): A[] {
   const res = arr.slice();
   for (let i = res.length-1; i >= 0; i--) {
     const j = Math.random() * (i+1) | 0;
@@ -112,25 +112,7 @@ export function shuffle<A>(arr: A[]): A[] {
 
 export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-export function clone<A>(value: A): A {
-  if (value === null || typeof value !== "object") {
-    return value;
-  }
-
-  if (Array.isArray(value)) {
-    return value.map(item => clone(item)) as A;
-  }
-
-  const clonedObj = {} as A;
-  for (const key in value) {
-    if (Object.prototype.hasOwnProperty.call(value, key)) {
-      clonedObj[key] = clone(value[key]);
-    }
-  }
-  return clonedObj;
-}
-
-export function allDistinct<A>(arr: A[]): boolean {
+export function allDistinct<A>(arr: readonly A[]): boolean {
   return new Set(arr).size === arr.length;
 }
 

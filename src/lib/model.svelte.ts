@@ -1,5 +1,5 @@
 import { tick } from "svelte";
-import {clone, delay, randomPick} from "./util";
+import { delay, randomPick } from "./util";
 import { page } from "$app/state";
 
 const VERSION = 1;
@@ -239,13 +239,8 @@ export abstract class Model<Position, Move> {
 
 type Constructor<T> = abstract new (...args: any[]) => T;
 
-export interface CombinatorialModel<Move> {
-  isLosingPosition: () => boolean;
-  possibleMoves: () => Move[];
-}
-
 export function WithCombinatorial<Pos, Move, TBase extends Constructor<Model<Pos, Move>>>(Base: TBase) {
-  abstract class C extends Base implements CombinatorialModel<Move> {
+  abstract class C extends Base {
     abstract isLosingPosition(): boolean;
     abstract possibleMoves(): Move[];
 
@@ -360,7 +355,7 @@ export function WithScore<Position, Move, TBase extends Constructor<Model<Positi
         const oldScore = this.#scores[hash];
         const isNewRecord = !oldScore || cmp(score, oldScore[0]);
         if (isNewRecord) {
-          this.#scores[hash] = [score, clone(this.position)];
+          this.#scores[hash] = [score, this.position];
         }
         return {
           isNewRecord,

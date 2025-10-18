@@ -95,7 +95,7 @@ export default class extends WithSize(Model<Position, Move>) {
 
   selectSquare(index: number) {
     if (this.sinks.length < this.sinkCount) {
-      this.position[index] = -1;
+      this.position = this.position.with(index, -1);
     } else {
       this.playA(index);
     }
