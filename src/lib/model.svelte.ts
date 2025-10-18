@@ -17,8 +17,8 @@ export interface SizeLimit {
 
 export abstract class Model<Position, Move> {
   #position: Position;
-  #history: Position[] = $state([]);
-  #redoHistory: Position[] = $state([]);
+  #history: Position[] = $state.raw([]);
+  #redoHistory: Position[] = $state.raw([]);
   turn: Turn = $state(1);
   computerStarts = $state(false);
   mode = $state(Mode.Solo);
@@ -96,7 +96,7 @@ export abstract class Model<Position, Move> {
     if (position === null)
       return false;
     if (push) {
-      this.#history.push(this.position);
+      this.#history = [...this.#history, this.position];
       this.#redoHistory = [];
     }
     this.#position = position;
@@ -118,7 +118,7 @@ export abstract class Model<Position, Move> {
 
     const {isNewRecord, showWin} = this.updateScore();
     if (isNewRecord) {
-      this.saveRecord();
+      this.onNewRecord();
     }
     
     if (showWin) {
@@ -174,7 +174,7 @@ export abstract class Model<Position, Move> {
     this.#newGameAction = null;
   }
 
-  saveRecord() {}
+  protected onNewRecord() {}
 
   private changeTurn() {
     if (this.mode === Mode.Duel) {
@@ -188,9 +188,10 @@ export abstract class Model<Position, Move> {
     if (this.#history.length === 0) {
       return;
     }
-    const position = this.#history.pop()!;
-    this.#redoHistory.push(this.position);
+    const [position, ...nextHistory] = this.#history;
+    this.#redoHistory = [...this.#redoHistory, position];
     this.#position = position;
+    this.#history = nextHistory;
     this.changeTurn();
   }
 
@@ -198,9 +199,10 @@ export abstract class Model<Position, Move> {
     if (this.#redoHistory.length === 0) {
       return;
     }
-    const position = this.#redoHistory.pop()!;
-    this.#history.push(this.#position);
+    const [position, ...nextHistory] = this.#redoHistory;
+    this.#history = [...this.#history, position];
     this.#position = position;
+    this.#redoHistory = nextHistory;
     this.changeTurn();
   }
 
@@ -211,7 +213,7 @@ export abstract class Model<Position, Move> {
     const position = this.#history[0];
     this.#history = [];
     this.#redoHistory = [];
-    this.turn = 1;
+    this.turn = this.computerStarts ? 2 : 1;
     this.#position = position;
   }
 
@@ -224,7 +226,7 @@ export abstract class Model<Position, Move> {
     } else if (this.mode === Mode.Duel) {
       return "Tour du second joueur"
     } else {
-      return "Tour de l'IA"
+      return "Tour de la machine"
     }
   }
 
@@ -233,7 +235,7 @@ export abstract class Model<Position, Move> {
       ? `Le ${this.turn === 2 ? "premier" : "second"} joueur gagne`
       : (this.turn === 2) !== this.computerStarts
       ? "Tu as gagné"
-      : "L'IA gagne";
+      : "La machine gagne";
   }
 }
 
@@ -396,7 +398,7 @@ export function WithScore<Position, Move, TBase extends Constructor<Model<Positi
       }
     }
 
-    saveRecord() {
+    protected onNewRecord() {
       const routeId = page.route.id;
       if (!routeId) {
         return;
