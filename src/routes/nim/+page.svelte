@@ -1,5 +1,6 @@
 <script lang="ts">
   import { range } from '$lib/util';
+  import { Turn } from '$lib/model.svelte';
   import Model from './model.svelte';
   import Template from '$lib/components/Template.svelte';
   import * as I from '$lib/components/Icons';
@@ -10,7 +11,7 @@
   let turnMessage = $derived(
     model.isLevelFinished() 
     ? "Partie finie"
-    : model.turn === 1
+    : model.turn === Turn.Player1
     ? "Tour du joueur bleu"
     : "Tour du joueur rouge"
   );

@@ -4,9 +4,9 @@ import { page } from "$app/state";
 
 const VERSION = 1;
 
-export type Turn = 1 | 2;
 export enum Mode { Solo, Random, Expert, Duel };
 export enum Dialog { None, Rules, Score, Customize, NewGame };
+export enum Turn { Player1, Player2 }
 
 export interface SizeLimit {
   minRows: number;
@@ -19,7 +19,7 @@ export abstract class Model<Position, Move> {
   #position: Position;
   #history: Position[] = $state.raw([]);
   #redoHistory: Position[] = $state.raw([]);
-  turn: Turn = $state(1);
+  turn = $state(Turn.Player1);
   computerStarts = $state(false);
   mode = $state(Mode.Solo);
   help = $state(false);
@@ -100,7 +100,7 @@ export abstract class Model<Position, Move> {
       this.#redoHistory = [];
     }
     this.#position = position;
-    this.turn = this.turn == 1 ? 2 : 1;
+    this.turn = this.turn == Turn.Player1 ? Turn.Player2 : Turn.Player1;
     return true;
   }
 
@@ -156,7 +156,7 @@ export abstract class Model<Position, Move> {
     this.#history = [];
     this.#redoHistory = [];
     this.help = false;
-    this.turn = 1;
+    this.turn = Turn.Player1;
     this.computerStarts = false;
     //if (this.isScoreModel(this)) {
     //  delete this.scores["$custom"];
@@ -178,50 +178,53 @@ export abstract class Model<Position, Move> {
 
   private changeTurn() {
     if (this.mode === Mode.Duel) {
-      this.turn = this.turn === 1 ? 2 : 1;
+      this.turn = this.turn === Turn.Player1 ? Turn.Player2 : Turn.Player1;
     } else {
-      this.turn = this.computerStarts ? 2 : 1;
+      this.turn = this.computerStarts ? Turn.Player2 : Turn.Player1;
     }
   }
 
   undo = () => {
     if (this.#history.length === 0) {
-      return;
+      return false;
     }
     const [position, ...nextHistory] = this.#history;
     this.#redoHistory = [...this.#redoHistory, position];
     this.#position = position;
     this.#history = nextHistory;
     this.changeTurn();
+    return true;
   }
 
   redo = () => {
     if (this.#redoHistory.length === 0) {
-      return;
+      return false;
     }
     const [position, ...nextHistory] = this.#redoHistory;
     this.#history = [...this.#history, position];
     this.#position = position;
     this.#redoHistory = nextHistory;
     this.changeTurn();
+    return true;
   }
 
   reset = () => {
     if (this.#history.length === 0) {
-      return;
+      return false;
     }
     const position = this.#history[0];
     this.#history = [];
     this.#redoHistory = [];
-    this.turn = this.computerStarts ? 2 : 1;
+    this.turn = this.computerStarts ? Turn.Player2 : Turn.Player1;
     this.#position = position;
+    return true;
   }
 
   // un message qui indique à qui est le tour ou si la partie est finie
   turnMessage() {
     if (this.isLevelFinished()) {
       return "Partie finie"
-    } else if ((this.turn === 1) !== this.computerStarts) {
+    } else if ((this.turn === Turn.Player1) !== this.computerStarts) {
       return "Tour du premier joueur"
     } else if (this.mode === Mode.Duel) {
       return "Tour du second joueur"
@@ -232,8 +235,8 @@ export abstract class Model<Position, Move> {
 
   winTitleFor2Player() {
     return this.mode === Mode.Duel
-      ? `Le ${this.turn === 2 ? "premier" : "second"} joueur gagne`
-      : (this.turn === 2) !== this.computerStarts
+      ? `Le ${this.turn === Turn.Player1 ? "premier" : "second"} joueur gagne`
+      : (this.turn === Turn.Player2) !== this.computerStarts
       ? "Tu as gagné"
       : "La machine gagne";
   }
@@ -246,7 +249,7 @@ export function WithCombinatorial<Pos, Move, TBase extends Constructor<Model<Pos
     abstract isLosingPosition(): boolean;
     abstract possibleMoves(): Move[];
 
-    constructor(...args: any) {
+    constructor(...args: any[]) {
       super(...args);
       this.mode = Mode.Random;
     }
@@ -266,7 +269,7 @@ export function WithCombinatorial<Pos, Move, TBase extends Constructor<Model<Pos
             found = true;
           }
           this.position = position;
-          this.turn = this.turn == 1 ? 2 : 1;
+          this.turn = this.turn === Turn.Player1 ? Turn.Player2 : Turn.Player1;
           if (found) {
             bestMove = move;
             break;
@@ -292,9 +295,9 @@ export interface SizeModel {
 }
 
 export function isSizeModel<Pos, Move>(model: Model<Pos, Move>): model is Model<Pos, Move> & SizeModel {
-  return (model as any).rows !== undefined 
-    && (model as any).columns !== undefined
-    && (model as any).customSize !== undefined
+  return (model as Partial<SizeModel>).rows !== undefined 
+    && (model as Partial<SizeModel>).columns !== undefined
+    && (model as Partial<SizeModel>).customSize !== undefined
 }
 
 export function WithSize<Pos, Move, TBase extends Constructor<Model<Pos, Move>>>(Base: TBase) {
@@ -303,7 +306,7 @@ export function WithSize<Pos, Move, TBase extends Constructor<Model<Pos, Move>>>
     columns = $state(0);
     customSize = $state(false);
 
-    constructor(...args: any) {
+    constructor(...args: any[]) {
       super(...args);
     }
 

@@ -1,5 +1,5 @@
 import { generate, random } from '$lib/util';
-import { Model, WithCombinatorial } from '$lib/model.svelte';
+import { Model, Turn, WithCombinatorial } from '$lib/model.svelte';
 
 type Position = [number, number][];
 type Move = {pile: number, pos: number};
@@ -16,7 +16,7 @@ export default class extends WithCombinatorial(Model<Position, Move>) {
   canPlay(move: Move) {
     const [p1, p2] = this.position[move.pile];
     return move.pos != p1 && move.pos != p2
-        && (this.turn === 1 ? move.pos < p2 : move.pos > p1)
+        && (this.turn === Turn.Player1 ? move.pos < p2 : move.pos > p1)
   }
 
   play(move: Move): Position | null {
@@ -24,7 +24,7 @@ export default class extends WithCombinatorial(Model<Position, Move>) {
       return null;
     }
     const [p1, p2] = this.position[move.pile];
-    return this.position.with(move.pile, this.turn === 1 ? [move.pos, p2] : [p1, move.pos]);
+    return this.position.with(move.pile, this.turn === Turn.Player1 ? [move.pos, p2] : [p1, move.pos]);
   }
 
   initialPosition = () =>
@@ -32,7 +32,7 @@ export default class extends WithCombinatorial(Model<Position, Move>) {
 
   isLevelFinished = () =>
     this.position.every(([p1, p2]) =>
-      p2 - p1 === 1 && p1 == (this.turn === 2 ? this.length - 2 : 0)
+      p2 - p1 === 1 && p1 === (this.turn === Turn.Player2 ? this.length - 2 : 0)
     );
 
   possibleMoves(): Move[] {
@@ -45,7 +45,7 @@ export default class extends WithCombinatorial(Model<Position, Move>) {
 
     const cmpKey = (move: Move) => {
       const [x, y] = this.position[move.pile];
-      return this.turn === 1 ? x - move.pos : move.pos - y;
+      return this.turn === Turn.Player1 ? x - move.pos : move.pos - y;
     }
 
     return moves
