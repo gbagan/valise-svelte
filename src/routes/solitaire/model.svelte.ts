@@ -14,7 +14,7 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
   
   constructor() {
     super([]);
-    this.resize(5, 1);
+    this.resize(6, 1);
   }
 
   // retourne la position du trou situé entre les deux positions d'un coup si celui est valide

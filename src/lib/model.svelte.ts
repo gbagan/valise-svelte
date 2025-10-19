@@ -81,7 +81,7 @@ export abstract class Model<Position, Move> {
     if (position === null)
       return false;
     if (push) {
-      this.#history = [...this.#history, this.position];
+      this.#history = [this.position, ...this.#history];
       this.#redoHistory = [];
     }
     this.#position = position;
@@ -148,7 +148,7 @@ export abstract class Model<Position, Move> {
       return false;
     }
     const [position, ...nextHistory] = this.#history;
-    this.#redoHistory = [...this.#redoHistory, position];
+    this.#redoHistory = [this.#position, ...this.#redoHistory];
     this.#position = position;
     this.#history = nextHistory;
     return true;
@@ -161,7 +161,7 @@ export abstract class Model<Position, Move> {
       return false;
     }
     const [position, ...nextHistory] = this.#redoHistory;
-    this.#history = [...this.#history, position];
+    this.#history = [this.#position, ...this.#history];
     this.#position = position;
     this.#redoHistory = nextHistory;
     return true;
@@ -173,7 +173,7 @@ export abstract class Model<Position, Move> {
     if (this.#history.length === 0) {
       return false;
     }
-    const position = this.#history[0];
+    const position = this.#history.at(-1)!;
     this.#history = [];
     this.#redoHistory = [];
     this.#position = position;

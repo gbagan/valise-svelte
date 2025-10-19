@@ -27,7 +27,7 @@
       disabled={
         Array.isArray(disabled) 
         ? disabled[i] 
-        : typeof disabled === "function" 
+        : typeof disabled === "function"
         ? disabled(val) 
         : !!disabled
       }

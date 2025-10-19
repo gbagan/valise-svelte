@@ -71,8 +71,6 @@
   }
 </script>
 
-
-
 {#snippet spiralPath()}
   <g>
     <path d={spiralDescription} fill="none" stroke="black" stroke-width="3"/>
