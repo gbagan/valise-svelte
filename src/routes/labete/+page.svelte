@@ -121,8 +121,8 @@
       values={[Mode.Standard, Mode.Cylinder, Mode.Torus]}
       text={["#grid-normal", "#grid-cylinder", "#grid-torus"]}
       tooltip={["Normale", "Cylindrique", "Torique"]}
-      selected={model.gameMode}
-      setter={i => model.newGame(() => model.gameMode = i)}
+      selected={model.mode}
+      setter={i => model.newGame(() => model.mode = i)}
     />
     <I.SizesGroup bind:model={model}
       values={[[3,3], [5,5], [6,6]]}

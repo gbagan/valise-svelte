@@ -1,19 +1,12 @@
 import { tick } from "svelte";
-import { delay, randomPick } from "./util";
 
 export const VERSION = 1;
-
-export enum Mode { Solo, Random, Expert, Duel };
 export enum Dialog { None, Rules, Score, Customize, NewGame };
-export enum Turn { Player1, Player2 }
 
 export abstract class Model<Position, Move> {
   #position: Position;
   #history: Position[] = $state.raw([]);
   #redoHistory: Position[] = $state.raw([]);
-  turn = $state(Turn.Player1);
-  computerStarts = $state(false);
-  mode = $state(Mode.Solo);
   help = $state(false);
   #isVictoryShown = $state(false);
   #dialog = $state(Dialog.None);
@@ -92,7 +85,6 @@ export abstract class Model<Position, Move> {
       this.#redoHistory = [];
     }
     this.#position = position;
-    this.turn = this.turn == Turn.Player1 ? Turn.Player2 : Turn.Player1;
     return true;
   }
 
@@ -102,6 +94,8 @@ export abstract class Model<Position, Move> {
       showWin: this.isLevelFinished()
     }
   }
+
+  protected afterPlay() {};
 
   async playA(move: Move) {
     if (!this.playHelper(move, true)) {
@@ -115,40 +109,16 @@ export abstract class Model<Position, Move> {
     
     if (showWin) {
       await this.showVictory();
-    } else if (this.mode === Mode.Expert || this.mode === Mode.Random) {
-      this.lock(async () => {
-        await delay(1000);
-        this.computerPlays();
-      })
+    } else {
+      this.afterPlay();
     }
-  }
-
-  async computerPlays() {
-    const move = this.computerMove();
-    if (move === null) {
-      return;
-    }
-    this.playHelper(move);
-    if (this.isLevelFinished()) {
-      await this.showVictory();
-    }
-  }
-
-  computerMove(): Move | null {
-    return null;
   }
 
   protected resetAttributes() {
     this.#history = [];
     this.#redoHistory = [];
     this.help = false;
-    this.turn = Turn.Player1;
-    this.computerStarts = false;
-    //if (this.isScoreModel(this)) {
-    //  delete this.scores["$custom"];
-    //}
   }
-
 
   newGame(action?: () => void) {
     if (!this.#newGameAction && action && this.#history.length > 0 && !this.isLevelFinished()) {
@@ -156,6 +126,8 @@ export abstract class Model<Position, Move> {
       this.#dialog = Dialog.NewGame;
       return;
     }
+
+    this.resetAttributes();
 
     (action || this.#newGameAction || (() => {}))();
     this.onNewGame();
@@ -171,15 +143,7 @@ export abstract class Model<Position, Move> {
 
   protected onNewRecord() {}
 
-  private changeTurn() {
-    if (this.mode === Mode.Duel) {
-      this.turn = this.turn === Turn.Player1 ? Turn.Player2 : Turn.Player1;
-    } else {
-      this.turn = this.computerStarts ? Turn.Player2 : Turn.Player1;
-    }
-  }
-
-  undo = () => {
+  protected undoHelper() {
     if (this.#history.length === 0) {
       return false;
     }
@@ -187,11 +151,12 @@ export abstract class Model<Position, Move> {
     this.#redoHistory = [...this.#redoHistory, position];
     this.#position = position;
     this.#history = nextHistory;
-    this.changeTurn();
     return true;
   }
 
-  redo = () => {
+  undo = () => this.undoHelper();
+
+  protected redoHelper() {
     if (this.#redoHistory.length === 0) {
       return false;
     }
@@ -199,85 +164,23 @@ export abstract class Model<Position, Move> {
     this.#history = [...this.#history, position];
     this.#position = position;
     this.#redoHistory = nextHistory;
-    this.changeTurn();
     return true;
   }
 
-  reset = () => {
+  redo = () => this.redoHelper();
+
+  protected resetHelper() {
     if (this.#history.length === 0) {
       return false;
     }
     const position = this.#history[0];
     this.#history = [];
     this.#redoHistory = [];
-    this.turn = this.computerStarts ? Turn.Player2 : Turn.Player1;
     this.#position = position;
     return true;
   }
 
-  // un message qui indique à qui est le tour ou si la partie est finie
-  turnMessage() {
-    if (this.isLevelFinished()) {
-      return "Partie finie"
-    } else if ((this.turn === Turn.Player1) !== this.computerStarts) {
-      return "Tour du premier joueur"
-    } else if (this.mode === Mode.Duel) {
-      return "Tour du second joueur"
-    } else {
-      return "Tour de la machine"
-    }
-  }
-
-  winTitleFor2Player() {
-    return this.mode === Mode.Duel
-      ? `Le ${this.turn === Turn.Player1 ? "premier" : "second"} joueur gagne`
-      : (this.turn === Turn.Player2) !== this.computerStarts
-      ? "Tu as gagné"
-      : "La machine gagne";
-  }
+  reset = () => this.resetHelper();
 }
 
 export type Constructor<T> = abstract new (...args: any[]) => T;
-
-export function WithCombinatorial<Pos, Move, TBase extends Constructor<Model<Pos, Move>>>(Base: TBase) {
-  abstract class C extends Base {
-    abstract isLosingPosition(): boolean;
-    abstract possibleMoves(): Move[];
-
-    constructor(...args: any[]) {
-      super(...args);
-      this.mode = Mode.Random;
-    }
-  
-    computerMove(): Move | null {
-      if (this.isLevelFinished()) {
-        return null;
-      }
-      const moves = this.possibleMoves();
-      let bestMove = null;
-      if (this.mode === Mode.Expert) {
-        const position = this.position;
-        for (const move of moves) {
-          let found = false;
-          this.playHelper(move);
-          if (this.isLosingPosition()) {
-            found = true;
-          }
-          this.position = position;
-          this.turn = this.turn === Turn.Player1 ? Turn.Player2 : Turn.Player1;
-          if (found) {
-            bestMove = move;
-            break;
-          }
-        }
-      }
-      if (bestMove !== null) {
-        return bestMove;
-      } else {
-        return randomPick(moves)
-      }
-    }
-  } 
-
-  return C;
-}

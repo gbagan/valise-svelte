@@ -1,5 +1,7 @@
 import { generate, random } from '$lib/util';
-import { Model, Turn, WithCombinatorial } from '$lib/model.svelte';
+import { Model } from '$lib/model.svelte';
+import { Turn } from '$lib/twoplayers.svelte';
+import { WithCombinatorial } from '$lib/combinatorial.svelte';
 
 type Position = [number, number][];
 type Move = {pile: number, pos: number};

@@ -31,7 +31,7 @@ function allRotations(beast: Beast): Beast[] {
 const pseudoRandomPick = <A>(arr: A[]) => arr[28921 % arr.length]
 
 export default class extends WithScore(WithSize(Model<Position, Move>)) {
-  gameMode = $state(Mode.Standard);
+  mode = $state(Mode.Standard);
   beastType = $state(BeastType.Type1);
   selectedColor = $state(0);
   currentPosition: {x: number, y: number} | null = $state(null);
@@ -77,7 +77,7 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
   }
 
   adaptBeast = (beast: Beast): Beast => beast.map(([row, col]) => {
-    switch (this.gameMode) {
+    switch (this.mode) {
       case Mode.Standard: return [row, col];
       case Mode.Cylinder: return [row, mod(col, this.columns)];
       default: return  [mod(row, this.rows), mod(col, this.columns)];

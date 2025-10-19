@@ -1,5 +1,6 @@
 import { random, range } from '$lib/util';
-import { Model, WithCombinatorial } from '$lib/model.svelte';
+import { Model } from '$lib/model.svelte';
+import { WithCombinatorial } from '$lib/combinatorial.svelte';
 import { WithSize } from '$lib/size.svelte';
 
 type Position = {left: number, right: number, top: number, bottom: number};

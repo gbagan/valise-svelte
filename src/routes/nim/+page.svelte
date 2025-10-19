@@ -1,6 +1,6 @@
 <script lang="ts">
   import { range } from '$lib/util';
-  import { Turn } from '$lib/model.svelte';
+  import { Turn } from '$lib/twoplayers.svelte';
   import Model from './model.svelte';
   import Template from '$lib/components/Template.svelte';
   import * as I from '$lib/components/Icons';

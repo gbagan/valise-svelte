@@ -18,7 +18,6 @@
       model.columns = columns;
       model.customSize = false;
     });
-
 </script>
 
 <IconGroup title="Dimensions de la grille">

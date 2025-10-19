@@ -1,6 +1,7 @@
 import { answer, makeArenaGraph, type Arena, type ArenaGraph } from "$lib/arena";
 import type { Edge, Graph } from "$lib/graph";
-import { Model, Mode } from "$lib/model.svelte";
+import { Model } from "$lib/model.svelte";
+import { Mode, WithTwoPlayers } from "$lib/twoplayers.svelte";
 import { WithSize } from "$lib/size.svelte";
 import { allDistinct, countBy, generate, generate2, minBy, randomPick, range, sublists } from "$lib/util";
 
@@ -211,7 +212,7 @@ function goodPermutation(graph: AdjGraph, guards: Conf, answer: Conf): number[] 
 
 // states
 
-export default class extends WithSize(Model<Position, Move>) {
+export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
   phase = $state(Phase.Preparation);
   graphKind = $state(GraphKind.Path);
   rulesName = $state(Rules.One);
@@ -224,8 +225,13 @@ export default class extends WithSize(Model<Position, Move>) {
     this.rows = 6;
     this.columns = 0;
     this.customSize = true;
-    this.mode = Mode.Duel;
+    //this.mode = Mode.Duel;
     this.newGame();
+  }
+
+  get didMachineStart() {
+    // hack pour empécher l'IA de commencer tant qu'on ait en phase de préparation
+    return super.didMachineStart || this.phase === Phase.Preparation;
   }
 
   nextMove = $derived(this.position.guards);
@@ -250,7 +256,7 @@ export default class extends WithSize(Model<Position, Move>) {
   validate = () => {
     if (this.phase === Phase.Preparation) {
       this.phase = Phase.Game;
-      this.computerStarts = false;
+      //this.computerStarts = false;
     } else {
       this.playA(this.nextMove);
     }
@@ -297,8 +303,6 @@ export default class extends WithSize(Model<Position, Move>) {
     this.nextMove = [];
     this.phase = Phase.Preparation;
     // draggedGuard;
-    // hack pour empécher l'IA de commencer tant qu'on ait en phase de préparation
-    this.computerStarts = true;
   }
 
   isLevelFinished = () => {
@@ -332,8 +336,8 @@ export default class extends WithSize(Model<Position, Move>) {
       return randomPick(candidates);
     }
   }
-
-  computerMove(): Move | null {
+  
+  machineMove(): Move | null {
     if (this.levelFinished) {
       return null;
     } else if (!this.arena || this.mode === Mode.Random) {
