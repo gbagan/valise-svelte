@@ -1,10 +1,12 @@
 import { allDistinct, diffCoords, random, range } from '$lib/util';
 import { Model } from '$lib/model.svelte';
-import { WithSize } from '$lib/size.svelte';
+import { WithSize, type SizeLimit } from '$lib/size.svelte';
 
 type Position = number[];
 type Move = number;
 export enum Mode { Mode1, Mode2 };
+
+const sizeLimit: SizeLimit = { minRows: 2, minCols: 2, maxRows: 9, maxCols: 9 };
 
 export default class extends WithSize(Model<Position, Move>) {
   exit: number | null = $state(null);
@@ -12,13 +14,10 @@ export default class extends WithSize(Model<Position, Move>) {
 
   constructor() {
     super([]);
-    this.rows = 4;
-    this.columns = 6;
-    this.customSize = false;
-    this.newGame();
+    this.resize(4, 6);
   }
 
-   // renvoie un chemin horizontal ou vertical entre u et v si celui ci existe (u exclus du chemin)
+  // renvoie un chemin horizontal ou vertical entre u et v si celui ci existe (u exclus du chemin)
   pathBetween(u: number, v: number): number[] | null {
     const [row, col] = diffCoords(this.columns, u, v);
     if (row == 0) {
@@ -75,6 +74,10 @@ export default class extends WithSize(Model<Position, Move>) {
   
   onNewGame() {
     this.exit = this.gameMode === Mode.Mode1 ? random(0, this.rows * this.columns) : null;
+  }
+
+  get sizeLimit() {
+    return sizeLimit;
   }
 
   selectSquare(square: number) {

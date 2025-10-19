@@ -196,7 +196,7 @@
   Dans une variante, le défenseur peut déplacer <strong>plusieurs gardes</strong> à chaque tour.
 {/snippet}
 
-<Template bind:model={model} {board} {config} {custom} {rules} sizeLimit={model.sizeLimit} {winTitle} />
+<Template bind:model={model} {board} {config} {custom} {rules} {winTitle} />
 
 <style>
   .board {

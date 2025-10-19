@@ -1,10 +1,17 @@
 import { range, repeat } from '$lib/util';
 import { Model } from '$lib/model.svelte';
 import { WithCombinatorial } from '$lib/combinatorial.svelte';
-import { WithSize } from '$lib/size.svelte';
+import { WithSize, type SizeLimit } from '$lib/size.svelte';
 
 type Position = number;
 type Move = number;
+
+const sizeLimit: SizeLimit = {
+  minRows: 5,
+  maxRows: 30,
+  minCols: 0,
+  maxCols: 0,
+}
 
 export default class extends WithCombinatorial(WithSize(Model<Position, Move>)) {
   moves = $state([1, 2, 3]);
@@ -12,10 +19,7 @@ export default class extends WithCombinatorial(WithSize(Model<Position, Move>)) 
   
   constructor() {
     super(20);
-    this.rows = 20;
-    this.columns = 0;
-    this.customSize = true;
-    this.newGame();
+    this.resize(20, 20, true);
   }
   
   canPlay = (v: number) => {
@@ -40,6 +44,10 @@ export default class extends WithCombinatorial(WithSize(Model<Position, Move>)) 
   possibleMoves = () => range(0, this.rows+1).filter(this.canPlay);
   isLosingPosition = () => this.losingPositions[this.position];
   onNewGame = () => this.marked = repeat(this.rows, false);
+
+  get sizeLimit() {
+    return sizeLimit;
+  }
 
   movesSetter(move: number) {
     const next = [1, 2, 3, 4, 5].filter(m => (m === move) != this.moves.includes(m));

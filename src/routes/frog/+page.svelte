@@ -1,7 +1,6 @@
 <script lang="ts">
   import Model from './model.svelte';
   import { generate, range } from '$lib/util';
-  import { type SizeLimit } from '$lib/size.svelte';
   import Template from '$lib/components/Template.svelte';
   import * as I from '$lib/components/Icons';
   import Config from '$lib/components/Config.svelte';
@@ -9,13 +8,6 @@
   let model = $state(new Model());
 
   let reachable = $derived(generate(model.rows+1, i => model.canPlay(i)));
-
-  const sizeLimit: SizeLimit = {
-    minRows: 5,
-    maxRows: 30,
-    minCols: 0,
-    maxCols: 0,
-  }
 
   type Cartesian = { x: number, y: number };
   type Polar = { radius: number, theta: number };
@@ -178,7 +170,7 @@
   <strong>shift + clic gauche</strong>.
 {/snippet}
 
-<Template bind:model={model} {board} {config} {rules} {winTitle} {sizeLimit} />
+<Template bind:model={model} {board} {config} {rules} {winTitle} />
 
 <style>
   .board {

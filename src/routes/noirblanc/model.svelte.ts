@@ -1,5 +1,5 @@
 import { Model } from '$lib/model.svelte';
-import { WithSize } from '$lib/size.svelte';
+import { WithSize, type SizeLimit } from '$lib/size.svelte';
 import { diffCoords, repeat } from '$lib/util';
 
 type Position = {light: boolean[], played: boolean[]};
@@ -7,7 +7,8 @@ type Move = number;
 export type Mode = 0 | 1 | 2 | 3;
 
 const sizes: [number, number][] = [ [3, 3], [4, 4], [2, 10], [3, 10], [5, 5]]; 
-  
+const sizeLimit: SizeLimit = { minRows: 2, minCols: 2, maxRows: 12, maxCols: 12 };
+
 export default class extends WithSize(Model<Position, Move>) {
   gameMode: Mode = $state(0);
   level = $state(0); // le niveau en cours
@@ -15,10 +16,7 @@ export default class extends WithSize(Model<Position, Move>) {
 
   constructor() {
     super({light: [], played: [] });
-    this.rows = 3;
-    this.columns = 3;
-    this.customSize = false;
-    this.newGame();
+    this.resize(3, 3);
   }
 
   // indique si index1 est voisine de index2 selon le mode de jeu en cours
@@ -62,6 +60,10 @@ export default class extends WithSize(Model<Position, Move>) {
       this.rows = 8;
       this.columns = 8;  
     }
+  }
+
+  get sizeLimit() {
+    return sizeLimit;
   }
 
   // si le niveau est fini, on met à jour les nivaux débloqués

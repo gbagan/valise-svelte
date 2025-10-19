@@ -16,8 +16,6 @@
     "Dimensions personnalisées", "Grille aléatoire"
   ];
   const levelTooltip = (i: number, unblocked: boolean) => unblocked ? levelTooltips[i] : "Difficulté non débloquée";
-
-  const sizeLimit: SizeLimit = { minRows: 2, minCols: 2, maxRows: 12, maxCols: 12 };
 </script>
 
 {#snippet square(light: boolean, cross: boolean, style: string, onclick: () => void)}
@@ -88,7 +86,7 @@
   Selon le mode choisi, les règles pour retourner les tuiles changent.
 {/snippet}
 
-<Template bind:model={model} {board} {config} {rules} {sizeLimit} />
+<Template bind:model={model} {board} {config} {rules} />
 
 <style>
   .board-container {

@@ -33,8 +33,6 @@
 
   let message = $derived(model.soap === null ? "Place le savon" : model.turnMessage());
   let winTitle = $derived(model.winTitleFor2Player());
-
-  const sizeLimit: SizeLimit = { minRows: 4, minCols: 4, maxRows: 10, maxCols: 10 };
 </script>
 
 {#snippet cutter(row: number, col: number, move: Move)}
@@ -143,7 +141,7 @@
   Lorsqu'il ne reste que le carré empoisonné, le joueur qui doit jouer a <strong>perdu</strong>.
 {/snippet}
 
-<Template bind:model={model} {board} {config} {rules} {winTitle} {sizeLimit} />
+<Template bind:model={model} {board} {config} {rules} {winTitle} />
 
 <style>
   .board-container {

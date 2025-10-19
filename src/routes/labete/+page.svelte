@@ -9,8 +9,6 @@
   import { onMount } from 'svelte';
 
   let model = $state(new Model());
-  
-  const sizeLimit: SizeLimit = { minRows: 2, minCols: 2, maxRows: 9, maxCols: 9 };
   let winTitle = $derived(`Record: ${model.score()} pièges`);
 
   const colors = [ "#5aa02c", "blue", "red", "yellow", "magenta", "cyan", "orange", "darkgreen", "grey" ];
@@ -196,7 +194,7 @@
 {/snippet}
 
 <svelte:window on:keydown={handleKeydown} />
-<Template bind:model={model} {board} {config} {rules} {sizeLimit} {winTitle} {bestScore} {custom} />
+<Template bind:model={model} {board} {config} {rules} {winTitle} {bestScore} {custom} />
 
 <style>
   .container {

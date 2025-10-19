@@ -1,7 +1,6 @@
 <script lang="ts">
   import {default as Model, type TileType} from './model.svelte';
   import { coords, gridStyle } from '$lib/util';
-  import { type SizeLimit } from '$lib/size.svelte';
   import Template from '$lib/components/Template.svelte';
   import * as I from '$lib/components/Icons';
   import Config from '$lib/components/Config.svelte';
@@ -15,8 +14,6 @@
     hoverSquare !== null 
     && (model.position[hoverSquare] !== 0 || model.play(hoverSquare) === null)
   );
-
-  const sizeLimit: SizeLimit = {minRows: 3, minCols: 3, maxRows: 10, maxCols: 10};
 
   const border = (i: number, d: number) => model.position[i] !== model.position[i+d];
 
@@ -194,7 +191,7 @@
 {/snippet}
 
 <svelte:window on:keydown={handleKeydown} />
-<Template bind:model={model} {board} {config} {rules} {custom} {sizeLimit} />
+<Template bind:model={model} {board} {config} {rules} {custom} />
 
 <style>
   .container {

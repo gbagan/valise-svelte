@@ -41,10 +41,6 @@ export abstract class Model<Position, Move> {
     this.#isVictoryShown = true;
   }
 
-  get locked() {
-    return this.#locked;
-  }
-
   isHistoryEmpty = () => this.#history.length === 0;
   isRedoHistoryEmpty = () => this.#redoHistory.length === 0;
   historyLength = () => this.#history.length;
@@ -68,6 +64,10 @@ export abstract class Model<Position, Move> {
 
   openCustomizeDialog = () => {
     this.#dialog = Dialog.Customize;
+  }
+
+  get locked() {
+    return this.#locked;
   }
 
   lock = async (action: () => Promise<void>) => {

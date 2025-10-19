@@ -16,10 +16,9 @@
     bestScore?: Snippet<[Position]>;
     custom?: Snippet;
     winTitle?: string;
-    sizeLimit?: SizeLimit;
   }
 
-  const { board, config, rules, bestScore, custom, winTitle, sizeLimit,
+  const { board, config, rules, bestScore, custom, winTitle,
           model=$bindable()}: Props = $props();
 </script>
 
@@ -35,14 +34,14 @@
 {/snippet}
 
 <div class="main-container">
-  {#if sizeLimit && isSizeModel(model)}
+  {#if isSizeModel(model) && model.sizeLimit}
     <IncDecGrid
       rows={model.rows}
       columns={model.columns}
-      showRowButtons={model.customSize && sizeLimit.minRows < sizeLimit.maxRows}
-      showColButtons={model.customSize && sizeLimit.minCols < sizeLimit.maxCols}
+      showRowButtons={model.customSize && model.sizeLimit.minRows < model.sizeLimit.maxRows}
+      showColButtons={model.customSize && model.sizeLimit.minCols < model.sizeLimit.maxCols}
       locked={model.locked}
-      resize={(row, col) => model.setGridSize(row, col, sizeLimit)}
+      resize={model.resize}
     >
       {@render board()}
     </IncDecGrid>

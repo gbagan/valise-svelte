@@ -6,16 +6,15 @@ import { WithSize } from '$lib/size.svelte';
 export type Position = number[];
 type Move = {from: number, to: number};
 
+const sizeLimit = { minRows: 1, minCols: 2, maxRows: 6, maxCols: 12 };
+
 export default class extends WithScore(WithSize(Model<Position, Move>)) {
   baseCount = $state(5);
   missingPeg = $state(1);
   
   constructor() {
     super([]);
-    this.rows = 4;
-    this.columns = 4;
-    this.customSize = false;
-    this.newGame();
+    this.resize(4, 4);
   }
 
   play({ from, to }: Move) {
@@ -46,4 +45,8 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
   scoreHash = () => `${this.rows},${this.columns}`;
   objective = () => Objective.Minimize;
   protected updateScore = () => this.updateScore2(true, "always");
+
+  get sizeLimit() {
+    return sizeLimit;
+  }
 }

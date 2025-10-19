@@ -1,7 +1,6 @@
 <script lang="ts">
   import { default as Model, piecesList, type Piece, type Position } from "./model.svelte";
   import { coords, gridStyle, range } from "$lib/util";
-  import type { SizeLimit } from "$lib/size.svelte";
   import PointerTracker from "$lib/components/PointerTracker.svelte";
   import Template from "$lib/components/Template.svelte";
   import * as I from "$lib/components/Icons";
@@ -9,8 +8,7 @@
   import Dialog from "$lib/components/Dialog.svelte";
   import { onMount } from "svelte";
 
-  const angles = [ 45, 90, 135, 0, 0, 180, -45, -90, -135 ]
-  const sizeLimit: SizeLimit = { minRows:3, minCols: 3, maxRows: 9, maxCols: 9 };
+  const angles = [ 45, 90, 135, 0, 0, 180, -45, -90, -135 ];
 
   let model = $state(new Model());
 
@@ -215,7 +213,7 @@
   </Dialog>
 {/snippet}
 
-<Template bind:model={model} {board} {config} {rules} {bestScore} {custom} {sizeLimit} />
+<Template bind:model={model} {board} {config} {rules} {bestScore} {custom} />
 
 <style>
   .board-container {

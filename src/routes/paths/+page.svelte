@@ -8,10 +8,7 @@
   import Config from '$lib/components/Config.svelte';
 
   let model = $state(new Model());
-
   let levelFinished = $derived(model.isLevelFinished());
-
-  const sizeLimit: SizeLimit = { minRows: 2, minCols: 2, maxRows: 9, maxCols: 9 };
 
   let grid = $derived.by(() => {
     const g = repeat(model.rows * model.columns, false);
@@ -158,7 +155,7 @@
   </p>
 {/snippet}
 
-<Template bind:model={model} {board} {config} {rules} {sizeLimit} />
+<Template bind:model={model} {board} {config} {rules} />
 
 <style>
   .board-container {

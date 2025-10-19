@@ -1,7 +1,7 @@
 import { coords, countBy, generate2, mod, repeat } from '$lib/util';
 import { Model } from '$lib/model.svelte';
 import { Objective, WithScore } from '$lib/score.svelte';
-import { WithSize } from '$lib/size.svelte';
+import { WithSize, type SizeLimit } from '$lib/size.svelte';
 
 export enum Mode { Standard, Cylinder, Torus };
 type Beast = [number, number][];
@@ -30,6 +30,8 @@ function allRotations(beast: Beast): Beast[] {
 // Il n'est pas nécessaire d'avoir une vraie fonction aléatoire
 const pseudoRandomPick = <A>(arr: A[]) => arr[28921 % arr.length]
 
+const sizeLimit: SizeLimit = { minRows: 2, minCols: 2, maxRows: 9, maxCols: 9 };
+
 export default class extends WithScore(WithSize(Model<Position, Move>)) {
   mode = $state(Mode.Standard);
   beastType = $state(BeastType.Type1);
@@ -42,10 +44,7 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
 
   constructor() {
     super([]);
-    this.rows = 5;
-    this.columns = 5;
-    this.customSize = false;
-    this.newGame()
+    this.resize(5, 5);
   }
 
   beast: Beast2 = $derived.by(() => {
@@ -131,6 +130,10 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
     : `${this.columns},${this.rows},${this.mode},${this.beastType}`;
 
   protected updateScore = () => this.updateScore2(true, "onNewRecord");
+
+  get sizeLimit() {
+    return sizeLimit;
+  }
 
   setBeastType(type: BeastType) {
     this.beastType = type;

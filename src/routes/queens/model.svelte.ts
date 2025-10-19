@@ -1,6 +1,6 @@
 import { Model } from "$lib/model.svelte";
 import { Objective, WithScore } from "$lib/score.svelte";
-import { WithSize } from "$lib/size.svelte";
+import { WithSize, type SizeLimit } from "$lib/size.svelte";
 import { diffCoords, generate, repeat } from "$lib/util";
 
 export type Piece = "R" | "B" | "K" | "N" | "Q" | "custom" | null;
@@ -20,6 +20,8 @@ function legalMoves(piece: Piece, x: number, y: number) {
   }
 }
 
+const sizeLimit: SizeLimit = { minRows:3, minCols: 3, maxRows: 9, maxCols: 9 };
+
 export default class extends WithScore(WithSize(Model<Position, Move>)) {
   selectedPiece: Piece = $state("Q");
   selectedSquare: number | null = $state(null);
@@ -30,10 +32,7 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
   
   constructor() {
     super([]);
-    this.rows = 8;
-    this.columns = 8;
-    this.customSize = false;
-    this.newGame();
+    this.resize(8, 8);
   }
 
   // teste si la pièce de type "piece" à la position index1 peut attaquer la pièce à la position index2
@@ -97,8 +96,11 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
     ? null
     : `${this.rows},${this.columns},${this.allowedPieces[0]}`;
 
-
   protected updateScore = () => this.updateScore2(false, "never")
+
+  get sizeLimit() {
+    return sizeLimit;
+  }
 
   toggleMultiPieces() {
     this.multiPieces = !this.multiPieces;

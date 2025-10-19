@@ -10,7 +10,6 @@
 
   let model = $state(new Model());
   let dragged: number | null = $state(null);
-  const sizeLimit = { minRows: 1, minCols: 2, maxRows: 6, maxCols: 12 };
 
   let winTitle = $derived.by(() => {
     const score = model.score();
@@ -104,7 +103,7 @@
   Le but est de finir la partie avec le moins de cases contenant des piles de jetons.
 {/snippet}
 
-<Template bind:model={model} {board} {config} {rules} {bestScore} {winTitle} {sizeLimit} />
+<Template bind:model={model} {board} {config} {rules} {bestScore} {winTitle} />
 
 <style>
   .board-container {

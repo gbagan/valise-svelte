@@ -1,6 +1,6 @@
 import { Model } from '$lib/model.svelte';
 import { Objective, WithScore } from '$lib/score.svelte';
-import { WithSize } from '$lib/size.svelte';
+import { WithSize, type SizeLimit } from '$lib/size.svelte';
 import { countBy, diffCoords, generate, generate2, random, repeat } from '$lib/util';
 
 export enum Board { French, English, Circle, Grid3, Random };
@@ -14,8 +14,7 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
   
   constructor() {
     super([]);
-    this.rows = 5;
-    this.columns = 1;
+    this.resize(5, 1);
   }
 
   // retourne la position du trou situé entre les deux positions d'un coup si celui est valide
@@ -117,7 +116,7 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
   scoreHash = () => this.boardType === Board.Random ? null : `${this.boardType},${this.rows},${this.columns}`;
   protected updateScore = () => this.updateScore2(true, "always");
 
-  setBoard(b: Board) {
+  setBoard = (b: Board) => this.newGame(() => {
     this.boardType = b;
     switch (b) {
       case Board.Circle:
@@ -133,5 +132,17 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
         this.rows = 7;
         this.columns = 7;
     }
+  });
+
+  #sizeLimit = $derived(
+    this.boardType === Board.Circle
+    ? { minRows: 3, maxRows: 12, minCols: 1, maxCols: 1 }
+    : this.boardType === Board.Grid3 || this.boardType === Board.Random
+    ? { minRows: 3, maxRows: 3, minCols: 1, maxCols: 12 }
+    : { minRows: 7, maxRows: 7, minCols: 7, maxCols: 7 }
+  );
+
+  get SizeLimit() {
+    return this.#sizeLimit;
   }
 }

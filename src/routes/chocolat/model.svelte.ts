@@ -1,11 +1,13 @@
 import { random, range } from '$lib/util';
 import { Model } from '$lib/model.svelte';
 import { WithCombinatorial } from '$lib/combinatorial.svelte';
-import { WithSize } from '$lib/size.svelte';
+import { WithSize, type SizeLimit } from '$lib/size.svelte';
 
 type Position = {left: number, right: number, top: number, bottom: number};
 export type Move = ["left" | "right" | "top" | "bottom", number];
 export enum SoapMode { Corner, Border, Standard, Custom };
+
+const sizeLimit: SizeLimit = { minRows: 4, minCols: 4, maxRows: 10, maxCols: 10 };
 
 export default class extends WithCombinatorial(WithSize(Model<Position, Move>)) {
   soap: [number, number] | null = $state(null);
@@ -13,10 +15,7 @@ export default class extends WithCombinatorial(WithSize(Model<Position, Move>)) 
 
   constructor() {
     super({left: 0, right: 0, top: 0, bottom: 0});
-    this.rows = 6;
-    this.columns = 7;
-    this.customSize = false;
-    this.newGame();
+    this.resize(6, 7);
   }
 
   play([dir, x]: Move): Position | null {
@@ -65,6 +64,10 @@ export default class extends WithCombinatorial(WithSize(Model<Position, Move>)) 
     const t = range(top+1, row+1).map(i => ["top", i] as Move);
     const b = range(row+1, bottom).map(i => ["bottom", i] as Move);
     return l.concat(r, t, b);
+  }
+
+  get sizeLimit() {
+    return sizeLimit;
   }
 
   putSoap(s: [number, number]) {

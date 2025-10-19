@@ -11,13 +11,6 @@
   }
   
   const {model=$bindable(), values, customSize }: Props = $props();
-
-  const setSize = (rows: number, columns: number) =>
-    model.newGame(() => {
-      model.rows = rows;
-      model.columns = columns;
-      model.customSize = false;
-    });
 </script>
 
 <IconGroup title="Dimensions de la grille">
@@ -25,7 +18,7 @@
     <Icon
       text="{rows}x{cols}"
       selected={!model.customSize && rows === model.rows && cols === model.columns}
-      onclick={() => setSize(rows, cols)}
+      onclick={() => model.resize(rows, cols)}
     />
   {/each}
   {#if customSize}
@@ -33,7 +26,7 @@
       text="NxM"
       tooltip="Taille personalisée"
       selected={model.customSize}
-      onclick={() => model.newGame(() => model.customSize = true)}
+      onclick={() => model.resize(model.rows, model.columns, true)}
     />
   {/if}
 </IconGroup>

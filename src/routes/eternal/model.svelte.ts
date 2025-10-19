@@ -222,15 +222,11 @@ export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
 
   constructor() {
     super({ guards: [], attacked: null });
-    this.rows = 6;
-    this.columns = 0;
-    this.customSize = true;
-    //this.mode = Mode.Duel;
-    this.newGame();
+    this.resize(6, 0, true);
   }
 
   get didMachineStart() {
-    // hack pour empécher l'IA de commencer tant qu'on ait en phase de préparation
+    // hack pour empécher l'IA de commencer tant qu'on est en phase de préparation
     return super.didMachineStart || this.phase === Phase.Preparation;
   }
 
@@ -310,7 +306,7 @@ export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
     return attacked !== null && this.position.guards.every(guard => !hasEdge(this.adjGraph, guard, attacked));
   }
 
-  sizeLimit = $derived.by(() => {
+  #sizeLimit = $derived.by(() => {
     switch (this.graphKind) {
       case GraphKind.Grid: return {minRows: 2, minCols: 2, maxRows: 5, maxCols: 5};
       //case "sun": return {minRows: 3, minC  ols: 0, maxRows: 6, maxCols: 0};
@@ -319,6 +315,10 @@ export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
       default: return {minRows: 3, minCols: 0, maxRows: 11, maxCols: 0};
     }
   });
+
+  get sizeLimit() {
+    return this.#sizeLimit;
+  }
 
   levelFinished = $derived(this.isLevelFinished());
 

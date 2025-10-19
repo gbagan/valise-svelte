@@ -13,14 +13,6 @@
   let model = $state(new Model());
   let dragged: number | null = $state(null);
 
-  let sizeLimit: SizeLimit = $derived(
-    model.boardType === Board.Circle
-    ? { minRows: 3, maxRows: 12, minCols: 1, maxCols: 1 }
-    : model.boardType === Board.Grid3 || model.boardType === Board.Random
-    ? { minRows: 3, maxRows: 3, minCols: 1, maxCols: 12 }
-    : { minRows: 7, maxRows: 7, minCols: 7, maxCols: 7 }
-  );
-
   let winTitle = $derived.by(() => {
     const score = model.score();
     const s = score > 1 ? "s" : "";
@@ -47,8 +39,6 @@
     }
   }
 
-  // svelte-ignore state_referenced_locally
-  model.newGame();
   onMount(() => {
     model.loadRecords();
   });
@@ -157,7 +147,7 @@
       text={["#circle", "3xN", "#shuffle", "#tea", "#bread"]}
       tooltip={["3xN", "Cercle", "Aléatoire", "Anglais", "Français"]}
       selected={model.boardType}
-      setter={i => model.newGame(() => model.setBoard(i))}
+      setter={model.setBoard}
     />
     <I.Group title="Options">
       <Icon
@@ -179,7 +169,7 @@
   todo
 {/snippet}
 
-<Template bind:model={model} {board} {config} {rules} {winTitle} {bestScore} {sizeLimit} />
+<Template bind:model={model} {board} {config} {rules} {winTitle} {bestScore} />
 
 <style>
   .board-container {

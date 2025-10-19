@@ -1,5 +1,5 @@
 import { Model } from "$lib/model.svelte";
-import { WithSize } from "$lib/size.svelte";
+import { WithSize, type SizeLimit } from "$lib/size.svelte";
 import { coords, mod, repeat } from "$lib/util";
 
 type Coord = [row: number, col: number];
@@ -28,6 +28,8 @@ const translate = (tile: Tile, [row, col]: Coord) => tile.map(([r,c]) => [row + 
 type Position = number[];
 type Move = number;
 
+const sizeLimit: SizeLimit = {minRows: 3, minCols: 3, maxRows: 10, maxCols: 10};
+
 export default class extends WithSize(Model<Position, Move>) {
   rotation = $state(0);
   tileType: TileType = $state("type1");
@@ -36,10 +38,7 @@ export default class extends WithSize(Model<Position, Move>) {
 
   constructor() {
     super([]);
-    this.rows = 5;
-    this.columns = 5;
-    this.customSize = false;
-    this.newGame();
+    this.resize(5, 5);
   }
 
   tile: Tile = $derived.by(() => {
@@ -93,6 +92,10 @@ export default class extends WithSize(Model<Position, Move>) {
   isLevelFinished = () => this.position.every(x => x !== 0);
   initialPosition = () => repeat(this.columns * this.rows, 0);
   onNewGame = () => this.rotation = 0;
+
+  get sizeLimit() {
+    return sizeLimit;
+  }
 
   selectSquare(index: number) {
     if (this.sinks.length < this.sinkCount) {
