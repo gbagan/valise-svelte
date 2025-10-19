@@ -132,6 +132,6 @@
     top: 0;
     left: 0.5em;
     color: blue;
-    font-size: 1.5em;
+    font-size: 1.5rem;
   }
 </style>

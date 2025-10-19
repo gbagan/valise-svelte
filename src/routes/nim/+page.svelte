@@ -71,14 +71,14 @@
       values={[ 1, 2, 3, 4, 5 ]}
       selected={model.pileCount}
       disabled={model.locked}
-      setter={i => model.newGame(() => model.pileCount = i)}
+      setter={model.setPileCount}
     />
     <I.SelectGroup 
       title="Taille des rangées"
       values={[ 10, 5 ]}
       selected={model.length}
       disabled={model.locked}
-      setter={i => model.newGame(() => model.length = i)}
+      setter={model.setLength}
     />
     <I.TwoPlayers bind:model={model} />
     <I.Group title="Options">

@@ -322,7 +322,7 @@ export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
 
   levelFinished = $derived(this.isLevelFinished());
 
-  randomMove() : Move | null {
+  #randomMove() : Move | null {
     if (this.levelFinished) {
       return null;
     }
@@ -341,7 +341,7 @@ export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
     if (this.levelFinished) {
       return null;
     } else if (!this.arena || this.mode === Mode.Random) {
-      return this.randomMove();
+      return this.#randomMove();
     }
     const {guards, attacked} = this.position;
     if (attacked !== null) {
@@ -352,7 +352,7 @@ export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
       if (ans !== null) {
         return ans;
       } else {
-        return this.randomMove();
+        return this.#randomMove();
       }
     }
   }
