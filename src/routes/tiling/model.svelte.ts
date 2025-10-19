@@ -28,7 +28,7 @@ const translate = (tile: Tile, [row, col]: Coord) => tile.map(([r,c]) => [row + 
 type Position = number[];
 type Move = number;
 
-const sizeLimit: SizeLimit = {minRows: 3, minCols: 3, maxRows: 10, maxCols: 10};
+const sizeLimit: SizeLimit = { minRows: 3, minCols: 3, maxRows: 10, maxCols: 10 };
 
 export default class extends WithSize(Model<Position, Move>) {
   rotation = $state(0);

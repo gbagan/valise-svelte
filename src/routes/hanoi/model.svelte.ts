@@ -5,11 +5,15 @@ type Position = number[][];
 type Move = {from: number, to: number};
 
 export default class extends Model<Position, Move> {
-  diskCount = $state(4);
+  #diskCount = $state(4);
   
   constructor() {
     super([]);
     this.newGame();
+  }
+
+  get diskCount() {
+    return this.#diskCount;
   }
 
   play({ from, to }: Move): Position | null {
@@ -22,6 +26,8 @@ export default class extends Model<Position, Move> {
     return position.with(from, init).with(to, position[to].concat([last]));
   }
 
-  initialPosition = () => [range(0, this.diskCount), [], []];
+  initialPosition = () => [range(0, this.#diskCount), [], []];
   isLevelFinished = () => this.position[0].length === 0 && this.position[1].length === 0;
+
+  setDiskCount = (diskCount: number) => this.newGame(() => this.#diskCount = diskCount);
 }

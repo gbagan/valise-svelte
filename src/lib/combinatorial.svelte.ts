@@ -6,8 +6,8 @@ type Constr<Pos, Move> = Constructor<Model<Pos, Move>>;
 
 export function WithCombinatorial<Pos, Move, TBase extends Constr<Pos, Move>>(Base: TBase) {
   abstract class C extends WithTwoPlayers(Base) {
-    abstract isLosingPosition(): boolean;
-    abstract possibleMoves(): Move[];
+    protected abstract isLosingPosition(): boolean;
+    protected abstract possibleMoves(): Move[];
 
     protected machineMove(): Move | null {
       if (this.isLevelFinished()) {

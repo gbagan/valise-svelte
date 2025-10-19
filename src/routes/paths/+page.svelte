@@ -1,7 +1,6 @@
 <script lang="ts">
   import {default as Model, Mode } from './model.svelte';
   import { gridStyle, repeat } from '$lib/util';
-  import type { SizeLimit } from '$lib/size.svelte';
   import Template from '$lib/components/Template.svelte';
   import PointerTracker from '$lib/components/PointerTracker.svelte';
   import * as I from '$lib/components/Icons';

@@ -6,7 +6,7 @@
 
   interface Props {
     model: Model<Position, Move> & SizeModel;
-    values: [number, number][];
+    values: readonly (readonly [number, number])[];
     customSize?: boolean;
   }
   

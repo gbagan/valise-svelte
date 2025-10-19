@@ -13,11 +13,11 @@ export abstract class Model<Position, Move> {
   #newGameAction: (() => void) | null = $state(null);
   #locked: boolean = $state(false);
 
-  abstract play(m: Move): (Position | null);
-  abstract initialPosition(): Position;
+  abstract play(m: Move): Position | null;
+  protected abstract initialPosition(): Position;
   abstract isLevelFinished(): boolean;
 
-  onNewGame() {};
+  protected onNewGame() {};
 
   constructor(position: Position) {
     this.#position = $state.raw(position);

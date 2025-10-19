@@ -6,7 +6,7 @@ type Move = number;
 
 export default class extends Model<Position, Move> {
   #baseCount = $state(5);
-  #missingPeg = $state(1);
+  #missingPeg = $state(0);
 
   get baseCount() {
     return this.#baseCount;
@@ -34,8 +34,8 @@ export default class extends Model<Position, Move> {
   }
 
   isLevelFinished = () => this.position.every((i, j) => i >> 1 == j >> 1);
-  initialPosition = () => shuffle(range(0, 2 * this.#baseCount));
-  onNewGame = () => this.#missingPeg = random(0, 2 * this.#baseCount);
+  protected initialPosition = () => shuffle(range(0, 2 * this.#baseCount));
+  protected onNewGame = () => this.#missingPeg = random(0, 2 * this.#baseCount);
 
   setBaseCount = (i: number) => this.newGame(() => this.#baseCount = i);
 }

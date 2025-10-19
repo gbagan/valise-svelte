@@ -130,7 +130,7 @@
       selected={model.graphIndex}
       text={i => "" + (i as number + 1)}
       tooltip={i => graphs[i as number].title}
-      setter={i => model.newGame(() => model.graphIndex = i)}
+      setter={model.setGraphIndex}
     >
       <I.Icon
         text="#customize"

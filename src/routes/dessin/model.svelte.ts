@@ -7,19 +7,23 @@ type Move = number | "raise";
 export type Position = Move[];
 
 export default class extends WithScore(Model<Position, Move>) {
-  graphIndex: number | "custom" = $state(0);
-  customGraph: Graph = $state({ title: "Graphe personnalisé", vertices: [], edges: []});
+  #graphIndex: number | "custom" = $state(0);
+  #customGraph: Graph = $state({ title: "Graphe personnalisé", vertices: [], edges: []});
   
   constructor() {
     super([]);
     this.newGame();
   }
 
+  get graphIndex() {
+    return this.#graphIndex;
+  }
+
   graph: Graph = $derived.by(() => {
-    if (this.graphIndex === "custom") {
-      return this.customGraph;
+    if (this.#graphIndex === "custom") {
+      return this.#customGraph;
     } else {
-      const g = graphs[this.graphIndex];
+      const g = graphs[this.#graphIndex];
       return {
         ...g,
         vertices: g.vertices.map(({x, y}) => ({x: x/5, y: y/5}))
@@ -46,7 +50,7 @@ export default class extends WithScore(Model<Position, Move>) {
 
   objective = () => Objective.Minimize;
   score = () => this.raiseCount;
-  scoreHash = () => this.graphIndex === "custom" ? null : "" + this.graphIndex;
+  scoreHash = () => this.#graphIndex === "custom" ? null : "" + this.#graphIndex;
   protected updateScore = () => this.updateScore2(true, "onNewRecord");
 
   edgesOf(position: Position): Edge[] {
@@ -78,9 +82,11 @@ export default class extends WithScore(Model<Position, Move>) {
   
   acceptCustomGraph = (graph: Graph) => {
     if (graph.vertices.length > 0) {
-      this.customGraph = graph;
-      this.graphIndex = "custom";
+      this.#customGraph = graph;
+      this.#graphIndex = "custom";
     }
     this.closeDialog();
   }
+
+  setGraphIndex = (i: number | "custom") => this.newGame(() => this.#graphIndex = i);
 }

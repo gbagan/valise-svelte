@@ -1,6 +1,6 @@
 import { Model } from '$lib/model.svelte';
 import { Objective, WithScore } from '$lib/score.svelte';
-import { WithSize, type SizeLimit } from '$lib/size.svelte';
+import { WithSize } from '$lib/size.svelte';
 import { countBy, diffCoords, generate, generate2, random, repeat } from '$lib/util';
 
 export enum Board { French, English, Circle, Grid3, Random };
@@ -142,7 +142,7 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
     : { minRows: 7, maxRows: 7, minCols: 7, maxCols: 7 }
   );
 
-  get SizeLimit() {
+  get sizeLimit() {
     return this.#sizeLimit;
   }
 }

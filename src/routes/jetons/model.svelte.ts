@@ -9,9 +9,6 @@ type Move = {from: number, to: number};
 const sizeLimit = { minRows: 1, minCols: 2, maxRows: 6, maxCols: 12 };
 
 export default class extends WithScore(WithSize(Model<Position, Move>)) {
-  baseCount = $state(5);
-  missingPeg = $state(1);
-  
   constructor() {
     super([]);
     this.resize(4, 4);
@@ -29,7 +26,7 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
     }
   }
 
-  initialPosition = () => repeat(this.rows * this.columns, 1);
+  protected initialPosition = () => repeat(this.rows * this.columns, 1);
 
   isLevelFinished () {
     const position = this.position;

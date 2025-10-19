@@ -10,12 +10,20 @@ export enum SoapMode { Corner, Border, Standard, Custom };
 const sizeLimit: SizeLimit = { minRows: 4, minCols: 4, maxRows: 10, maxCols: 10 };
 
 export default class extends WithCombinatorial(WithSize(Model<Position, Move>)) {
-  soap: [number, number] | null = $state(null);
-  soapMode = $state(SoapMode.Corner);
+  #soap: [number, number] | null = $state.raw(null);
+  #soapMode = $state(SoapMode.Corner);
 
   constructor() {
     super({left: 0, right: 0, top: 0, bottom: 0});
     this.resize(6, 7);
+  }
+
+  get soap() {
+    return this.#soap;
+  }
+
+  get soapMode() {
+    return this.#soapMode;
   }
 
   play([dir, x]: Move): Position | null {
@@ -35,29 +43,29 @@ export default class extends WithCombinatorial(WithSize(Model<Position, Move>)) 
   initialPosition = () => ({left: 0, right: this.columns, top: 0, bottom: this.rows});
 
   onNewGame() {
-    if (this.soapMode === SoapMode.Custom) {
-      this.soap = null;
+    if (this.#soapMode === SoapMode.Custom) {
+      this.#soap = null;
     } else {
-      const row = this.soapMode === SoapMode.Standard ? random(0, this.rows) : 0;
-      const col = this.soapMode !== SoapMode.Corner ? random(0, this.columns) : 0;
-      this.soap = [row, col];
+      const row = this.#soapMode === SoapMode.Standard ? random(0, this.rows) : 0;
+      const col = this.#soapMode !== SoapMode.Corner ? random(0, this.columns) : 0;
+      this.#soap = [row, col];
     }
   }
 
   isLosingPosition(): boolean {
-    if (this.soap === null) {
+    if (this.#soap === null) {
       return false;
     }
-    const [row, col] = this.soap;
+    const [row, col] = this.#soap;
     const {left, right, top, bottom} = this.position;
     return ((col - left) ^ (right - col - 1) ^ (row - top) ^ (bottom - row - 1)) === 0;
   }
 
   possibleMoves(): Move[] {
-    if (this.soap === null) {
+    if (this.#soap === null) {
        return [];
     }
-    const [row, col] = this.soap;
+    const [row, col] = this.#soap;
     const {left, right, top, bottom} = this.position;
     const l = range(left+1, col+1).map(i => ["left", i] as Move);
     const r = range(col+1, right).map(i => ["right", i] as Move);
@@ -71,8 +79,10 @@ export default class extends WithCombinatorial(WithSize(Model<Position, Move>)) 
   }
 
   putSoap(s: [number, number]) {
-    if (this.soap === null) {
-      this.soap = s;
+    if (this.#soap === null) {
+      this.#soap = s;
     }
   }
+
+  setSoapMode = (mode: SoapMode) => this.newGame(() => this.#soapMode = mode);
 }

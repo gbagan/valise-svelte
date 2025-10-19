@@ -64,7 +64,7 @@
 
   const onLilyClick = (e: MouseEvent, i: number) => {
     if (e.shiftKey) {
-      model.marked[i] = !model.marked[i];
+      model.toggleMarked(i);
     } else {
       model.playA(i)
     }
@@ -94,7 +94,7 @@
     onclick={e => onLilyClick(e, i)}
     oncontextmenu={e => {
       e.preventDefault();
-      model.marked[i] = !model.marked[i];
+      model.toggleMarked(i);
     }}
   />
 {/snippet}
@@ -144,7 +144,7 @@
       values={[1, 2, 3, 4, 5]}
       selected={model.moves}
       disabled={model.locked}
-      setter={i => model.movesSetter(i)}
+      setter={model.movesSetter}
     />
     <I.TwoPlayers bind:model={model} />
     <I.Group title="Options">

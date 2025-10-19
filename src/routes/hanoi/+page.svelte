@@ -89,7 +89,7 @@
       title="Nombre de disques"
       values={[4, 5, 6, 7, 8]}
       selected={model.diskCount}
-      setter={n => model.newGame(() => model.diskCount = n)}
+      setter={model.setDiskCount}
     />
     <I.Group title="Options">
       <I.Undo bind:model={model} />

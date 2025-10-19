@@ -1,7 +1,6 @@
 <script lang="ts">
   import { default as Model, type Position, Board } from './model.svelte';
   import { gridStyle } from '$lib/util';
-  import { type SizeLimit } from '$lib/size.svelte';
   import Template from '$lib/components/Template.svelte';
   import Icon from '$lib/components/icons/Icon.svelte';
   import * as I from '$lib/components/Icons';
