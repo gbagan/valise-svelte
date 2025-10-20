@@ -57,15 +57,15 @@
       title="Mode de jeu"
       values={[0, 1, 2, 3] as Mode[]}
       text={i => `#lo-mode${i+1}`}
-      selected={model.gameMode}
+      selected={model.mode}
       setter={i => model.changeMode(i)}
     />
     <I.SelectGroup
       title="Difficulté"
       values={[0, 1, 2, 3, 4, 5, 6]}
-      text={i => levelText(i, i <= model.maxLevels[model.gameMode])}
-      tooltip={i => levelTooltip(i, i <= model.maxLevels[model.gameMode])}
-      disabled={i => i > model.maxLevels[model.gameMode]}
+      text={i => levelText(i, i <= model.maxLevels[model.mode])}
+      tooltip={i => levelTooltip(i, i <= model.maxLevels[model.mode])}
+      disabled={i => i > model.maxLevels[model.mode]}
       selected={model.level}
       setter={i => model.changeLevel(i)}
     />

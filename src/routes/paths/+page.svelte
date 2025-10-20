@@ -110,8 +110,8 @@
       values={[Mode.Mode1, Mode.Mode2]}
       text={["#paths-mode0", "#paths-mode1"]}
       tooltip={["Mode 1", "Mode 2"]}
-      selected={model.gameMode}
-      setter={(m => model.newGame(() => model.gameMode = m))}
+      selected={model.mode}
+      setter={model.setMode}
     />
 
     <I.SizesGroup bind:model={model}
