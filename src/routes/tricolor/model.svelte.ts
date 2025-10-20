@@ -31,11 +31,11 @@ export default class extends Model<Position, Move> {
     return this.#shuffle;
   }
 
-  play = (move: Move) => this.position.map((color, i) => 
+  protected play = (move: Move) => this.position.map((color, i) => 
     this.inRange(move, i) ? (color + 1) % this.#colorCount : color
   );
 
-  initialPosition = () =>
+  protected initialPosition = () =>
     this.shuffle
     ? generate(this.#size, () => random(0, this.#colorCount))
     : repeat(this.#size, 1);

@@ -6,22 +6,31 @@ export type Location = { kind: "panel", id: number } | { kind: "wheel", id: numb
 type Move = {from: Location, to: Location};
 
 export default class extends Model<Position, Move> {
-  size = $state(5);
-  rotation = $state(0);
-  
+  #size = $state(5);
+  #rotation = $state(0);
+
+  constructor() {
+    super([]);
+    this.newGame();
+  }
+
+  get size() {
+    return this.#size;
+  }
+
+  get rotation() {
+    return this.#rotation;
+  }
+
   // tableau indiquant quelles sont les balles alignées avec leur couleur
-  aligned = $derived(this.position.map((v, i) =>
-    v !== null && mod(i + this.rotation, this.size) === v
+  readonly aligned = $derived(this.position.map((v, i) =>
+    v !== null && mod(i + this.#rotation, this.#size) === v
   ));
   // comme isValidRotation mais avec seconde conditition en moins 
   isValidRotation2 = $derived(this.aligned.filter(x => x).length === 1);
   // une rotation est valide si exactement une couleur est alignée et il y a une balle pour chaque couleur 
   isValidRotation = $derived(this.isValidRotation2 && this.position.every(v => v !== null)); 
   
-  constructor() {
-    super([]);
-    this.newGame();
-  }
 
   play({from, to}: Move): Position | null {
     if (from.kind === "panel" && to.kind === "wheel") {
@@ -35,20 +44,24 @@ export default class extends Model<Position, Move> {
     }
   }
 
-  initialPosition = () => repeat(this.size, null);
+  protected initialPosition = () => repeat(this.#size, null);
   isLevelFinished = () => false;
-  onNewGame = () => this.rotation = 0;
+  protected onNewGame = () => this.#rotation = 0;
 
-  async check() { 
+  check = async () => {
     this.lock(async () => {
-      for (let i = 0; i < this.size; i++) {
+      for (let i = 0; i < this.#size; i++) {
         if (!this.isValidRotation) {
           return;
         }
-        this.rotation += 1;
+        this.#rotation += 1;
         await delay(600);
       }
       await this.showVictory();
     });
   }
+
+  setSize = (size: number) => this.newGame(() => this.#size = size);
+  rotateLeft = () => this.#rotation -= 1;
+  rotateRight = () => this.#rotation += 1;
 }

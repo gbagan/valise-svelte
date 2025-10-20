@@ -33,7 +33,7 @@ export default class extends WithCombinatorial(WithSize(Model<Position, Move>)) 
   canPlay = (v: number) => {
     const position = this.position;
     const maximum = Math.max(...this.moves);
-    return this.moves.includes(position-v) || position > 0 && v == 0 && position <= maximum
+    return this.moves.includes(position-v) || position > 0 && v === 0 && position <= maximum
   }
 
   protected losingPositions: boolean[] = $derived.by(() => {
@@ -46,7 +46,7 @@ export default class extends WithCombinatorial(WithSize(Model<Position, Move>)) 
     return losing;
   });
 
-  play = (v: number) => this.canPlay(v) ? v : null;
+  protected play = (v: number) => this.canPlay(v) ? v : null;
   protected initialPosition = () => this.rows;
   isLevelFinished = () => this.position === 0;
   protected possibleMoves = () => range(0, this.rows+1).filter(this.canPlay);
@@ -58,7 +58,7 @@ export default class extends WithCombinatorial(WithSize(Model<Position, Move>)) 
   }
 
   movesSetter = (move: number) => {
-    const next = [1, 2, 3, 4, 5].filter(m => (m === move) != this.moves.includes(m));
+    const next = [1, 2, 3, 4, 5].filter(m => (m === move) !== this.moves.includes(m));
     if (next.length > 0) {
       this.newGame(() => this.#moves = next);
     }

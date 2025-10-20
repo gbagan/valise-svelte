@@ -80,7 +80,7 @@ export function WithTwoPlayers<Position, Move, TBase extends Constructor<Model<P
 
     protected playHelper(move: Move, push?: boolean): boolean {
       if (super.playHelper(move, push)) {
-        this.#turn = this.#turn == Turn.Player1 ? Turn.Player2 : Turn.Player1;
+        this.#turn = this.#turn === Turn.Player1 ? Turn.Player2 : Turn.Player1;
         return true;
       } else {
         return false;

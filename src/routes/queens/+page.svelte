@@ -122,7 +122,7 @@
     <I.Group title="Options">
       <I.Icon
         text="#customize"
-        selected={model.allowedPieces[0] == "custom"}
+        selected={model.allowedPieces[0] === "custom"}
         tooltip="Crée ta propre pièce"
         onclick={model.customize}
       />

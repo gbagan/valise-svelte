@@ -11,11 +11,11 @@ export const piecesList: Piece[] = ["R", "B", "K", "N", "Q"];
 
 function legalMoves(piece: Piece, x: number, y: number) {
   switch(piece) {
-    case "Q": return (x * x - y * y) * x * y == 0;
+    case "Q": return (x * x - y * y) * x * y === 0;
     case "K": return x * x + y * y <= 2;
-    case "R": return x * y == 0;
-    case "B": return x * x - y * y == 0;
-    case "N": return x * x + y * y == 5;
+    case "R": return x * y === 0;
+    case "B": return x * x - y * y === 0;
+    case "N": return x * x + y * y === 5;
     default: return false;
   }
 }

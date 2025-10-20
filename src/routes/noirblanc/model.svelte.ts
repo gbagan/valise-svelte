@@ -36,8 +36,8 @@ export default class extends WithSize(Model<Position, Move>) {
   #neighbor(index1: number, index2: number): boolean {
     const [row, col] = diffCoords(this.columns, index1, index2);
     return row * row + col * col === 1
-      || this.#mode % 3 == 0 && index1 === index2
-      || this.#mode >= 2 && index1 !== index2 && row * col == 0
+      || this.#mode % 3 === 0 && index1 === index2
+      || this.#mode >= 2 && index1 !== index2 && row * col === 0
   }
 
   // met à jour le tableau light en fonction du coup joué à la position index

@@ -162,17 +162,17 @@
     <button
       class="ui-button ui-button-primary btn-left"
       disabled={model.locked}
-      onclick={() => model.rotation -= 1}
+      onclick={model.rotateLeft}
     >↶</button>
     <button
       class="ui-button ui-button-primary btn-right"
       disabled={model.locked}
-      onclick={() => model.rotation += 1}
+      onclick={model.rotateRight}
     >↷</button>
     <button
       class="ui-button ui-button-primary btn-validate"
       disabled={model.locked || !model.isValidRotation}
-      onclick={() => model.check()}
+      onclick={model.check}
     >Valider</button>
   </div>
 {/snippet}
@@ -184,7 +184,7 @@
       values={[4, 5, 6, 7, 8]}
       selected={model.size}
       disabled={model.locked}
-      setter={s => model.newGame(() => model.size = s)}
+      setter={model.setSize}
     />
     <I.Group title="Options">
       <I.Reset bind:model={model} />

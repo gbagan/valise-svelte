@@ -20,7 +20,7 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
   // retourne la position du trou situé entre les deux positions d'un coup si celui est valide
   private betweenMove({ from, to }: Move): number | null {
     const [row, col] = diffCoords(this.columns, from, to);
-    return row * row + col * col == 4 ? (from + to) / 2 | 0 : null;
+    return row * row + col * col === 4 ? (from + to) / 2 | 0 : null;
   }
   
   // même chose que betweenMove mais dans un plateau circulaire    
@@ -30,7 +30,7 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
     ? (from + to) / 2 | 0
     : (size + to - from) % size === 2
     ? (from + 1) % size
-    : (size + from - to) % size == 2
+    : (size + from - to) % size === 2
     ? (to + 1) % size
     : null;
 

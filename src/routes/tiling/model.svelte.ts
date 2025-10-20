@@ -70,7 +70,7 @@ export default class extends WithSize(Model<Position, Move>) {
   canPutTile = (tile: number[]) => tile.every(i => this.position[i] === 0);
 
   // renvoie la liste des positions des éviers
-  sinks = $derived(this.position.map((v, i) => v == -1 ? i : null).filter(x => x !== null));
+  sinks = $derived(this.position.map((v, i) => v === -1 ? i : null).filter(x => x !== null));
 
   play(index: Move): Position | null {
     const tilePos = this.tilePositions(index);

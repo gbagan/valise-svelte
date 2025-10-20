@@ -50,7 +50,7 @@
   let polarPoints = $derived.by(() => {
     const n = model.rows;
     return range(0, n+1).map(i => {
-      const theta = Math.sqrt(i == n ? 21 : i * 20 / n) * 1.36 * Math.PI;
+      const theta = Math.sqrt(i === n ? 21 : i * 20 / n) * 1.36 * Math.PI;
       const radius = 61 * theta / (2 * Math.PI);
       return {theta, radius};
     }).toReversed();

@@ -22,9 +22,8 @@
   let { model=$bindable(), dragged=$bindable(), draggable, droppable, equals,
         id, argument, render }: Props = $props();
   
-  let candrop = $derived(
-    !!droppable && dragged !== null
-    && model.play({from: dragged, to: id}) !== null
+  const candrop = $derived(
+    !!droppable && dragged !== null && model.canPlay({from: dragged, to: id})
   );
 
   function onpointerdown(e: PointerEvent) {

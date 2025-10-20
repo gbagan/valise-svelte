@@ -50,7 +50,7 @@
               height="7"
               fill={colors[peg / 2 | 0]}
               onclick={() => model.playA(peg)}
-              style:cursor={model.play(peg) !== null ? "pointer" : "not-allowed"}
+              style:cursor={model.canPlay(peg) ? "pointer" : "not-allowed"}
               style:animation-delay="{1000 + 2000 * peg / model.baseCount}ms"
               class={{animate: levelFinished}} 
             />

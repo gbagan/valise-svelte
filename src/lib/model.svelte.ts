@@ -13,7 +13,7 @@ export abstract class Model<Position, Move> {
   #newGameAction: (() => void) | null = $state(null);
   #locked: boolean = $state(false);
 
-  abstract play(m: Move): Position | null;
+  protected abstract play(m: Move): Position | null;
   protected abstract initialPosition(): Position;
   abstract isLevelFinished(): boolean;
 
@@ -74,6 +74,10 @@ export abstract class Model<Position, Move> {
     this.#locked = true;
     await action();
     this.#locked = false;
+  }
+
+  canPlay(move: Move): boolean {
+    return this.play(move) !== null;
   }
 
   protected playHelper(move: Move, push?: boolean): boolean {

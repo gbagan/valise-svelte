@@ -57,12 +57,12 @@
     </CDialog>
   {:else if model.dialog === Dialog.Customize}
     {@render custom?.()}
-  {:else if model.dialog == Dialog.Score && isScoreModel(model)}
+  {:else if model.dialog === Dialog.Score && isScoreModel(model)}
     <CDialog title="Meilleur score" onOk={model.closeDialog}>
       {@const position = model.bestPosition()! }
       {@render bestScore?.(position)}
     </CDialog>
-  {:else if model.dialog == Dialog.NewGame}
+  {:else if model.dialog === Dialog.NewGame}
     <CDialog
       title="Nouvelle Partie"
       onOk={() => model.newGame()}

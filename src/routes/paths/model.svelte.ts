@@ -28,9 +28,9 @@ export default class extends WithSize(Model<Position, Move>) {
   // renvoie un chemin horizontal ou vertical entre u et v si celui ci existe (u exclus du chemin)
   #pathBetween(u: number, v: number): number[] | null {
     const [row, col] = diffCoords(this.columns, u, v);
-    if (row == 0) {
+    if (row === 0) {
       return u < v ? range(u+1, v+1) : range(u-1, v-1, -1);
-    } else if (col == 0) {
+    } else if (col === 0) {
       return u < v ? range(u + this.columns, v+1, this.columns) : range(u - this.columns, v-1, -this.columns);
     } else {
       return null;
@@ -58,7 +58,7 @@ export default class extends WithSize(Model<Position, Move>) {
             )
   }
 
-  play(v: Move): Position | null {
+  protected play(v: Move): Position | null {
     if (this.position.length === 0) {
       return this.#mode === Mode.Mode2 ? [v] : null;
     } else {
@@ -75,7 +75,7 @@ export default class extends WithSize(Model<Position, Move>) {
   isLevelFinished = () =>
     this.#exit !== null 
     && this.position.length > 0
-    && this.position.length == this.columns * this.rows
+    && this.position.length === this.columns * this.rows
         + (this.#exit === this.position[0] ? 1 : 0);
 
   protected initialPosition = () => this.exit === null ? [] : [this.exit];

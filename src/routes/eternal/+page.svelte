@@ -64,7 +64,7 @@
         {@const {x1, x2, y1, y2} = getCoordsOfEdge(model.graph, u, v)}
         <line x1={100*x1} x2={100*x2} y1={100*y1} y2={100*y2} class="line1" />
       {/each}
-      {#if model.rulesName == Rules.Many}
+      {#if model.rulesName === Rules.Many}
         {#each model.nextMove as to, i}
           {@const from = model.position.guards[i]}
           {#if from !== to}

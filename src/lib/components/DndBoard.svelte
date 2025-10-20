@@ -29,7 +29,7 @@
   onpointerleave={() => dragged = null}
 >
   {@render children()}
-  {#if dragged != null && position}
+  {#if dragged !== null && position}
     {@render draggedElement(`transform:translate(${100*position.x}%,${100*position.y}%);`)}
   {/if}
 </svg>

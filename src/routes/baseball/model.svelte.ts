@@ -21,7 +21,7 @@ export default class extends Model<Position, Move> {
     this.newGame();
   }
 
-  play(i: number): Position | null {
+  protected play(i: number): Position | null {
     const position = this.position;
     const j = this.#missingPeg;
     const x = position[i];
@@ -33,7 +33,7 @@ export default class extends Model<Position, Move> {
     }
   }
 
-  isLevelFinished = () => this.position.every((i, j) => i >> 1 == j >> 1);
+  isLevelFinished = () => this.position.every((i, j) => i >> 1 === j >> 1);
   protected initialPosition = () => shuffle(range(0, 2 * this.#baseCount));
   protected onNewGame = () => this.#missingPeg = random(0, 2 * this.#baseCount);
 

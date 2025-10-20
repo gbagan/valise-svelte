@@ -25,11 +25,11 @@ export default class extends WithCombinatorial(Model<Position, Move>) {
 
   canPlay(move: Move) {
     const [p1, p2] = this.position[move.pile];
-    return move.pos != p1 && move.pos != p2
+    return move.pos !== p1 && move.pos !== p2
         && (this.turn === Turn.Player1 ? move.pos < p2 : move.pos > p1)
   }
 
-  play(move: Move): Position | null {
+  protected play(move: Move): Position | null {
     if (!this.canPlay(move)) {
       return null;
     }

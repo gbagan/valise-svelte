@@ -129,16 +129,16 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
     return res;
   });
 
-  play = (i: Move) => this.position.with(i, !this.position[i]);
+  protected play = (i: Move) => this.position.with(i, !this.position[i]);
   isLevelFinished = () => this.#nonTrappedBeasts.length === 0;
-  initialPosition = () => repeat(this.rows * this.columns, false);
-  onNewGame() {
+  protected initialPosition = () => repeat(this.rows * this.columns, false);
+  protected onNewGame() {
     this.#squareColors = repeat(this.rows * this.columns, 0);
   }
 
-  objective = () => Objective.Minimize;
+  protected objective = () => Objective.Minimize;
   score = () => countBy(this.position, x => x);
-  scoreHash = () => this.#beastType === BeastType.Custom
+  protected scoreHash = () => this.#beastType === BeastType.Custom
     ? null
     : `${this.columns},${this.rows},${this.#mode},${this.#beastType}`;
 
