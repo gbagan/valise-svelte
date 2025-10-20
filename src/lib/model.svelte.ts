@@ -15,8 +15,7 @@ export abstract class Model<Position, Move> {
 
   protected abstract play(m: Move): Position | null;
   protected abstract initialPosition(): Position;
-  abstract isLevelFinished(): boolean;
-
+  protected abstract isLevelFinished(): boolean;
   protected onNewGame() {};
 
   constructor(position: Position) {

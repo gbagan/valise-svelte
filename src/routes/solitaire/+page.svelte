@@ -153,7 +153,7 @@
         text="#help"
         tooltip="Aide"
         selected={model.help2 > 0}
-        onclick={() => model.help2 = (model.help2 + 1) % 3}
+        onclick={model.incrementHelp}
       />
       <I.Undo bind:model={model} />
       <I.Redo bind:model={model} />
