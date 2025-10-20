@@ -8,23 +8,35 @@
   import { onMount } from 'svelte';
 
   let model = $state(new Model());
+  let currentPosition: {x: number, y: number} | null = $state(null);
+  let startingPosition: {x: number, y: number} | null = $state(null);
+  let startingSquare : number | null = $state(null);
+
   let winTitle = $derived(`Record: ${model.score()} pièges`);
 
   const colors = [ "#5aa02c", "blue", "red", "yellow", "magenta", "cyan", "orange", "darkgreen", "grey" ];
 
   function handleKeydown(e: KeyboardEvent) {
     if (e.code === "ArrowLeft") {
-      model.selectedColor = (model.selectedColor + 8) % 9;
+      model.decrementSelectedColor();
     } else if (e.code === "ArrowRight") {
-      model.selectedColor = (model.selectedColor + 1) % 9;
+      model.incrementSelectedColor();
     }
   }
 
   function handlePointerdown(e: PointerEvent, i: number) {
     if (e.shiftKey) {
       (e.currentTarget as Element)?.releasePointerCapture(e.pointerId);
-      model.startingSquare = i;
+      startingSquare = i;
     }
+  }
+
+  function finishZone(i: number) {
+    if (startingSquare !== null) {
+      model.fillZone(startingSquare, i);
+    }
+    startingSquare = null;
+    startingPosition = null;
   }
 
   onMount(() => {
@@ -33,9 +45,9 @@
 </script>
 
 {#snippet zone()}
-  {#if model.startingPosition && model.currentPosition}
-    {@const { x: x1, y: y1 } = model.startingPosition}
-    {@const { x: x2, y: y2 } = model.currentPosition}
+  {#if startingPosition && currentPosition}
+    {@const { x: x1, y: y1 } = startingPosition}
+    {@const { x: x2, y: y2 } = currentPosition}
     <rect
       x="{100*Math.min(x1, x2)}%"
       y="{100*Math.min(y1, y2)}%"
@@ -48,8 +60,8 @@
 {/snippet}
 
 {#snippet pointerTrap()}
-  {#if !model.startingPosition && model.currentPosition}
-    {@const {x, y} = model.currentPosition}
+  {#if !startingPosition && currentPosition}
+    {@const {x, y} = currentPosition}
     <use
       href="#trap"
       x="-20"
@@ -66,10 +78,10 @@
   <div class="container">
     <div class="ui-board" style={gridStyle(model.rows, model.columns, 5)}>
       <svg
-        onpointerdown={e => { if(e.shiftKey) model.startingPosition = getPointerPosition(e) }} 
-        viewBox="0 0 {50*model.columns} {50*model.rows}"
-        onpointermove={e => model.currentPosition = getPointerPosition(e)}
-        onpointerleave={() => model.startingPosition = model.currentPosition = null}
+        viewBox="0 0 {50*model.columns} {50*model.rows}"  
+        onpointerdown={e => { if(e.shiftKey) startingPosition = getPointerPosition(e) }}   
+        onpointermove={e => currentPosition = getPointerPosition(e)}
+        onpointerleave={() => startingPosition = currentPosition = null}
       >
         {#each model.squareColors as color, i}
           {@const [row, col] = coords(model.columns, i)}
@@ -79,7 +91,7 @@
           <rect x={50*col} y={50*row} width="50" height="50"
             class="square-borders"
             onpointerdown={e => handlePointerdown(e, i)}
-            onpointerup={() => model.finishZone(i)}
+            onpointerup={() => finishZone(i)}
             onclick={e => { if (!e.shiftKey) model.playA(i) }}
           />
         {/each}
@@ -119,7 +131,7 @@
       text={["#grid-normal", "#grid-cylinder", "#grid-torus"]}
       tooltip={["Normale", "Cylindrique", "Torique"]}
       selected={model.mode}
-      setter={i => model.newGame(() => model.mode = i)}
+      setter={model.setMode}
     />
     <I.SizesGroup bind:model={model}
       values={[[3,3], [5,5], [6,6]]}
