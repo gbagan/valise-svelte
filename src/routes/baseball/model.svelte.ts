@@ -1,7 +1,7 @@
 import { random, range, shuffle } from '$lib/util';
 import { Model } from '$lib/model.svelte';
 
-type Position = number[];
+type Position = readonly number[];
 type Move = number;
 
 export default class extends Model<Position, Move> {
@@ -35,7 +35,9 @@ export default class extends Model<Position, Move> {
 
   isLevelFinished = () => this.position.every((i, j) => i >> 1 === j >> 1);
   protected initialPosition = () => shuffle(range(0, 2 * this.#baseCount));
-  protected onNewGame = () => this.#missingPeg = random(0, 2 * this.#baseCount);
+  protected onNewGame() {
+    this.#missingPeg = random(0, 2 * this.#baseCount);
+  }
 
   setBaseCount = (i: number) => this.newGame(() => this.#baseCount = i);
 }

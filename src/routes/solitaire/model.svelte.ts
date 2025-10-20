@@ -4,8 +4,8 @@ import { WithSize } from '$lib/size.svelte';
 import { countBy, diffCoords, generate, generate2, random, repeat } from '$lib/util';
 
 export enum Board { French, English, Circle, Grid3, Random };
-export type Position = boolean[];
-type Move = {from: number, to: number};
+export type Position = readonly boolean[];
+type Move = {readonly from: number, readonly to: number};
 
 export default class extends WithScore(WithSize(Model<Position, Move>)) {
   #holes: boolean[] = $state([]);
@@ -17,7 +17,7 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
     this.resize(6, 1);
   }
 
-  get holes() {
+  get holes(): readonly boolean[] {
     return this.#holes;
   }
 

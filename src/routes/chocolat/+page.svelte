@@ -14,8 +14,8 @@
     return col >= left && col < right && row >= top && row < bottom;
   }
 
-  let grid = $derived(generate2(model.rows, model.columns, (row, col) => [row, col]));
-  let pmoves = $derived(model.possibleMoves());
+  const grid = $derived(generate2(model.rows, model.columns, (row, col) => [row, col]));
+  const pmoves = $derived(model.possibleMoves());
 
   let cutLine = $derived.by(() => {
     if (moveWhenHover === null) {

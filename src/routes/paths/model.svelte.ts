@@ -2,7 +2,7 @@ import { allDistinct, diffCoords, random, range } from '$lib/util';
 import { Model } from '$lib/model.svelte';
 import { WithSize, type SizeLimit } from '$lib/size.svelte';
 
-type Position = number[];
+type Position = readonly number[];
 type Move = number;
 export enum Mode { Mode1, Mode2 };
 

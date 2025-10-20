@@ -3,14 +3,19 @@ import { Model } from '$lib/model.svelte';
 import { WithCombinatorial } from '$lib/combinatorial.svelte';
 import { WithSize, type SizeLimit } from '$lib/size.svelte';
 
-type Position = {left: number, right: number, top: number, bottom: number};
-export type Move = ["left" | "right" | "top" | "bottom", number];
+type Position = {
+  readonly left: number,
+  readonly right: number,
+  readonly top: number,
+  readonly bottom: number
+};
+export type Move = readonly ["left" | "right" | "top" | "bottom", number];
 export enum SoapMode { Corner, Border, Standard, Custom };
 
 const sizeLimit: SizeLimit = { minRows: 4, minCols: 4, maxRows: 10, maxCols: 10 };
 
 export default class extends WithCombinatorial(WithSize(Model<Position, Move>)) {
-  #soap: [number, number] | null = $state.raw(null);
+  #soap: readonly [number, number] | null = $state.raw(null);
   #soapMode = $state(SoapMode.Corner);
 
   constructor() {
@@ -26,7 +31,7 @@ export default class extends WithCombinatorial(WithSize(Model<Position, Move>)) 
     return this.#soapMode;
   }
 
-  play([dir, x]: Move): Position | null {
+  protected play([dir, x]: Move): Position | null {
     switch (dir) {
       case "left": return {...this.position, left: x};
       case "right": return {...this.position, right: x};
@@ -40,9 +45,9 @@ export default class extends WithCombinatorial(WithSize(Model<Position, Move>)) 
     return left === right - 1 && top === bottom - 1;
   }
 
-  initialPosition = () => ({left: 0, right: this.columns, top: 0, bottom: this.rows});
+  protected initialPosition = () => ({left: 0, right: this.columns, top: 0, bottom: this.rows});
 
-  onNewGame() {
+  protected onNewGame() {
     if (this.#soapMode === SoapMode.Custom) {
       this.#soap = null;
     } else {
@@ -52,7 +57,7 @@ export default class extends WithCombinatorial(WithSize(Model<Position, Move>)) 
     }
   }
 
-  isLosingPosition(): boolean {
+  protected isLosingPosition(): boolean {
     if (this.#soap === null) {
       return false;
     }

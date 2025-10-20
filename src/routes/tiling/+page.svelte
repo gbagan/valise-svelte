@@ -19,7 +19,7 @@
 
   function handleKeydown(e: KeyboardEvent) {
     if (e.key === " ") {
-      model.rotation += 1;
+      model.rotate();
     }
   }
 
@@ -89,7 +89,7 @@
     <div
       class="ui-board"
       style={gridStyle(model.rows, model.columns, 5)}
-      oncontextmenu={e => {e.preventDefault(); model.rotation += 1}}
+      oncontextmenu={e => {e.preventDefault(); model.rotate()}}
     >
       <PointerTracker {pointer} viewBox="0 0 {50 * model.columns} {50 * model.rows}">
         {#each model.position as pos, index}
@@ -138,13 +138,13 @@
       values={["type1", "type2", "type3", "custom"] as TileType[]}
       text={["#beast1", "#beast2", "#beast3", "#customize"]}
       selected={model.tileType}
-      setter={t => model.setTileType(t)}
+      setter={model.setTileType}
     />
     <I.SelectGroup
       title="Nombre d'éviers"
       values={[0, 1, 2]}
       selected={model.sinkCount}
-      setter={i => model.newGame(() => model.sinkCount = i)}
+      setter={model.setSinkCount}
     />
     <I.Group title="Options">
       <I.Help bind:model={model} />

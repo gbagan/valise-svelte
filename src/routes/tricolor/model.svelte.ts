@@ -1,7 +1,7 @@
 import { generate, random, repeat } from '$lib/util';
 import { Model } from '$lib/model.svelte';
 
-type Position = number[];
+type Position = readonly number[];
 type Move = number;
 
 export default class extends Model<Position, Move> {
