@@ -1,5 +1,4 @@
 import { Graph } from "$lib/graph.svelte";
-import { title } from "process";
 
 const house = new Graph(
   "Maison",
