@@ -1,5 +1,5 @@
-export type Edge = [number, number];
-export type Position = { x: number, y: number };
+export type Edge = readonly [number, number];
+export type Position = { readonly x: number, readonly y: number };
 export type Graph = { title: string, vertices: Position[], edges: Edge[] }
    
 export const getCoords = (graph: Graph, u: number) => graph.vertices[u];

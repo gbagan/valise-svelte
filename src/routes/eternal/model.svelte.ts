@@ -5,7 +5,7 @@ import { Mode, WithTwoPlayers } from "$lib/twoplayers.svelte";
 import { WithSize } from "$lib/size.svelte";
 import { allDistinct, countBy, generate, generate2, minBy, randomPick, range, sublists } from "$lib/util";
 
-type Conf = number[];
+type Conf = readonly number[];
 type AdjGraph = number[][];
 export enum Rules { One, Many }
 
@@ -125,8 +125,11 @@ function makeEDS(graph: AdjGraph, rulesName: Rules, k: number) {
 
 export enum GraphKind { Path, Cycle, Grid, Biclique, Custom }
 export enum Phase { Preparation, Game }
-type Position = { guards: number[], attacked: number | null };
-type Move = number | number[]   // attack | defense;
+type Position = {
+  readonly guards: readonly number[],
+  readonly attacked: number | null
+};
+type Move = number | readonly number[]   // attack | defense;
 
 const path = (n: number) => ({
   title: "Chemin",
@@ -184,7 +187,7 @@ function edgesToGraph(n: number, edges: Edge[]): AdjGraph {
   return g;
 }
 
-function permutations<A>(arr: A[]): A[][] {
+function permutations<A>(arr: readonly A[]): A[][] {
   if (arr.length === 0) return [[]];
   
   const result = [];
@@ -209,8 +212,6 @@ function goodPermutation(graph: AdjGraph, guards: Conf, answer: Conf): number[] 
   ));
   return minBy(perms, guards2 => countBy(guards2, (v, i) => v !== guards[i]));
 }
-
-// states
 
 export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
   phase = $state(Phase.Preparation);
@@ -258,7 +259,9 @@ export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
     }
   }
 
-  addToNextMove(from: number, to: number, srcs: number[], dests: number[]): number[] {
+  addToNextMove(from: number, to: number, srcs: readonly number[], dests: readonly number[])
+    : readonly number[]
+  {
     if (from === to || hasEdge(this.adjGraph, from, to)) {
       const idx = srcs.indexOf(from);
       return idx !== -1 ? dests.with(idx, to) : dests;
@@ -267,7 +270,7 @@ export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
     }
   }
 
-  isValidNextMove(dests: number[]) {
+  isValidNextMove(dests: readonly number[]) {
     if (this.position.attacked === null) {
       return false;
     }
@@ -358,13 +361,13 @@ export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
   }
 
   selectVertex(x: number) {
-    const {guards, attacked} = this.position;
+    let {guards, attacked} = this.position;
     if (this.phase === Phase.Preparation) {
       const idx = guards.indexOf(x);
       if (idx === -1) {
         this.position = { attacked, guards: [...guards, x] };
       } else {
-        guards.splice(idx, 1);
+        guards = guards.slice(idx, 1);
       }
     } else if (attacked === null) {
       this.playA(x);

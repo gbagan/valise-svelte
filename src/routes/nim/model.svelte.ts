@@ -3,8 +3,8 @@ import { Model } from '$lib/model.svelte';
 import { Turn } from '$lib/twoplayers.svelte';
 import { WithCombinatorial } from '$lib/combinatorial.svelte';
 
-type Position = [number, number][];
-type Move = {pile: number, pos: number};
+type Position = readonly (readonly [number, number])[];
+type Move = {readonly pile: number, readonly pos: number};
 
 export default class extends WithCombinatorial(Model<Position, Move>) {
   #length = $state(10);

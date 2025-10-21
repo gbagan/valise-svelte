@@ -75,7 +75,7 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
   ));
 
   // ensemble des cases attaquées par la case survolée par le pointeur de la souris
-  attackedBySelected = $derived(
+  readonly attackedBySelected: readonly boolean[] = $derived(
     this.selectedSquare === null
     ? repeat(this.rows * this.columns, false)
     : this.attackedBy(this.selectedPiece, this.selectedSquare)

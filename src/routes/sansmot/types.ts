@@ -1,0 +1,1 @@
+export enum Page { Pythagore, Caroll }

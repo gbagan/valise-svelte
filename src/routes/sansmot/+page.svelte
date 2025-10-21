@@ -1,12 +1,12 @@
 <script lang="ts">
   import { delay, range } from "$lib/util";
+  import { Page } from "./types";
 
   type AnimationStep = [number, string, number];
-  type Page = "pythagore" | "caroll";
 
   let anim: Record<string, number> = $state({});
   let locked = $state(false);
-  let page: Page = $state("pythagore");
+  let page: Page = $state(Page.Pythagore);
 
   async function runAnim(animation: AnimationStep[]) {
     if (locked) {
@@ -148,15 +148,15 @@
 
 <div class="main">
   <div class="menu">
-    <button class="link" onclick={() => setPage("pythagore")}>1</button>
-    <button class="link" onclick={() => setPage("caroll")}>2</button>
+    <button class="link" onclick={() => setPage(Page.Pythagore)}>1</button>
+    <button class="link" onclick={() => setPage(Page.Caroll)}>2</button>
   </div>
 
   <div>
     <h1 class="title">Preuves sans mot</h1>
-    {#if page === "pythagore"}
+    {#if page === Page.Pythagore}
       {@render pythagore()}
-    {:else if page === "caroll"}
+    {:else if page === Page.Caroll}
       {@render caroll()}
     {/if}
   </div>

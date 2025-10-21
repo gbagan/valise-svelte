@@ -91,7 +91,7 @@ export function sublists(n: number, k: number): number[][] {
 export const random = (start: number, end: number) =>
   start + (end - start) * Math.random() | 0;
 
-export function randomPick<A>(arr: A[]): A | null {
+export function randomPick<A>(arr: readonly A[]): A | null {
   if (arr.length === 0) {
     return null;
   } else {

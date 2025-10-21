@@ -1,8 +1,8 @@
 import { range } from '$lib/util';
 import { Model } from "$lib/model.svelte";
 
-type Position = number[][];
-type Move = {from: number, to: number};
+type Position = readonly (readonly number[])[];
+type Move = {readonly from: number, readonly to: number};
 
 export default class extends Model<Position, Move> {
   #diskCount = $state(4);

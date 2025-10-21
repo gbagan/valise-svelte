@@ -3,8 +3,8 @@ import { Model } from '$lib/model.svelte';
 import { Objective, WithScore } from '$lib/score.svelte';
 import { WithSize } from '$lib/size.svelte';
 
-export type Position = number[];
-type Move = {from: number, to: number};
+export type Position = readonly number[];
+type Move = {readonly from: number, readonly to: number};
 
 const sizeLimit = { minRows: 1, minCols: 2, maxRows: 6, maxCols: 12 };
 
@@ -14,7 +14,7 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
     this.resize(4, 4);
   }
 
-  play({ from, to }: Move) {
+  protected play({ from, to }: Move) {
     const position = this.position;
     const [row, col] = diffCoords(this.columns, from, to);
     const pfrom = position[from];
@@ -28,7 +28,7 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
 
   protected initialPosition = () => repeat(this.rows * this.columns, 1);
 
-  isLevelFinished () {
+  protected isLevelFinished () {
     const position = this.position;
     const columns = this.columns;
     return position.every((x, i) => {
@@ -39,8 +39,8 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
   }
 
   score = () => this.position.filter(v => v > 0).length;
-  scoreHash = () => `${this.rows},${this.columns}`;
-  objective = () => Objective.Minimize;
+  protected scoreHash = () => `${this.rows},${this.columns}`;
+  protected objective = () => Objective.Minimize;
   protected updateScore = () => this.updateScore2(true, "always");
 
   get sizeLimit() {

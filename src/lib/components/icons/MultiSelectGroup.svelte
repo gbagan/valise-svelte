@@ -4,8 +4,8 @@
 
   interface Props {
     title: string;
-    values: A[];
-    selected: A[];
+    values: readonly A[];
+    selected: readonly A[];
     setter: (val: A) => void;
     disabled?: boolean;
   }

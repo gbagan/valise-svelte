@@ -8,7 +8,7 @@
 
   let model = $state(new Model());
 
-  let turnMessage = $derived(
+  const turnMessage = $derived(
     model.isLevelFinished() 
     ? "Partie finie"
     : model.turn === Turn.Player1
@@ -16,7 +16,7 @@
     : "Tour du joueur rouge"
   );
 
-  let winTitle = $derived(model.winTitleFor2Player());
+  const winTitle = $derived(model.winTitleFor2Player());
 </script>
 
 {#snippet row(i: number)}

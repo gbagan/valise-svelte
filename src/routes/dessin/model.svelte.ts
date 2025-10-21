@@ -4,7 +4,7 @@ import { Objective, WithScore } from "$lib/score.svelte";
 import graphs from "./graphs";
 
 type Move = number | "raise";
-export type Position = Move[];
+export type Position = readonly Move[];
 
 export default class extends WithScore(Model<Position, Move>) {
   #graphIndex: number | "custom" = $state(0);
@@ -19,7 +19,7 @@ export default class extends WithScore(Model<Position, Move>) {
     return this.#graphIndex;
   }
 
-  graph: Graph = $derived.by(() => {
+  readonly graph: Graph = $derived.by(() => {
     if (this.#graphIndex === "custom") {
       return this.#customGraph;
     } else {
@@ -31,13 +31,13 @@ export default class extends WithScore(Model<Position, Move>) {
     }
   });
 
-  play(x: Move): Position | null {
+  protected play(x: Move): Position | null {
     const last = this.position.at(-1);
     if (x === "raise") {
       return typeof last === "number" ? [...this.position, x] : null;
     } if (typeof last === "number" && 
-        (this.containsEdge(this.positionEdges, x, last) 
-        || !this.containsEdge(this.graph.edges, x, last))) 
+        (this.#containsEdge(this.positionEdges, x, last) 
+        || !this.#containsEdge(this.graph.edges, x, last))) 
     {
       return null;
     } else {
@@ -45,12 +45,12 @@ export default class extends WithScore(Model<Position, Move>) {
     }
   }
 
-  initialPosition = () => [];
+  protected initialPosition = () => [];
   isLevelFinished = () => this.positionEdges.length === this.graph.edges.length;
 
-  objective = () => Objective.Minimize;
-  score = () => this.raiseCount;
-  scoreHash = () => this.#graphIndex === "custom" ? null : "" + this.#graphIndex;
+  protected objective = () => Objective.Minimize;
+  protected score = () => this.raiseCount;
+  protected scoreHash = () => this.#graphIndex === "custom" ? null : "" + this.#graphIndex;
   protected updateScore = () => this.updateScore2(true, "onNewRecord");
 
   edgesOf(position: Position): Edge[] {
@@ -69,11 +69,11 @@ export default class extends WithScore(Model<Position, Move>) {
     return res;
   }
 
-  positionEdges: Edge[] = $derived(this.edgesOf(this.position))
+  readonly positionEdges: readonly Edge[] = $derived(this.edgesOf(this.position))
 
-  raiseCount: number = $derived(this.position.filter(x => x === "raise").length);
+  readonly raiseCount: number = $derived(this.position.filter(x => x === "raise").length);
 
-  containsEdge(edges: Edge[], u: number, v: number) {
+  #containsEdge(edges: readonly Edge[], u: number, v: number) {
     if (u > v) {
       [v, u] = [u, v];
     }

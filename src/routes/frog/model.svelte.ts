@@ -22,11 +22,11 @@ export default class extends WithCombinatorial(WithSize(Model<Position, Move>)) 
     this.resize(20, 0, true);
   }
   
-  get moves() {
+  get moves(): readonly number[] {
     return this.#moves;
   }
 
-  get marked() {
+  get marked(): readonly boolean[] {
     return this.#marked;
   }
 
@@ -51,7 +51,9 @@ export default class extends WithCombinatorial(WithSize(Model<Position, Move>)) 
   isLevelFinished = () => this.position === 0;
   protected possibleMoves = () => range(0, this.rows+1).filter(this.canPlay);
   protected isLosingPosition = () => this.losingPositions[this.position];
-  protected onNewGame = () => this.#marked = repeat(this.rows, false);
+  protected onNewGame() {
+    this.#marked = repeat(this.rows, false);
+  }
 
   get sizeLimit() {
     return sizeLimit;
