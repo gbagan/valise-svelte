@@ -1,5 +1,5 @@
 import { answer, makeArenaGraph, type Arena, type ArenaGraph } from "$lib/arena";
-import type { Edge, Graph } from "$lib/graph";
+import { type Edge, type IGraph, Graph, MutableGraph } from "$lib/graph.svelte";
 import { Model } from "$lib/model.svelte";
 import { Mode, WithTwoPlayers } from "$lib/twoplayers.svelte";
 import { WithSize } from "$lib/size.svelte";
@@ -131,55 +131,57 @@ type Position = {
 };
 type Move = number | readonly number[]   // attack | defense;
 
-const path = (n: number) => ({
-  title: "Chemin",
-  vertices: generate(n, i => ({
+const path = (n: number): IGraph => new Graph(
+  "Chemin",
+  generate(n, i => ({
       x: 0.5 + 0.35 * Math.cos(2 * i * Math.PI / n),
       y: 0.5 + 0.35 * Math.sin(2 * i * Math.PI / n)
     })),
-    edges: generate(n - 1, i => [i, i+1])
-  }) as Graph;
+  generate(n - 1, i => [i, i+1])
+);
 
 
-function cycle(n: number): Graph {
-  const g = path(n);
-  g.title = "Cycle";
-  g.edges.push([0, n-1]);
-  return g;
-}
+const cycle = (n: number): IGraph => new Graph(
+ "Cycle",
+  generate(n, i => ({
+      x: 0.5 + 0.35 * Math.cos(2 * i * Math.PI / n),
+      y: 0.5 + 0.35 * Math.sin(2 * i * Math.PI / n)
+    })),
+  generate(n, i => [i, (i+1) % n])
+);
 
 // generate a grid graph
-function grid(n: number, m: number): Graph {
+function grid(n: number, m: number): IGraph {
   const p = Math.max(n, m);
-  return {
-    title: "Grille",
-    vertices: generate2(n, m, (i, j) => ({
+  return new Graph(
+    "Grille",
+    generate2(n, m, (i, j) => ({
       x: 0.15 + 0.7 * i / (p - 1),
       y: 0.1 + 0.7 * j / (p - 1)
     })),
-    edges: [
+    [
       ...generate2(n, m - 1, (i, j) => [i * m + j, i * m + j + 1] as Edge),
       ...generate2(n - 1, m, (i, j) => [i * m + j, i * m + j + m] as Edge)
     ]
-  }
+  )
 }
 
 // generate a biclique graph
-const biclique = (m: number, n: number) => ({
-  title: "Biclique",
-  vertices: generate(n + m, i => ({
+const biclique = (m: number, n: number): IGraph => new Graph(
+  "Biclique",
+  generate(n + m, i => ({
     x: i < n ? 0.2 : 0.8,
     y: 0.75 - 0.7 * (i < n ? i : i - n) / (i < n ? n : m)
   })),
-  edges: generate2(n, m, (i, j) => [i, j + n]),
-}) as Graph;
+  generate2(n, m, (i, j) => [i, j + n]),
+);
 
 function addEdge(graph: AdjGraph, u: number, v: number) {
   graph[u].push(v);
   graph[v].push(u);
 }
 
-function edgesToGraph(n: number, edges: Edge[]): AdjGraph {
+function edgesToGraph(n: number, edges: readonly Edge[]): AdjGraph {
   const g = generate(n, () => []);
   for (const [u, v] of edges) {
     addEdge(g, u, v);
@@ -219,7 +221,7 @@ export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
   rulesName = $state(Rules.One);
   draggedGuard: number | null = $state(null);
   pointerPosition: {x: number, y: number} | null = $state(null);
-  customGraph: Graph = $state({ title: "Graphe personnalisé", vertices: [], edges: []});
+  customGraph: IGraph = $state(new MutableGraph());
 
   constructor() {
     super({ guards: [], attacked: null });
@@ -413,10 +415,16 @@ export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
     }
   })
 
-  acceptCustomGraph = (graph: Graph) => {
+  customize = () => {
+    this.newGame(() =>this.openCustomizeDialog());
+  }
+
+  acceptCustomGraph = (graph: IGraph) => {
     if (graph.vertices.length > 0) {
-      this.customGraph = graph;
-      this.graphKind = GraphKind.Custom;
+      this.newGame(() => {
+        this.customGraph = graph;
+        this.graphKind = GraphKind.Custom;
+      });
     }
     this.closeDialog();
   }

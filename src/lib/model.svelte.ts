@@ -121,6 +121,7 @@ export abstract class Model<Position, Move> {
     this.#history = [];
     this.#redoHistory = [];
     this.help = false;
+    this.#dialog = Dialog.None;
   }
 
   newGame(action?: () => void) {
@@ -137,10 +138,6 @@ export abstract class Model<Position, Move> {
     do {
       this.#position = this.initialPosition();
     } while (this.isLevelFinished());
-
-    if (this.#dialog === Dialog.NewGame) {
-      this.#dialog = Dialog.None;
-    }
     this.#newGameAction = null;
   }
 

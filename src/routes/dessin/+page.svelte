@@ -1,6 +1,5 @@
 <script lang="ts">
   import { default as Model, type Position } from "./model.svelte";
-  import { getCoordsOfEdge } from "$lib/graph";
   import GraphEditor from "$lib/components/GraphEditor.svelte";
   import * as I from '$lib/components/Icons';
   import Config from '$lib/components/Config.svelte';
@@ -76,7 +75,7 @@
   <div class="ui-board board" oncontextmenu={e => { e.preventDefault(); model.playA("raise")}}>
     <PointerTracker viewBox="0 0 100 100" pointer={currentLine}>
       {#each model.graph.edges as [u, v]}
-        {@const {x1, x2, y1, y2} = getCoordsOfEdge(model.graph, u, v)}
+        {@const {x1, x2, y1, y2} = model.graph.getCoordsOfEdge(u, v)}
         <line
           x1={x1*100}
           x2={x2*100}
@@ -153,7 +152,7 @@
   <div class="bestscore">
     <svg viewBox="0 0 100 100">
       {#each model.edgesOf(position) as [u, v], i}
-        {@const {x1, x2, y1, y2} = getCoordsOfEdge(model.graph, u, v)}
+        {@const {x1, x2, y1, y2} = model.graph.getCoordsOfEdge(u, v)}
         <line
           x1={x1*100}
           x2={x2*100}

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { default as Model, GraphKind, Phase, Rules } from "./model.svelte";
   import { getPointerPosition } from "$lib/util";
-  import { getCoordsOfEdge } from "$lib/graph";
+  import { type IGraph } from "$lib/graph.svelte";
   import Template from "$lib/components/Template.svelte";
   import * as I from '$lib/components/Icons';
   import Config from '$lib/components/Config.svelte';
@@ -61,14 +61,14 @@
       onpointerleave={() => model.draggedGuard = null}
     >
       {#each model.graph.edges as [u, v]}
-        {@const {x1, x2, y1, y2} = getCoordsOfEdge(model.graph, u, v)}
+        {@const {x1, x2, y1, y2} = model.graph.getCoordsOfEdge(u, v)}
         <line x1={100*x1} x2={100*x2} y1={100*y1} y2={100*y2} class="line1" />
       {/each}
       {#if model.rulesName === Rules.Many}
         {#each model.nextMove as to, i}
           {@const from = model.position.guards[i]}
           {#if from !== to}
-            {@const {x1, y1, x2, y2} = getCoordsOfEdge(model.graph, from, to)}
+            {@const {x1, y1, x2, y2} = model.graph.getCoordsOfEdge(from, to)}
             {@render arrow(100*x1, 100*y1, 100*x2, 100*y2)}
           {/if}
         {/each}
@@ -158,7 +158,7 @@
         tooltip="Créé ton propre graphe"
         selected={model.graphKind === GraphKind.Custom}
         disabled={model.locked}
-        onclick={model.openCustomizeDialog}
+        onclick={model.customize}
       />
     </I.SelectGroup>
     <I.SelectGroup

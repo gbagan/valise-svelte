@@ -1,4 +1,4 @@
-import type { Edge, Graph } from "$lib/graph";
+import { type Edge, Graph, type IGraph } from "$lib/graph.svelte";
 import { Model } from "$lib/model.svelte";
 import { Objective, WithScore } from "$lib/score.svelte";
 import graphs from "./graphs";
@@ -8,7 +8,7 @@ export type Position = readonly Move[];
 
 export default class extends WithScore(Model<Position, Move>) {
   #graphIndex: number | "custom" = $state(0);
-  #customGraph: Graph = $state({ title: "Graphe personnalisé", vertices: [], edges: []});
+  #customGraph: IGraph = new Graph();
   
   constructor() {
     super([]);
@@ -19,17 +19,9 @@ export default class extends WithScore(Model<Position, Move>) {
     return this.#graphIndex;
   }
 
-  readonly graph: Graph = $derived.by(() => {
-    if (this.#graphIndex === "custom") {
-      return this.#customGraph;
-    } else {
-      const g = graphs[this.#graphIndex];
-      return {
-        ...g,
-        vertices: g.vertices.map(({x, y}) => ({x: x/5, y: y/5}))
-      }
-    }
-  });
+  readonly graph: IGraph = $derived(
+    this.#graphIndex === "custom" ? this.#customGraph : graphs[this.#graphIndex]
+  );
 
   protected play(x: Move): Position | null {
     const last = this.position.at(-1);
@@ -80,12 +72,14 @@ export default class extends WithScore(Model<Position, Move>) {
     return edges.findIndex(e => e[0] === u && e[1] === v) !== -1;
   }
   
-  acceptCustomGraph = (graph: Graph) => {
-    if (graph.vertices.length > 0) {
-      this.#customGraph = graph;
-      this.#graphIndex = "custom";
-    }
-    this.closeDialog();
+  acceptCustomGraph = (graph: IGraph) => {
+    this.newGame(() => {
+      if (graph.vertices.length > 0 && graph.edges.length > 0) {
+        this.#customGraph = graph;
+        this.#graphIndex = "custom";
+      }
+      this.closeDialog();
+    });
   }
 
   setGraphIndex = (i: number | "custom") => this.newGame(() => this.#graphIndex = i);

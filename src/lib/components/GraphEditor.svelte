@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { addEdge, addVertex, getCoordsOfEdge, removeEdge, removeVertex,
-  type Graph, type Position } from "$lib/graph";
+  import { type IGraph, MutableGraph, type Coords } from "$lib/graph.svelte";
     import { getPointerPosition } from "$lib/util";
   import Dialog from "./Dialog.svelte";
   import Icon from "./icons/Icon.svelte";
@@ -8,19 +7,19 @@
   type Mode = "vertex" | "addedge" | "delete";
 
   interface Props {
-    onOk: (graph: Graph) => void;
+    onOk: (graph: IGraph) => void;
   }
 
   let {onOk}: Props = $props();
 
-  let graph: Graph = $state({title: "Graph personnalisé", vertices: [], edges: []});
+  let graph = $state(new MutableGraph());
   let mode: Mode = $state("vertex");
   let selectedVertex: number | null = $state(null);
-  let currentPosition: Position | null = $state.raw(null);
+  let currentPosition: Coords | null = $state.raw(null);
 
   const onclick = (e: MouseEvent) => {
     if (mode === "vertex") {
-      addVertex(graph, getPointerPosition(e));
+      graph.addVertex(getPointerPosition(e));
     }
   }
 
@@ -28,7 +27,7 @@
     if (selectedVertex === null) return;
     const {x, y} = getPointerPosition(e);
     if (mode === "vertex" && selectedVertex !== null) {
-      graph.vertices[selectedVertex] = {x, y};
+      graph.moveVertex(selectedVertex, {x, y});
     } else if (mode === "addedge") {
       currentPosition = {x, y};
     }
@@ -45,7 +44,7 @@
     if (mode === "vertex") {
       e.stopPropagation();
     } else if (mode === "delete") {
-      removeVertex(graph, i);
+      graph.removeVertex(i);
     }
   }
 
@@ -54,7 +53,7 @@
       selectedVertex = null;
       currentPosition = null;
     } else if (mode === "addedge" && selectedVertex !== null) {
-      addEdge(graph, selectedVertex, i);
+      graph.addEdge(selectedVertex, i);
       selectedVertex = null;
     }
   }
@@ -68,7 +67,7 @@
 
   function onEdgeClick(u: number, v: number) {
     if (mode === "delete") {
-      removeEdge(graph, u, v);
+      graph.removeEdge(u, v);
     }
   }
 
@@ -88,7 +87,7 @@
         onpointerleave={dropOrLeave}
       >
         {#each graph.edges as [u, v]}
-          {@const {x1, y1, x2, y2} = getCoordsOfEdge(graph, u, v)}
+          {@const {x1, y1, x2, y2} = graph.getCoordsOfEdge(u, v)}
           <line
             x1={100*x1} y1={100*y1} x2={100*x2} y2={100*y2}
             class="edge"
@@ -123,7 +122,7 @@
         onclick={() => mode = "delete"}
       />
       <Icon text="#clear" tooltip="Efface tout le graphe"
-        onclick={() => {graph.vertices = []; graph.edges = []}}
+        onclick={() => graph.clear()}
       />
     </div>
 
