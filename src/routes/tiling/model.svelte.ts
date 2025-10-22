@@ -130,9 +130,9 @@ export default class extends WithSize(Model<Position, Move>) {
     col -= 2;
     const idx = this.#customTile.findIndex(([r, c]) => r === row && c === col);
     if (idx === -1) {
-        this.#customTile.push([row, col])
+      this.#customTile.push([row, col])
     } else {
-        this.#customTile.slice(idx, 1);
+      this.#customTile.splice(idx, 1);
     }
   }
 
