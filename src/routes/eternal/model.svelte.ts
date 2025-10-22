@@ -1,129 +1,13 @@
-import { answer, makeArenaGraph, type Arena, type ArenaGraph } from "$lib/arena";
 import { type Edge, type IGraph, Graph, MutableGraph } from "$lib/graph.svelte";
 import { Model } from "$lib/model.svelte";
 import { Mode, WithTwoPlayers } from "$lib/twoplayers.svelte";
 import { WithSize } from "$lib/size.svelte";
-import { allDistinct, countBy, generate, generate2, minBy, randomPick, range, sublists } from "$lib/util";
-
-type Conf = readonly number[];
-type AdjGraph = number[][];
-export enum Rules { One, Many }
-
-const hasEdge = (graph: AdjGraph, v: number, w: number) => graph[v].includes(w)
-
-function * multiMoves(graph: AdjGraph, conf: Conf, i=0): Generator<Conf> {
-  if (i === conf.length) {
-    yield conf
-  } else {
-    for (const conf2 of multiMoves(graph, conf, i + 1)) {
-      yield conf2;
-      for (const nbor of graph[conf2[i]]) {
-        //const conf3 = conf2.slice();
-        //conf3[i] = nbor;
-        yield conf2.with(i, nbor);
-      }
-    }
-  } 
-}
-
-const attackerMoves = (graph: AdjGraph, guards: Conf): Conf[] =>
-  range(0, graph.length)
-    .filter(attack => !guards.includes(attack))
-    .map(attack => ([...guards, attack]));
-
-function * oneGuardMoves (graph: AdjGraph, conf: Conf): Generator<Conf> {
-  const attack = conf[conf.length - 1];
-  const guards = conf.slice(0, -1);
-    
-  for (let i = 0; i < guards.length; i++) {
-    if (hasEdge(graph, guards[i], attack)) {
-      const guards2 = guards.with(i, attack);
-      // todo nécessaire ?
-      guards2.sort((a, b) => a - b)
-      yield guards2;
-    }
-  }
-}
-
-function * allGuardsMoves (graph: AdjGraph, conf: Conf): Generator<Conf> {
-  const gconf = conf.slice()
-  const attack = gconf.pop()!;
-  for (const conf2 of multiMoves(graph, gconf, 0)) {
-    const conf3 = conf2.slice()
-    conf3.sort((a, b) => a - b) // todo nécessaire ?
-    if (allDistinct(conf3) && conf3.includes(attack)) {
-      yield conf3
-    }
-  }
-}
-
-const oneRules = {
-  attackerMoves,
-  guardsMoves: oneGuardMoves
-}
-    
-const allRules = {
-  attackerMoves,
-  guardsMoves: allGuardsMoves
-};
-
-const makeRules = (name: Rules) => name === Rules.One ? oneRules : allRules;
-
-type EdsArena = ArenaGraph<Conf>;
-
-const guardsAnswer = (arena: EdsArena, guards: Conf, attack: number) =>
-  answer(arena, guards.concat(attack));
-  
-function attackerAnswer(arena: EdsArena, conf: Conf): number | null {
-  const econf = arena.encode(conf);
-  if(!arena.attractor[econf]) {
-    return null;
-  }
-  const attacks = arena.adj[econf];
-  const minattack = minBy(attacks, attack => arena.attractor[arena.encode(attack)] || 1000)!;
-  return minattack.at(-1)!;
-}
-
-function makeEDS(graph: AdjGraph, rulesName: Rules, k: number) {
-  const n = graph.length;
-  const rules = makeRules(rulesName);
-  const aconfs = sublists(graph.length, k);
-  const bconfs = [];
-  for (const conf of aconfs) {
-    for (let i = 0; i < n; i++) {
-      if (!conf.includes(i)) {
-        bconfs.push(conf.concat(i))
-      }
-    }
-  }
-
-  const arena: Arena<Conf> = {
-    size: (n+1) << k,
-    AConfs: aconfs,
-    BConfs: bconfs,
-    isAConf: (conf => conf.length === k),
-    neighbors: (conf => conf.length === k
-      ? rules.attackerMoves(graph, conf)
-      : Array.from(rules.guardsMoves(graph, conf))
-    ),
-    
-    // encode a configuration into an integer between 0 and size - 1
-    encode: array => {
-      let acc = 0
-      const last = array[k]
-      for (let i = 0; i < k; i++) {
-        acc += (1 << array[i])
-      }
-      if (last !== undefined) {
-        acc += (last + 1) << n;
-      }
-      return acc
-    }
-  }
-  return makeArenaGraph(arena)
-}
+import { allDistinct, generate, generate2, randomPick, range } from "$lib/util";
+import { edgesToGraph, hasEdge } from "./types";
+import { ManyGuardsArena, OneGuardArena } from "./arena";
 
 export enum GraphKind { Path, Cycle, Grid, Biclique, Custom }
+export enum Rules { OneGuard, ManyGuards }
 export enum Phase { Preparation, Game }
 type Position = {
   readonly guards: readonly number[],
@@ -176,49 +60,10 @@ const biclique = (m: number, n: number): IGraph => new Graph(
   generate2(n, m, (i, j) => [i, j + n]),
 );
 
-function addEdge(graph: AdjGraph, u: number, v: number) {
-  graph[u].push(v);
-  graph[v].push(u);
-}
-
-function edgesToGraph(n: number, edges: readonly Edge[]): AdjGraph {
-  const g = generate(n, () => []);
-  for (const [u, v] of edges) {
-    addEdge(g, u, v);
-  }
-  return g;
-}
-
-function permutations<A>(arr: readonly A[]): A[][] {
-  if (arr.length === 0) return [[]];
-  
-  const result = [];
-  for (let i = 0; i < arr.length; i++) {
-    const current = arr[i];
-    const remaining = arr.toSpliced(i, 1);
-    const remainingPerms = permutations(remaining);
-    for (const perm of remainingPerms) {
-      result.push([current].concat(perm));
-    }
-  }
-  return result;
-}
-
-// une bonne permutation d'un tableau [v1, ..., vn] pour un ensemble de gardes [g1, ..., gn]
-// est une permutation [u1, ..., vn]
-// telle que pour tout i, ui = gi ou {ui, gi} est une arete du graphe
-// et qui minimize le nombre de déplacements de gardes (i.e. le nombre de ui ≠ gi
-function goodPermutation(graph: AdjGraph, guards: Conf, answer: Conf): number[] | null {
-  const perms = permutations(answer).filter(guards2 => guards2.every((u, i) =>
-    u === guards[i] || hasEdge(graph, u, guards[i])
-  ));
-  return minBy(perms, guards2 => countBy(guards2, (v, i) => v !== guards[i]));
-}
-
 export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
   phase = $state(Phase.Preparation);
   graphKind = $state(GraphKind.Path);
-  rulesName = $state(Rules.One);
+  rules = $state(Rules.OneGuard);
   draggedGuard: number | null = $state(null);
   pointerPosition: {x: number, y: number} | null = $state(null);
   customGraph: IGraph = $state(new MutableGraph());
@@ -249,7 +94,11 @@ export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
   adjGraph = $derived(edgesToGraph(this.graph.vertices.length, this.graph.edges));
 
   arena = $derived(
-    this.mode === Mode.Duel ? null : makeEDS(this.adjGraph, this.rulesName, this.guardCount)
+    this.mode === Mode.Duel 
+    ? null 
+    : this.rules === Rules.OneGuard
+    ? new OneGuardArena(this.adjGraph, this.guardCount)
+    : new ManyGuardsArena(this.adjGraph, this.guardCount)
   );
 
   validate = () => {
@@ -350,10 +199,9 @@ export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
     }
     const {guards, attacked} = this.position;
     if (attacked !== null) {
-      const ans = guardsAnswer(this.arena, guards, attacked);
-      return !ans || this.rulesName === Rules.One ? ans : goodPermutation(this.adjGraph, guards, ans);
+      return this.arena.guardsAnswer(guards, attacked);
     } else {
-      const ans = attackerAnswer(this.arena, guards);
+      const ans = this.arena.attackerAnswer(guards);
       if (ans !== null) {
         return ans;
       } else {
@@ -373,13 +221,15 @@ export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
       }
     } else if (attacked === null) {
       this.playA(x);
-    } else if (this.rulesName === Rules.One) {
+    } else if (this.rules === Rules.OneGuard) {
       this.playA(this.addToNextMove(x, attacked, guards, guards)); // todo
     }
   }
 
   startDrag(e: PointerEvent, i: number) {
-    if (this.rulesName === Rules.Many && this.position.guards.includes(i) && this.position.attacked !== null) {
+    if (this.rules === Rules.ManyGuards && this.position.guards.includes(i) 
+      && this.position.attacked !== null)
+    {
       (e.currentTarget as Element)?.releasePointerCapture(e.pointerId);
       this.draggedGuard = i;
     }

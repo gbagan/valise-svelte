@@ -1,7 +1,6 @@
 <script lang="ts">
   import { default as Model, GraphKind, Phase, Rules } from "./model.svelte";
   import { getPointerPosition } from "$lib/util";
-  import { type IGraph } from "$lib/graph.svelte";
   import Template from "$lib/components/Template.svelte";
   import * as I from '$lib/components/Icons';
   import Config from '$lib/components/Config.svelte';
@@ -64,7 +63,7 @@
         {@const {x1, x2, y1, y2} = model.graph.getCoordsOfEdge(u, v)}
         <line x1={100*x1} x2={100*x2} y1={100*y1} y2={100*y2} class="line1" />
       {/each}
-      {#if model.rulesName === Rules.Many}
+      {#if model.rules === Rules.ManyGuards}
         {#each model.nextMove as to, i}
           {@const from = model.position.guards[i]}
           {#if from !== to}
@@ -136,7 +135,7 @@
     <button
       class="ui-button ui-button-primary validate"
       disabled={model.guardCount === 0 || model.phase === Phase.Game 
-                && (model.rulesName === Rules.One)}
+                && (model.rules === Rules.OneGuard)}
       onclick={model.validate}
     >Valider</button>
   </div>
@@ -163,12 +162,12 @@
     </I.SelectGroup>
     <I.SelectGroup
       title="Règles"
-      values={[Rules.One, Rules.Many]}
-      selected={model.rulesName}
+      values={[Rules.OneGuard, Rules.ManyGuards]}
+      selected={model.rules}
       text={["1", "∞"]}
       disabled={model.locked}
       tooltip={["Un seul garde peut se déplacer", "Plusieurs gardes peuvent se déplacer"]}
-      setter={i => model.newGame(() => model.rulesName = i)}
+      setter={i => model.newGame(() => model.rules = i)}
     />
     <I.TwoPlayers bind:model={model} />
     <I.Group title="Options">
