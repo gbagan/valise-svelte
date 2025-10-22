@@ -34,8 +34,7 @@
   }
 
   function startDrag(e: PointerEvent, i: number) {
-    if (model.rules === Rules.ManyGuards && model.position.guards.includes(i) 
-      && model.position.attacked !== null)
+    if (model.position.guards.includes(i) && model.position.attacked !== null)
     {
       (e.currentTarget as Element)?.releasePointerCapture(e.pointerId);
       draggedGuard = i;

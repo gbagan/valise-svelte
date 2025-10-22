@@ -225,19 +225,23 @@ export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
     if (this.phase === Phase.Preparation) {
       const idx = guards.indexOf(x);
       if (idx === -1) {
-        this.position = { attacked, guards: [...guards, x] };
+        guards = [...guards, x];
       } else {
-        guards = guards.slice(idx, 1);
+        guards = guards.toSpliced(idx, 1);
       }
+      this.position = { attacked, guards };
     } else if (attacked === null) {
       this.playA(x);
-    } else if (this.rules === Rules.OneGuard) {
-      this.playA(this.addToNextMove(x, attacked, guards, guards)); // todo
     }
   }
 
   moveGuard(from: number, to: number | null) {
-    this.nextMove = this.addToNextMove(from, to ?? from, this.position.guards, this.nextMove);
+    if (this.rules === Rules.OneGuard && to !== null) {
+      const guards = this.position.guards;
+      this.playA(this.addToNextMove(from, to, guards, guards))
+    } else if (this.rules === Rules.ManyGuards) {
+      this.nextMove = this.addToNextMove(from, to ?? from, this.position.guards, this.nextMove);
+    }
   }
 
   setRules = (rules: Rules) => this.newGame(() => {
