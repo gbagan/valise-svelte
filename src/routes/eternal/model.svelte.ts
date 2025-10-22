@@ -61,16 +61,26 @@ const biclique = (m: number, n: number): IGraph => new Graph(
 );
 
 export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
-  phase = $state(Phase.Preparation);
-  graphKind = $state(GraphKind.Path);
-  rules = $state(Rules.OneGuard);
-  draggedGuard: number | null = $state(null);
-  pointerPosition: {x: number, y: number} | null = $state(null);
-  customGraph: IGraph = $state(new MutableGraph());
+  #phase = $state(Phase.Preparation);
+  #graphKind = $state(GraphKind.Path);
+  #rules = $state(Rules.OneGuard);
+  #customGraph: IGraph = $state(new MutableGraph());
 
   constructor() {
     super({ guards: [], attacked: null });
     this.resize(6, 0, true);
+  }
+
+  get phase() {
+    return this.#phase;
+  }
+
+  get graphKind() {
+    return this.#graphKind;
+  }
+
+  get rules() {
+    return this.#rules;
   }
 
   get didMachineStart() {
@@ -86,14 +96,14 @@ export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
       case GraphKind.Cycle: return cycle(this.rows);
       case GraphKind.Biclique: return biclique(this.rows, this.columns);
       case GraphKind.Grid: return grid(this.rows, this.columns);
-      default: return this.customGraph;
+      default: return this.#customGraph;
     }
   })
 
   guardCount = $derived(this.position.guards.length);
   adjGraph = $derived(edgesToGraph(this.graph.vertices.length, this.graph.edges));
 
-  arena = $derived(
+  #arena = $derived(
     this.mode === Mode.Duel 
     ? null 
     : this.rules === Rules.OneGuard
@@ -103,7 +113,7 @@ export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
 
   validate = () => {
     if (this.phase === Phase.Preparation) {
-      this.phase = Phase.Game;
+      this.#phase = Phase.Game;
       //this.computerStarts = false;
     } else {
       this.playA(this.nextMove);
@@ -151,7 +161,7 @@ export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
 
   onNewGame() {
     this.nextMove = [];
-    this.phase = Phase.Preparation;
+    this.#phase = Phase.Preparation;
     // draggedGuard;
   }
 
@@ -194,14 +204,14 @@ export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
   machineMove(): Move | null {
     if (this.levelFinished) {
       return null;
-    } else if (!this.arena || this.mode === Mode.Random) {
+    } else if (!this.#arena || this.mode === Mode.Random) {
       return this.#randomMove();
     }
     const {guards, attacked} = this.position;
     if (attacked !== null) {
-      return this.arena.guardsAnswer(guards, attacked);
+      return this.#arena.guardsAnswer(guards, attacked);
     } else {
-      const ans = this.arena.attackerAnswer(guards);
+      const ans = this.#arena.attackerAnswer(guards);
       if (ans !== null) {
         return ans;
       } else {
@@ -226,29 +236,16 @@ export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
     }
   }
 
-  startDrag(e: PointerEvent, i: number) {
-    if (this.rules === Rules.ManyGuards && this.position.guards.includes(i) 
-      && this.position.attacked !== null)
-    {
-      (e.currentTarget as Element)?.releasePointerCapture(e.pointerId);
-      this.draggedGuard = i;
-    }
+  moveGuard(from: number, to: number | null) {
+    this.nextMove = this.addToNextMove(from, to ?? from, this.position.guards, this.nextMove);
   }
 
-  dropGuard(to: number | null) {
-    if (this.draggedGuard !== null) {
-      this.nextMove = this.addToNextMove(
-        this.draggedGuard,
-        to ?? this.draggedGuard,
-        this.position.guards,
-        this.nextMove
-      );
-      this.draggedGuard = null;
-    }
-  }
+  setRules = (rules: Rules) => this.newGame(() => {
+    this.#rules = rules;
+  });
 
   setGraphKind = (kind: GraphKind) => this.newGame(() => {
-    this.graphKind = kind;
+    this.#graphKind = kind;
     switch (kind) {
       case GraphKind.Path:
       case GraphKind.Cycle:
@@ -272,8 +269,8 @@ export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
   acceptCustomGraph = (graph: IGraph) => {
     if (graph.vertices.length > 0) {
       this.newGame(() => {
-        this.customGraph = graph;
-        this.graphKind = GraphKind.Custom;
+        this.#customGraph = graph;
+        this.#graphKind = GraphKind.Custom;
       });
     }
     this.closeDialog();

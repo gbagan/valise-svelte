@@ -8,6 +8,9 @@
 
   let model = $state(new Model());
 
+  let draggedGuard: number | null = $state(null);
+  let pointerPosition: {x: number, y: number} | null = $state(null);
+
   type Coords = {x: number, y: number};
   const translateGuard = ({ x, y }: Coords) => `translate(${100*x}%,${100*y}%)`;
 
@@ -26,8 +29,24 @@
   }
 
   function setPointer(e: PointerEvent) {
-    if (model.draggedGuard === null) return;
-    model.pointerPosition = getPointerPosition(e);
+    if (draggedGuard === null) return;
+    pointerPosition = getPointerPosition(e);
+  }
+
+  function startDrag(e: PointerEvent, i: number) {
+    if (model.rules === Rules.ManyGuards && model.position.guards.includes(i) 
+      && model.position.attacked !== null)
+    {
+      (e.currentTarget as Element)?.releasePointerCapture(e.pointerId);
+      draggedGuard = i;
+    }
+  }
+
+  function dropGuard(to: number | null) {
+    if (draggedGuard !== null) {
+      model.moveGuard(draggedGuard, to);
+      draggedGuard = null;
+    }
   }
 
   const winTitle = "L'attaquant gagne";
@@ -56,8 +75,8 @@
       viewBox="0 0 100 100"
       onpointerdown={setPointer}
       onpointermove={setPointer}
-      onpointerup={() => model.dropGuard(null)}
-      onpointerleave={() => model.draggedGuard = null}
+      onpointerup={() => dropGuard(null)}
+      onpointerleave={() => draggedGuard = null}
     >
       {#each model.graph.edges as [u, v]}
         {@const {x1, x2, y1, y2} = model.graph.getCoordsOfEdge(u, v)}
@@ -108,8 +127,8 @@
           fill="transparent"
           style:transform={translateGuard(pos)}
           onclick={() => model.selectVertex(i)}
-          onpointerdown={e => model.startDrag(e, i)}
-          onpointerup={() => model.dropGuard(i)}
+          onpointerdown={e => startDrag(e, i)}
+          onpointerup={() => dropGuard(i)}
           class={{sel: model.phase === Phase.Preparation
                   || model.position.attacked !== null && model.position.guards.includes(i)
                   || model.position.attacked === null && !model.position.guards.includes(i)
@@ -117,8 +136,8 @@
                 }}
         />
       {/each}
-      {#if model.draggedGuard !== null && model.pointerPosition !== null}
-        {@render cursor(model.pointerPosition.x, model.pointerPosition.y)}
+      {#if draggedGuard !== null && pointerPosition !== null}
+        {@render cursor(pointerPosition.x, pointerPosition.y)}
       {/if}
     </svg>
     <span class="info">
@@ -167,7 +186,7 @@
       text={["1", "∞"]}
       disabled={model.locked}
       tooltip={["Un seul garde peut se déplacer", "Plusieurs gardes peuvent se déplacer"]}
-      setter={i => model.newGame(() => model.rules = i)}
+      setter={model.setRules}
     />
     <I.TwoPlayers bind:model={model} />
     <I.Group title="Options">
