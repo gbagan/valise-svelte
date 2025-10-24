@@ -1,13 +1,13 @@
 import { tick } from "svelte";
+import { Dialog, type ICoreModel } from "./types";
 
 export const VERSION = 1;
-export enum Dialog { None, Rules, Score, Customize, NewGame };
 
-export abstract class Model<Position, Move> {
+export abstract class CoreModel<Position, Move> implements ICoreModel<Position, Move> {
   #position: Position;
   #history: Position[] = $state.raw([]);
   #redoHistory: Position[] = $state.raw([]);
-  help = $state(false);
+  #help = $state(false);
   #isVictoryShown = $state(false);
   #dialog = $state(Dialog.None);
   #newGameAction: (() => void) | null = $state(null);
@@ -75,6 +75,14 @@ export abstract class Model<Position, Move> {
     this.#locked = false;
   }
 
+  get help() {
+    return this.#help;
+  }
+
+  toggleHelp = () => {
+    this.#help = !this.#help;
+  }
+
   canPlay(move: Move): boolean {
     return this.play(move) !== null;
   }
@@ -120,7 +128,7 @@ export abstract class Model<Position, Move> {
   protected resetAttributes() {
     this.#history = [];
     this.#redoHistory = [];
-    this.help = false;
+    this.#help = false;
     this.#dialog = Dialog.None;
   }
 

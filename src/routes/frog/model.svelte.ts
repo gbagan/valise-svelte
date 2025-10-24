@@ -1,10 +1,9 @@
 import { range, repeat } from '$lib/util';
-import { Model } from '$lib/model.svelte';
-import { WithCombinatorial } from '$lib/combinatorial.svelte';
-import { WithSize, type SizeLimit } from '$lib/size.svelte';
-
-type Position = number;
-type Move = number;
+import { CoreModel } from '$lib/model/core.svelte';
+import { WithCombinatorial } from '$lib/model/combinatorial.svelte';
+import { WithSize } from '$lib/model/size.svelte';
+import type { SizeLimit } from '$lib/model/types';
+import type { IModel, Move, Position } from './types';
 
 const sizeLimit: SizeLimit = {
   minRows: 5,
@@ -13,7 +12,10 @@ const sizeLimit: SizeLimit = {
   maxCols: 0,
 }
 
-export default class extends WithCombinatorial(WithSize(Model<Position, Move>)) {
+const C1 = WithSize<Position, Move>()(CoreModel<Position, Move>);
+const C2 = WithCombinatorial<Position, Move>()(C1);
+
+export default class extends C2 implements IModel {
   #moves = $state([1, 2, 3]);
   #marked: boolean[] = $state([]);
   

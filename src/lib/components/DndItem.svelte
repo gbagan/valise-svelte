@@ -1,5 +1,5 @@
 <script lang="ts" generics="Pos, D, P">
-  import { Model } from '$lib/model.svelte';
+  import { Model } from '$lib/model/core.svelte';
   import type { Snippet } from 'svelte';
 
   interface Props {

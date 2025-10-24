@@ -1,9 +1,9 @@
 <script lang="ts" generics="Pos,Move">
-  import { type Model } from '$lib/model.svelte';
+  import { type ICoreModel } from '$lib/model/types';
   import Icon from "./Icon.svelte";
 
   interface Props {
-    model: Model<Pos, Move>;
+    model: ICoreModel<Pos, Move>;
   }
 
   const {model=$bindable()}: Props = $props();

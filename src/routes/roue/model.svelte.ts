@@ -1,5 +1,5 @@
 import { delay, mod, repeat, swap } from '$lib/util';
-import { Model } from '$lib/model.svelte';
+import { Model } from '$lib/model/core.svelte';
 
 type Position = (number | null)[];
 export type Location = { kind: "panel", id: number } | { kind: "wheel", id: number } | {kind: "board"};

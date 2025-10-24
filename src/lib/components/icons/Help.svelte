@@ -1,11 +1,11 @@
 <script lang="ts" generics="Pos, Move">
-  import { type Model } from '$lib/model.svelte';
+  import { type ICoreModel } from '$lib/model/types';
   import Icon from "./Icon.svelte";
 
   type Interaction = "click" | "press";
 
   interface Props {
-    model: Model<Pos, Move>;
+    model: ICoreModel<Pos, Move>;
     interaction?: Interaction
   }
 
@@ -17,8 +17,8 @@
   tooltip="Aide"
   disabled={model.locked}
   selected={model.help}
-  onclick={interaction !== "click" ? null : () => model.help = !model.help}
-  onpointerdown={interaction !== "press" ? null : () => model.help = true}
-  onpointerup={interaction !== "press" ? null : () => model.help = false}
-  onpointerleave={interaction !== "press" ? null : () => model.help = false}
+  onclick={interaction !== "click" ? null : () => model.toggleHelp()}
+  onpointerdown={interaction !== "press" ? null : () => model.setHelp(true)}
+  onpointerup={interaction !== "press" ? null : () => model.setHelp(false)}
+  onpointerleave={interaction !== "press" ? null : () => model.setHelp(false)}
 />

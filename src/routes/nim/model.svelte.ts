@@ -1,5 +1,5 @@
 import { generate, random } from '$lib/util';
-import { Model } from '$lib/model.svelte';
+import { Model } from '$lib/model/core.svelte';
 import { Turn } from '$lib/twoplayers.svelte';
 import { WithCombinatorial } from '$lib/combinatorial.svelte';
 

@@ -1,19 +1,11 @@
 import { type Edge, type IGraph, Graph, MutableGraph } from "$lib/graph.svelte";
-import { Model } from "$lib/model.svelte";
-import { Mode, WithTwoPlayers } from "$lib/twoplayers.svelte";
-import { WithSize } from "$lib/size.svelte";
+import { Mode } from "$lib/model/types";
+import { CoreModel } from "$lib/model/core.svelte";
+import { WithTwoPlayers } from "$lib/model/twoplayers.svelte";
+import { WithSize } from "$lib/model/size.svelte";
 import { allDistinct, generate, generate2, randomPick, range } from "$lib/util";
-import { edgesToGraph, hasEdge } from "./types";
+import { edgesToGraph, GraphKind, hasEdge, Phase, Rules, type IModel, type Move, type Position } from "./types";
 import { ManyGuardsArena, OneGuardArena } from "./arena";
-
-export enum GraphKind { Path, Cycle, Grid, Biclique, Custom }
-export enum Rules { OneGuard, ManyGuards }
-export enum Phase { Preparation, Game }
-type Position = {
-  readonly guards: readonly number[],
-  readonly attacked: number | null
-};
-type Move = number | readonly number[]   // attack | defense;
 
 const path = (n: number): IGraph => new Graph(
   "Chemin",
@@ -60,7 +52,10 @@ const biclique = (m: number, n: number): IGraph => new Graph(
   generate2(n, m, (i, j) => [i, j + n]),
 );
 
-export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
+const C1 = WithSize<Position, Move>()(CoreModel<Position, Move>);
+const C2 = WithTwoPlayers<Position, Move>()(C1);
+
+export default class extends C2 implements IModel {
   #phase = $state(Phase.Preparation);
   #graphKind = $state(GraphKind.Path);
   #rules = $state(Rules.OneGuard);
@@ -88,9 +83,14 @@ export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
     return super.didMachineStart || this.phase === Phase.Preparation;
   }
 
-  nextMove = $derived(this.position.guards);
+  // mutable
+  #nextMove: readonly number[] = $derived(this.position.guards);
+  
+  get nextMove() {  
+    return this.#nextMove;
+  }
 
-  graph = $derived.by(() => {
+  readonly graph = $derived.by(() => {
     switch (this.graphKind) {
       case GraphKind.Path: return path(this.rows);
       case GraphKind.Cycle: return cycle(this.rows);
@@ -100,8 +100,8 @@ export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
     }
   })
 
-  guardCount = $derived(this.position.guards.length);
-  adjGraph = $derived(edgesToGraph(this.graph.vertices.length, this.graph.edges));
+  readonly guardCount = $derived(this.position.guards.length);
+  readonly adjGraph = $derived(edgesToGraph(this.graph.vertices.length, this.graph.edges));
 
   #arena = $derived(
     this.mode === Mode.Duel 
@@ -160,7 +160,7 @@ export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
   initialPosition = () => ({ guards: [], attacked: null });
 
   onNewGame() {
-    this.nextMove = [];
+    this.#nextMove = [];
     this.#phase = Phase.Preparation;
     // draggedGuard;
   }
@@ -240,7 +240,7 @@ export default class extends WithTwoPlayers(WithSize(Model<Position, Move>)) {
       const guards = this.position.guards;
       this.playA(this.addToNextMove(from, to, guards, guards))
     } else if (this.rules === Rules.ManyGuards) {
-      this.nextMove = this.addToNextMove(from, to ?? from, this.position.guards, this.nextMove);
+      this.#nextMove = this.addToNextMove(from, to ?? from, this.position.guards, this.nextMove);
     }
   }
 

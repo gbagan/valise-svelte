@@ -1,5 +1,5 @@
 import { diffCoords, repeat } from '$lib/util';
-import { Model } from '$lib/model.svelte';
+import { Model } from '$lib/model/core.svelte';
 import { Objective, WithScore } from '$lib/score.svelte';
 import { WithSize } from '$lib/size.svelte';
 

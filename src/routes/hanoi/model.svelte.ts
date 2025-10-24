@@ -1,10 +1,11 @@
 import { range } from '$lib/util';
-import { Model } from "$lib/model.svelte";
+import { CoreModel } from "$lib/model/core.svelte";
+import type { IModel } from './types';
 
 type Position = readonly (readonly number[])[];
 type Move = {readonly from: number, readonly to: number};
 
-export default class extends Model<Position, Move> {
+export default class extends CoreModel<Position, Move> implements IModel {
   #diskCount = $state(4);
   
   constructor() {
@@ -16,7 +17,7 @@ export default class extends Model<Position, Move> {
     return this.#diskCount;
   }
 
-  play({ from, to }: Move): Position | null {
+  protected play({ from, to }: Move): Position | null {
     const position = this.position;
     const last = position[from].at(-1);
     if (from === to || last === undefined || last < (position[to].at(-1) ?? -1)) {
@@ -26,8 +27,8 @@ export default class extends Model<Position, Move> {
     return position.with(from, init).with(to, position[to].concat([last]));
   }
 
-  initialPosition = () => [range(0, this.#diskCount), [], []];
-  isLevelFinished = () => this.position[0].length === 0 && this.position[1].length === 0;
+  protected initialPosition = () => [range(0, this.#diskCount), [], []];
+  protected isLevelFinished = () => this.position[0].length === 0 && this.position[1].length === 0;
 
   setDiskCount = (diskCount: number) => this.newGame(() => this.#diskCount = diskCount);
 }

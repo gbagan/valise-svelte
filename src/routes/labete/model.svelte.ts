@@ -1,5 +1,5 @@
 import { coords, countBy, generate2, mod, repeat } from '$lib/util';
-import { Model } from '$lib/model.svelte';
+import { Model } from '$lib/model/core.svelte';
 import { Objective, WithScore } from '$lib/score.svelte';
 import { WithSize, type SizeLimit } from '$lib/size.svelte';
 

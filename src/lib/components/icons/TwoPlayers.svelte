@@ -1,11 +1,10 @@
 <script lang="ts" generics="Position,Move">
-  import { type Model } from '$lib/model.svelte';
-  import { Mode, type TwoPlayersModel } from '$lib/twoplayers.svelte';
+  import { type ICoreModel, Mode, type ITwoPlayersModel } from '$lib/model/types';
   import Icon from "./Icon.svelte";
   import SelectGroup from "./SelectGroup.svelte";
 
   interface Props {
-    model: Model<Position, Move> & TwoPlayersModel;
+    model: ICoreModel<Position, Move> & ITwoPlayersModel;
   }
   
   const {model=$bindable() }: Props = $props();

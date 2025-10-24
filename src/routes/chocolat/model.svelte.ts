@@ -1,20 +1,16 @@
 import { random, range } from '$lib/util';
-import { Model } from '$lib/model.svelte';
-import { WithCombinatorial } from '$lib/combinatorial.svelte';
-import { WithSize, type SizeLimit } from '$lib/size.svelte';
-
-type Position = {
-  readonly left: number,
-  readonly right: number,
-  readonly top: number,
-  readonly bottom: number
-};
-export type Move = readonly ["left" | "right" | "top" | "bottom", number];
-export enum SoapMode { Corner, Border, Standard, Custom };
+import { CoreModel } from '$lib/model/core.svelte';
+import { WithCombinatorial } from '$lib/model/combinatorial.svelte';
+import { WithSize } from '$lib/model/size.svelte';
+import { SoapMode, type IModel, type Move, type Position } from './types';
+import type { SizeLimit } from '$lib/model/types';
 
 const sizeLimit: SizeLimit = { minRows: 4, minCols: 4, maxRows: 10, maxCols: 10 };
 
-export default class extends WithCombinatorial(WithSize(Model<Position, Move>)) {
+const C1 = WithSize<Position, Move>()(CoreModel<Position, Move>);
+const C2 = WithCombinatorial<Position, Move>()(C1);
+
+export default class extends C2 implements IModel {
   #soap: readonly [number, number] | null = $state.raw(null);
   #soapMode = $state(SoapMode.Corner);
 

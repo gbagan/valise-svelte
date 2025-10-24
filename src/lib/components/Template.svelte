@@ -1,14 +1,12 @@
 <script lang="ts" generics="Position, Move">
-  import { type Model, Dialog } from '$lib/model.svelte';
-  import { isScoreModel } from '$lib/score.svelte';
-  import { isSizeModel } from '$lib/size.svelte';
+  import { type ICoreModel, Dialog, isScoreModel, isSizeModel } from '$lib/model/types';
   import CDialog from '$lib/components/Dialog.svelte';
   import IncDecGrid from '$lib/components/IncDecGrid.svelte';
   import { confetti } from '$lib/confetti';
   import type { Snippet } from 'svelte';
 
   interface Props {
-    model: Model<Position, Move>;
+    model: ICoreModel<Position, Move>;
     board: Snippet;
     config: Snippet;
     rules: Snippet;

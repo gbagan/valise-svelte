@@ -1,12 +1,10 @@
 import { type Edge, Graph, type IGraph } from "$lib/graph.svelte";
-import { Model } from "$lib/model.svelte";
-import { Objective, WithScore } from "$lib/score.svelte";
+import { CoreModel } from "$lib/model/core.svelte";
+import { Objective, WithScore } from "$lib/model/score.svelte";
 import graphs from "./graphs";
+import type { IModel, Move, Position } from "./types";
 
-type Move = number | "raise";
-export type Position = readonly Move[];
-
-export default class extends WithScore(Model<Position, Move>) {
+export default class extends WithScore<Position, Move>()(CoreModel<Position, Move>) implements IModel {
   #graphIndex: number | "custom" = $state(0);
   #customGraph: IGraph = new Graph();
   

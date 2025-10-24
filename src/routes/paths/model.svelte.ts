@@ -1,5 +1,5 @@
 import { allDistinct, diffCoords, random, range } from '$lib/util';
-import { Model } from '$lib/model.svelte';
+import { Model } from '$lib/model/core.svelte';
 import { WithSize, type SizeLimit } from '$lib/size.svelte';
 
 type Position = readonly number[];

@@ -1,10 +1,8 @@
 import { generate, random, repeat } from '$lib/util';
-import { Model } from '$lib/model.svelte';
+import { CoreModel } from '$lib/model/core.svelte';
+import type { IModel, Move, Position } from './types';
 
-type Position = readonly number[];
-type Move = number;
-
-export default class extends Model<Position, Move> {
+export default class extends CoreModel<Position, Move> implements IModel {
   #size = $state(5);
   #colorCount = $state(2);
   #range = $state(1);
