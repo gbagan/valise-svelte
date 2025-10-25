@@ -114,17 +114,17 @@
       setter={model.setMode}
     />
 
-    <I.SizesGroup bind:model={model}
+    <I.SizesGroup {model}
       values={[[4, 6], [5, 5], [3, 8]]}
       customSize={true}
     />
 
     <I.Group title="Options">
-      <I.Help bind:model={model} />
-      <I.Undo bind:model={model} />
-      <I.Redo bind:model={model} />
-      <I.Reset bind:model={model} />
-      <I.Rules bind:model={model} />
+      <I.Help {model} />
+      <I.Undo {model} />
+      <I.Redo {model} />
+      <I.Reset {model} />
+      <I.Rules {model} />
     </I.Group>
   </Config>
 {/snippet}
@@ -154,7 +154,7 @@
   </p>
 {/snippet}
 
-<Template bind:model={model} {board} {config} {rules} />
+<Template {model} {board} {config} {rules} />
 
 <style>
   .board-container {

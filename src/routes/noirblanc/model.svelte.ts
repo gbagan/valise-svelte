@@ -2,6 +2,7 @@ import { type SizeLimit } from '$lib/model/types';
 import { CoreModel } from '$lib/model/core.svelte';
 import { WithSize } from '$lib/model/size.svelte';
 import { diffCoords, repeat } from '$lib/util';
+import type { Mode, Move, Position } from './types';
 
 const sizes: [number, number][] = [ [3, 3], [4, 4], [2, 10], [3, 10], [5, 5]]; 
 const sizeLimit: SizeLimit = { minRows: 2, minCols: 2, maxRows: 12, maxCols: 12 };
