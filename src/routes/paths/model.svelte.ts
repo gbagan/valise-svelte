@@ -1,14 +1,11 @@
 import { allDistinct, diffCoords, random, range } from '$lib/util';
-import { Model } from '$lib/model/core.svelte';
-import { WithSize, type SizeLimit } from '$lib/size.svelte';
-
-type Position = readonly number[];
-type Move = number;
-export enum Mode { Mode1, Mode2 };
+import { CoreModel } from '$lib/model/core.svelte';
+import { WithSize } from '$lib/model/size.svelte';
+import type { SizeLimit } from '$lib/model/types';
 
 const sizeLimit: SizeLimit = { minRows: 2, minCols: 2, maxRows: 9, maxCols: 9 };
 
-export default class extends WithSize(Model<Position, Move>) {
+export default class extends WithSize<Position, Move>()(CoreModel<Position, Move>) {
   #exit: number | null = $state(null);
   #mode = $state(Mode.Mode1);
 

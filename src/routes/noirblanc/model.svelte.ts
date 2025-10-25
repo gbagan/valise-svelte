@@ -1,15 +1,12 @@
-import { Model } from '$lib/model/core.svelte';
-import { WithSize, type SizeLimit } from '$lib/size.svelte';
+import { type SizeLimit } from '$lib/model/types';
+import { CoreModel } from '$lib/model/core.svelte';
+import { WithSize } from '$lib/model/size.svelte';
 import { diffCoords, repeat } from '$lib/util';
-
-type Position = {light: boolean[], played: boolean[]};
-type Move = number;
-export type Mode = 0 | 1 | 2 | 3;
 
 const sizes: [number, number][] = [ [3, 3], [4, 4], [2, 10], [3, 10], [5, 5]]; 
 const sizeLimit: SizeLimit = { minRows: 2, minCols: 2, maxRows: 12, maxCols: 12 };
 
-export default class extends WithSize(Model<Position, Move>) {
+export default class extends WithSize<Position, Move>()(CoreModel<Position, Move>) {
   #mode: Mode = $state(0);
   #level = $state(0); // le niveau en cours
   #maxLevels = $state([ 0, 1, 1, 0 ]);
