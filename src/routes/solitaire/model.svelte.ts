@@ -1,13 +1,13 @@
-import { Model } from '$lib/model/core.svelte';
-import { Objective, WithScore } from '$lib/score.svelte';
-import { WithSize } from '$lib/size.svelte';
+import { CoreModel } from '$lib/model/core.svelte';
+import { Objective, WithScore } from '$lib/model/score.svelte';
+import { WithSize } from '$lib/model/size.svelte';
 import { countBy, diffCoords, generate, generate2, random, repeat } from '$lib/util';
+import { Board, type IModel, type Move, type Position } from './types';
 
-export enum Board { French, English, Circle, Grid3, Random };
-export type Position = readonly boolean[];
-type Move = {readonly from: number, readonly to: number};
+const C1 = WithSize<Position, Move>()(CoreModel<Position, Move>);
+const C2 = WithScore<Position, Move>()(C1);
 
-export default class extends WithScore(WithSize(Model<Position, Move>)) {
+export default class extends C2 implements IModel {
   #holes: boolean[] = $state([]);
   #help2 = $state(0);
   #boardType = $state(Board.Circle);
