@@ -1,14 +1,15 @@
 import { diffCoords, repeat } from '$lib/util';
-import { Model } from '$lib/model/core.svelte';
-import { Objective, WithScore } from '$lib/score.svelte';
-import { WithSize } from '$lib/size.svelte';
-
-export type Position = readonly number[];
-type Move = {readonly from: number, readonly to: number};
+import { CoreModel } from '$lib/model/core.svelte';
+import { Objective, WithScore } from '$lib/model/score.svelte';
+import { WithSize } from '$lib/model/size.svelte';
+import type { IModel, Move, Position } from './types';
 
 const sizeLimit = { minRows: 1, minCols: 2, maxRows: 6, maxCols: 12 };
 
-export default class extends WithScore(WithSize(Model<Position, Move>)) {
+const C1 = WithSize<Position, Move>()(CoreModel<Position, Move>);
+const C2 = WithScore<Position, Move>()(C1);
+
+export default class extends C2 implements IModel {
   constructor() {
     super([]);
     this.resize(4, 4);

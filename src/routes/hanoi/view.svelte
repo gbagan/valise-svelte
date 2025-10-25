@@ -7,7 +7,7 @@
   import DndItem from '$lib/components/DndItem.svelte';
 
 
-  const { model }: {model: IModel} = $props();
+  const {model}: {model: IModel} = $props();
   let dragged: number | null = $state(null);
 
   const colors = [ "blue", "red", "green", "magenta", "orange", "gray", "cyan" ];

@@ -1,10 +1,8 @@
-import { Model } from "$lib/model/core.svelte";
-import { WithSize, type SizeLimit } from "$lib/size.svelte";
+import { CoreModel } from "$lib/model/core.svelte";
+import { WithSize } from "$lib/model/size.svelte";
+import type { SizeLimit } from "$lib/model/types";
 import { coords, mod, repeat } from "$lib/util";
-
-type Coord = [row: number, col: number];
-type Tile = Coord[];
-export type TileType = "type1" | "type2" | "type3" | "custom";
+import type { Coord, IModel, Move, Position, Tile, TileType } from "./types";
 
 const rotate90 = (tile: Tile) => tile.map(([row, col]) => [col, -row]) as Tile;
 
@@ -25,12 +23,9 @@ const translate = (tile: Tile, [row, col]: Coord) => tile.map(([r,c]) => [row + 
 // une partie est terminé si toute case contient un évier ou un morceau de tuile
 // un coup peut consister à poser une tuile ou à en retirer une
 
-type Position = readonly number[];
-type Move = number;
-
 const sizeLimit: SizeLimit = { minRows: 3, minCols: 3, maxRows: 10, maxCols: 10 };
 
-export default class extends WithSize(Model<Position, Move>) {
+export default class extends WithSize<Position, Move>()(CoreModel<Position, Move>) implements IModel {
   #rotation = $state(0);
   #tileType: TileType = $state("type1");
   #sinkCount = $state(0);
@@ -84,7 +79,7 @@ export default class extends WithSize(Model<Position, Move>) {
   // renvoie la liste des positions des éviers
   sinks = $derived(this.position.map((v, i) => v === -1 ? i : null).filter(x => x !== null));
 
-  play(index: Move): Position | null {
+  protected play(index: Move): Position | null {
     const tilePos = this.tilePositions(index);
     if (this.canPutTile(tilePos)) {
       const m = Math.max(...this.position) + 1;
@@ -101,9 +96,9 @@ export default class extends WithSize(Model<Position, Move>) {
     }
   }
 
-  isLevelFinished = () => this.position.every(x => x !== 0);
-  initialPosition = () => repeat(this.columns * this.rows, 0);
-  onNewGame() {
+  protected isLevelFinished = () => this.position.every(x => x !== 0);
+  protected initialPosition = () => repeat(this.columns * this.rows, 0);
+  protected onNewGame() {
     this.#rotation = 0;
   }
 
