@@ -1,11 +1,8 @@
 import { delay, mod, repeat, swap } from '$lib/util';
-import { Model } from '$lib/model/core.svelte';
+import { CoreModel } from '$lib/model/core.svelte';
+import type { IModel, Move, Position } from './types';
 
-type Position = (number | null)[];
-export type Location = { kind: "panel", id: number } | { kind: "wheel", id: number } | {kind: "board"};
-type Move = {from: Location, to: Location};
-
-export default class extends Model<Position, Move> {
+export default class extends CoreModel<Position, Move> implements IModel {
   #size = $state(5);
   #rotation = $state(0);
 
@@ -32,7 +29,7 @@ export default class extends Model<Position, Move> {
   isValidRotation = $derived(this.isValidRotation2 && this.position.every(v => v !== null)); 
   
 
-  play({from, to}: Move): Position | null {
+  protected play({from, to}: Move): Position | null {
     if (from.kind === "panel" && to.kind === "wheel") {
       return this.position.with(to.id, from.id);
     } else if (from.kind === "wheel" && to.kind === "wheel") {
@@ -45,7 +42,7 @@ export default class extends Model<Position, Move> {
   }
 
   protected initialPosition = () => repeat(this.#size, null);
-  isLevelFinished = () => false;
+  protected isLevelFinished = () => false;
   protected onNewGame = () => this.#rotation = 0;
 
   check = async () => {
