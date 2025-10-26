@@ -1,13 +1,9 @@
-import { Model } from "$lib/model/core.svelte";
-import { Objective, WithScore } from "$lib/score.svelte";
-import { WithSize, type SizeLimit } from "$lib/size.svelte";
+import { CoreModel } from "$lib/model/core.svelte";
+import { Objective, WithScore } from "$lib/model/score.svelte";
+import { WithSize } from "$lib/model/size.svelte";
+import type { SizeLimit } from "$lib/model/types";
 import { diffCoords, generate, repeat } from "$lib/util";
-
-export type Piece = "R" | "B" | "K" | "N" | "Q" | "custom" | null;
-export type Position = Piece[];
-type Move = number;
-
-export const piecesList: Piece[] = ["R", "B", "K", "N", "Q"];
+import { piecesList, type IModel, type Move, type Piece, type Position } from "./types";
 
 function legalMoves(piece: Piece, x: number, y: number) {
   switch(piece) {
@@ -22,17 +18,39 @@ function legalMoves(piece: Piece, x: number, y: number) {
 
 const sizeLimit: SizeLimit = { minRows:3, minCols: 3, maxRows: 9, maxCols: 9 };
 
-export default class extends WithScore(WithSize(Model<Position, Move>)) {
-  selectedPiece: Piece = $state("Q");
-  selectedSquare: number | null = $state(null);
-  allowedPieces: Piece[] = $state(["R"]);
-  multiPieces = $state(false);
-  customLocalMoves = $state(repeat(25, false));
-  customDirections = $state(repeat(9, false));
-  
+const C1 = WithSize<Position, Move>()(CoreModel<Position, Move>);
+const C2 = WithScore<Position, Move>()(C1);
+
+export default class extends C2 implements IModel {
+  #selectedPiece: Piece = $state("Q");
+  #allowedPieces: Piece[] = $state(["R"]);
+  #multiPieces = $state(false);
+  #customLocalMoves = $state(repeat(25, false));
+  #customDirections = $state(repeat(9, false));
+
   constructor() {
     super([]);
     this.resize(8, 8);
+  }
+
+  get selectedPiece() {
+    return this.#selectedPiece;
+  }
+
+  get allowedPieces(): readonly Piece[] {
+    return this.#allowedPieces;
+  }
+
+  get multiPieces() {
+    return this.#multiPieces;
+  }
+
+  get customLocalMoves(): readonly boolean[] {
+    return this.#customLocalMoves;
+  }
+
+  get customDirections(): readonly boolean[] {
+    return this.#customDirections;
   }
 
   // teste si la pièce de type "piece" à la position index1 peut attaquer la pièce à la position index2
@@ -43,9 +61,9 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
       return index1 !== index2 && legalMoves(piece, row, col);
     } else {
       return (row * row - col * col) * row * col === 0
-        && this.customDirections[3 * Math.sign(row) + Math.sign(col) + 4]
+        && this.#customDirections[3 * Math.sign(row) + Math.sign(col) + 4]
         || row * row + col * col <= 8
-        && this.customLocalMoves[5 * row + col + 12]
+        && this.#customLocalMoves[5 * row + col + 12]
     }
   }
 
@@ -74,27 +92,22 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
     piece === null || !this.capturable[i]
   ));
 
-  // ensemble des cases attaquées par la case survolée par le pointeur de la souris
-  readonly attackedBySelected: readonly boolean[] = $derived(
-    this.selectedSquare === null
-    ? repeat(this.rows * this.columns, false)
-    : this.attackedBy(this.selectedPiece, this.selectedSquare)
-  );
-
-  play(i: Move): Position | null {
-    const p = this.position[i] === null ? this.selectedPiece : null;
+  protected play(i: Move): Position | null {
+    const p = this.position[i] === null ? this.#selectedPiece : null;
     return this.position.with(i, p);
   }
 
-  initialPosition = () => repeat(this.rows * this.columns, null);
-  isLevelFinished = () => false;
-  onNewGame = () => this.selectedPiece = this.allowedPieces[0];
+  protected initialPosition = () => repeat(this.rows * this.columns, null);
+  protected isLevelFinished = () => false;
+  protected onNewGame = () => {
+    this.#selectedPiece = this.#allowedPieces[0];
+  }
 
-  objective = () => Objective.Maximize;
-  score = () => this.isValidPosition ? this.position.filter(p => p !== null).length : 0;
-  scoreHash = () => this.multiPieces || this.allowedPieces.includes("custom")
+  protected objective = () => Objective.Maximize;
+  protected score = () => this.isValidPosition ? this.position.filter(p => p !== null).length : 0;
+  protected scoreHash = () => this.#multiPieces || this.#allowedPieces.includes("custom")
     ? null
-    : `${this.rows},${this.columns},${this.allowedPieces[0]}`;
+    : `${this.rows},${this.columns},${this.#allowedPieces[0]}`;
 
   protected updateScore = () => this.updateScore2(false, "never")
 
@@ -102,29 +115,45 @@ export default class extends WithScore(WithSize(Model<Position, Move>)) {
     return sizeLimit;
   }
 
-  toggleMultiPieces() {
-    this.multiPieces = !this.multiPieces;
-    if (!this.multiPieces) {
-      this.allowedPieces = this.allowedPieces.slice(0, 1);
+  setSelectedPiece(piece: Piece) {
+    this.#selectedPiece = piece;
+  }
+
+  toggleMultiPieces = () => {
+    this.#multiPieces = !this.#multiPieces;
+    if (!this.#multiPieces) {
+      this.#allowedPieces = this.#allowedPieces.slice(0, 1);
     }
   }
 
   changeAllowedPieces(piece: Piece) {
     this.newGame(() => {
-      if (this.multiPieces) {
-        const pieces = piecesList.filter(p2 => (p2 === piece) !== this.allowedPieces.includes(p2));
+      if (this.#multiPieces) {
+        const pieces = piecesList.filter(p2 => (p2 === piece) !== this.#allowedPieces.includes(p2));
         if (pieces.length > 0) {
-          this.allowedPieces = pieces;
+          this.#allowedPieces = pieces;
         }
       } else {
-        this.allowedPieces = [piece];
+        this.#allowedPieces = [piece];
       }
     })
   }
 
   customize = () => this.newGame(() => {
-    this.allowedPieces = ["custom"];
-    this.multiPieces = false;
+    this.#allowedPieces = ["custom"];
+    this.#multiPieces = false;
     this.openCustomizeDialog();
   });
+
+  toggleCustomLocalMove(index: number) {
+    if (index !== 12) {
+      this.#customLocalMoves[index] = !this.#customLocalMoves[index];
+    }
+  }
+
+  toggleCustomDirection(index: number) {
+    if (index !== 4) {
+      this.#customDirections[index] = !this.#customDirections[index];
+    }
+  }
 }
